@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "rosco-bake" {
 
 resource "aws_iam_policy" "rosco-bake" {
   name   = "${local.name}-bake"
-  policy = "${data.aws_iam_policy_document.rosco-bake.json}"
+  policy = data.aws_iam_policy_document.rosco-bake.json
 }
 
 ### describes ec2
@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "spin-ec2read" {
 
 resource "aws_iam_policy" "spin-ec2read" {
   name   = "${local.name}-ec2read"
-  policy = "${data.aws_iam_policy_document.spin-ec2read.json}"
+  policy = data.aws_iam_policy_document.spin-ec2read.json
 }
 
 ### assume role
@@ -76,11 +76,12 @@ data "aws_iam_policy_document" "spin-assume" {
   statement {
     actions   = ["sts:AssumeRole"]
     effect    = "Allow"
-    resources = ["${var.assume_role_arn}"]
+    resources = var.assume_role_arn
   }
 }
 
 resource "aws_iam_policy" "spin-assume" {
   name   = "${local.name}-assume"
-  policy = "${data.aws_iam_policy_document.spin-assume.json}"
+  policy = data.aws_iam_policy_document.spin-assume.json
 }
+

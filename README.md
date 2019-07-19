@@ -5,23 +5,23 @@ You can use this module like as below example.
 
 ```
 module "your_spin" {
-  source  = "terraform-aws-spinnaker"
+  source  = "Young-ook/aws/spinnaker"
   version = "v1.0.0"
 
-  app_name             = "spin"
-  app_detail           = "dev"
-  stack_name           = "${var.stack_name}"
-  region               = "${var.aws_region}"
-  vpc                  = "${module.vpc.vpc_id}"
-  azs                  = "${var.azs}"
-  cidr                 = "${var.cidr}"
+  name                 = "spin"
+  stack                = "dev"
+  detail               = "proj"
+  region               = "us-east-1"
+  vpc                  = "vpc-2f09a348ea"
+  azs                  = "["us-east-1a","us-east-1b","us-east-1c"]
+  cidr                 = "10.51.0.0/16"
   tags                 = "${map("env", "test")}"
   aws_profile          = "default"
   kube_version         = "1.11"
   kube_node_type       = "m5.xlarge"
   kube_node_size       = "5"
   
-  ecr_repo_names = "${list(
+  ecr_repos = "${list(
     map("org", "your-env", "repo", "monitoring-daemon"),
     map("org", "your-env", "repo", "clouddriver"),
   )}"

@@ -98,13 +98,13 @@ resource "aws_route_table" "private" {
   }"
 }
 
-resource "aws_route" "route_igw" {
+resource "aws_route" "route-igw" {
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = "${aws_route_table.public.id}"
   gateway_id             = "${aws_internet_gateway.igw.id}"
 }
 
-resource "aws_route" "route_ngw" {
+resource "aws_route" "route-ngw" {
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = "${aws_route_table.private.id}"
   nat_gateway_id         = "${aws_nat_gateway.ngw.id}"

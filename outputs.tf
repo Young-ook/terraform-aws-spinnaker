@@ -13,7 +13,7 @@ output "master_sg" {
 }
 
 output "node_pool_sg" {
-  value = "${aws_security_group.node_pool.id}"
+  value = "${aws_security_group.node-pool.id}"
 }
 
 output "bucket_name" {

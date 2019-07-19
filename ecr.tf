@@ -1,7 +1,7 @@
 # ecr.tf
 # elastic container registry
 
-resource "aws_ecr_repository" "docker_repositories" {
+resource "aws_ecr_repository" "docker-repositories" {
   count = "${length(var.ecr_repos)}"
 
   name = "${join("/", compact(list(

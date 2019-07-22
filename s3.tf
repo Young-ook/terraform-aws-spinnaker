@@ -36,15 +36,15 @@ data "aws_iam_policy_document" "s3admin" {
 
 resource "aws_iam_policy" "s3admin" {
   name   = "${local.name}-s3admin"
-  policy = "${data.aws_iam_policy_document.s3admin.json}"
+  policy = data.aws_iam_policy_document.s3admin.json
 }
 
 resource "aws_s3_bucket" "storage" {
-  bucket = "${local.name}"
-  tags   = "${var.tags}"
+  bucket = local.name
+  tags   = var.tags
 
   lifecycle_rule {
-    id      = "${local.name}"
+    id      = local.name
     enabled = true
 
     tags = {
@@ -69,8 +69,9 @@ resource "aws_s3_bucket" "storage" {
 }
 
 resource "aws_s3_bucket_object" "prefix_objects" {
-  count   = "${length(var.s3_prefixies)}"
-  bucket  = "${aws_s3_bucket.storage.id}"
+  count   = length(var.s3_prefixies)
+  bucket  = aws_s3_bucket.storage.id
   key     = "${var.s3_prefixies[count.index]}/"
   content = "${var.s3_prefixies[count.index]}/"
 }
+

@@ -8,7 +8,7 @@ variable "region" {
 
 variable "azs" {
   description = "A list of availability zones for the vpc"
-  type        = "list"
+  type        = list(string)
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
@@ -68,7 +68,7 @@ variable "aws_profile" {
 ### tags
 variable "tags" {
   description = "The key-value maps for tagging"
-  type        = "map"
+  type        = map(string)
 }
 
 ### security
@@ -110,5 +110,6 @@ variable "slug" {
 
 ### dns
 variable "dns_zone" {
-  description = "The hosted zone name for internal dns, e.g., ${var.dns_zone}.internal"
+  description = "The hosted zone name for internal dns, e.g., $${var.dns_zone}.internal"
 }
+

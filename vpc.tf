@@ -1,7 +1,6 @@
-# vpc.tf
 # virtual private cloud
 
-### vpc
+# vpc
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr
   instance_tenancy     = "default"
@@ -10,26 +9,26 @@ resource "aws_vpc" "vpc" {
 
   tags = merge(
     {
-      "Name" = "${local.name}-vpc"
+      "Name" = "local.name-vpc"
     },
-    local.k8s_tag_shared,
+    local.vpc-k8s-shared-tag,
     var.tags,
   )
 }
 
-### internet gateway
+# internet gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
     {
-      "Name" = "${local.name}-igw"
+      "Name" = "local.name-igw"
     },
     var.tags,
   )
 }
 
-### nat gateway
+# nat gateway
 resource "aws_eip" "ngw" {
   vpc = true
 }
@@ -40,7 +39,7 @@ resource "aws_nat_gateway" "ngw" {
 
   tags = merge(
     {
-      "Name" = "${local.name}-ngw"
+      "Name" = "local.name-ngw"
     },
     var.tags,
   )
@@ -51,7 +50,7 @@ resource "aws_nat_gateway" "ngw" {
   ]
 }
 
-### public subnets
+# public subnets
 resource "aws_subnet" "public" {
   count                   = length(var.azs)
   vpc_id                  = aws_vpc.vpc.id
@@ -61,9 +60,9 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     {
-      "Name" = "${local.name}.public.${element(var.azs, count.index)}"
+      "Name" = "local.name.public.element(var.azs, count.index)"
     },
-    local.k8s_tag_shared,
+    local.vpc-k8s-shared-tag,
     var.tags,
   )
 
@@ -72,7 +71,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-### private subnets
+# private subnets
 resource "aws_subnet" "private" {
   count             = length(var.azs)
   vpc_id            = aws_vpc.vpc.id
@@ -81,9 +80,9 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     {
-      "Name" = "${local.name}.private.${element(var.azs, count.index)}"
+      "Name" = "local.name.private.element(var.azs, count.index)"
     },
-    local.k8s_tag_shared,
+    local.vpc-k8s-shared-tag,
     var.tags,
   )
 
@@ -92,13 +91,13 @@ resource "aws_subnet" "private" {
   }
 }
 
-### route tables
+# route tables
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
     {
-      "Name" = "${local.name}-public-route-${count.index}"
+      "Name" = "local.name-public-route-count.index"
     },
     var.tags,
   )
@@ -109,7 +108,7 @@ resource "aws_route_table" "private" {
 
   tags = merge(
     {
-      "Name" = "${local.name}-private-route-${count.index}"
+      "Name" = "local.name-private-route-count.index"
     },
     var.tags,
   )
@@ -139,7 +138,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-### vpc endpoints
+# vpc endpoints
 data "aws_vpc_endpoint_service" "s3" {
   service = "s3"
 }
@@ -153,4 +152,3 @@ resource "aws_vpc_endpoint_route_table_association" "s3" {
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
   route_table_id  = aws_route_table.private.id
 }
-

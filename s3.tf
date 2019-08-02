@@ -48,13 +48,13 @@ resource "aws_s3_bucket" "storage" {
     enabled = true
 
     tags = {
-      "rule"      = "transit the current version object to IA after 90 days"
+      "rule"      = "transit the current version object to IA after 180 days"
       "rule"      = "permanently delete the previous version object after 120 days"
       "autoclean" = "true"
     }
 
     transition {
-      days          = 90
+      days          = 180
       storage_class = "STANDARD_IA"
     }
 
@@ -74,4 +74,3 @@ resource "aws_s3_bucket_object" "prefix_objects" {
   key     = "${var.s3_prefixies[count.index]}/"
   content = "${var.s3_prefixies[count.index]}/"
 }
-

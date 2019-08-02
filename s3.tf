@@ -68,9 +68,21 @@ resource "aws_s3_bucket" "storage" {
   }
 }
 
-resource "aws_s3_bucket_object" "prefix_objects" {
-  count   = length(var.s3_prefixies)
+resource "aws_s3_bucket_object" "front50" {
   bucket  = aws_s3_bucket.storage.id
-  key     = "${var.s3_prefixies[count.index]}/"
-  content = "${var.s3_prefixies[count.index]}/"
+  key     = "front50/"
+  content = "front50/"
+}
+
+resource "aws_s3_bucket_object" "kayenta" {
+  bucket  = aws_s3_bucket.storage.id
+  key     = "kayenta/"
+  content = "kayenta/"
+}
+
+resource "aws_s3_bucket_object" "halyard" {
+  bucket                 = aws_s3_bucket.storage.id
+  key                    = "halyard/"
+  content                = "halyard/"
+  server_side_encryption = "AES256"
 }

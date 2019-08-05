@@ -6,12 +6,12 @@ output "cluster_name" {
 }
 
 output "endpoint" {
-  value       = aws_eks_cluster.master.endpoint
+  value       = aws_eks_cluster.eks.endpoint
   description = "The enpoint of eks cluster"
 }
 
-output "master_sg" {
-  value       = aws_security_group.master.id
+output "eks_sg" {
+  value       = aws_security_group.eks.id
   description = "The id of security group for master nodes"
 }
 

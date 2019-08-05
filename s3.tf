@@ -45,13 +45,13 @@ resource "aws_s3_bucket" "storage" {
     enabled = true
 
     tags = {
-      "rule"      = "transit the current version object to IA after 90 days"
+      "rule"      = "transit the current version object to IA after 180 days"
       "rule"      = "permanently delete the previous version object after 120 days"
       "autoclean" = "true"
     }
 
     transition {
-      days          = 90
+      days          = 180
       storage_class = "STANDARD_IA"
     }
 
@@ -65,10 +65,21 @@ resource "aws_s3_bucket" "storage" {
   }
 }
 
-resource "aws_s3_bucket_object" "prefix_objects" {
-  count   = length(var.s3_prefixies)
+resource "aws_s3_bucket_object" "front50" {
   bucket  = aws_s3_bucket.storage.id
-  key     = "${var.s3_prefixies[count.index]}/"
-  content = "${var.s3_prefixies[count.index]}/"
+  key     = "front50/"
+  content = "front50/"
 }
 
+resource "aws_s3_bucket_object" "kayenta" {
+  bucket  = aws_s3_bucket.storage.id
+  key     = "kayenta/"
+  content = "kayenta/"
+}
+
+resource "aws_s3_bucket_object" "halyard" {
+  bucket                 = aws_s3_bucket.storage.id
+  key                    = "halyard/"
+  content                = "halyard/"
+  server_side_encryption = "AES256"
+}

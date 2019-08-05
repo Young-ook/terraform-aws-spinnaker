@@ -48,12 +48,6 @@ variable "kube_node_ami" {
   default     = ""
 }
 
-### s3 storage
-variable "s3_prefixies" {
-  description = "The list of key objects to be pregenerated when bucket creating"
-  default     = ["front50", "kayenta"]
-}
-
 ### docker registry
 variable "ecr_repos" {
   default = []

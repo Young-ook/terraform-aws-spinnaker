@@ -56,7 +56,7 @@ resource "aws_iam_instance_profile" "nodes" {
 # security/firewall
 resource "aws_security_group" "nodes" {
   name        = local.nodes-name
-  description = "security group for worker node of ${local.cluster-name}"
+  description = format("security group for worker node of %s", local.cluster-name)
   vpc_id      = aws_vpc.vpc.id
 
   tags = merge(
@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "nodes-ingress-allow-master-https" {
   to_port                  = 443
   protocol                 = "tcp"
   description              = "https traffic from master cluster"
-  source_security_group_id = aws_security_group.master.id
+  source_security_group_id = aws_security_group.eks.id
   security_group_id        = aws_security_group.nodes.id
 }
 
@@ -83,7 +83,7 @@ resource "aws_security_group_rule" "nodes-ingress-allow-master-tcp" {
   to_port                  = 65535
   protocol                 = "tcp"
   description              = "https traffic from master cluster"
-  source_security_group_id = aws_security_group.master.id
+  source_security_group_id = aws_security_group.eks.id
   security_group_id        = aws_security_group.nodes.id
 }
 
@@ -113,8 +113,8 @@ data "template_file" "nodes-userdata" {
 
   vars = {
     name      = local.cluster-name
-    endpoint  = aws_eks_cluster.master.endpoint
-    cert_auth = aws_eks_cluster.master.certificate_authority[0].data
+    endpoint  = aws_eks_cluster.eks.endpoint
+    cert_auth = aws_eks_cluster.eks.certificate_authority[0].data
   }
 }
 

@@ -12,7 +12,7 @@ resource "random_string" "suffix" {
 locals {
   name         = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
   cluster-name = local.name
-  master-name  = join("-", compact([local.cluster-name, "eks"]))
+  eks-name     = join("-", compact([local.cluster-name, "eks"]))
   nodes-name   = join("-", compact([local.cluster-name, "node-pool"]))
   suffix       = random_string.suffix.result
 }

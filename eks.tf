@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "eks-service" {
 # security/firewall
 resource "aws_security_group" "eks" {
   name        = local.eks-name
-  description = "security group for eks node of ${local.cluster-name}"
+  description = format("security group for eks node of %s", local.cluster-name)
   vpc_id      = aws_vpc.vpc.id
 
   tags = merge(

@@ -56,7 +56,7 @@ resource "aws_iam_instance_profile" "nodes" {
 # security/firewall
 resource "aws_security_group" "nodes" {
   name        = local.nodes-name
-  description = "security group for worker node of ${local.cluster-name}"
+  description = format("security group for worker node of %s", local.cluster-name)
   vpc_id      = aws_vpc.vpc.id
 
   tags = merge(

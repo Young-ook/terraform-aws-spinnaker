@@ -1,7 +1,4 @@
-# s3.tf
-# simple storage service
-
-### s3 admin
+# s3 admin
 data "aws_iam_policy_document" "s3admin" {
   statement {
     effect    = "Allow"

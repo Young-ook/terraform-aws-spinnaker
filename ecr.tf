@@ -1,4 +1,3 @@
-# ecr.tf
 # elastic container registry
 
 resource "aws_ecr_repository" "ecr-repos" {
@@ -13,7 +12,7 @@ resource "aws_ecr_repository" "ecr-repos" {
           compact(
             [
               lookup(var.ecr_repos[count.index], "org", "default"),
-              local.slug,
+              local.suffix,
             ],
           ),
         ),

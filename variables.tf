@@ -78,8 +78,8 @@ variable "elb_sec_policy" {
 }
 
 variable "ssl_cert_arn" {
-  description = "Registered ssl cretification for internal services"
-  default     = ""
+  description = "The arn of registered ssl cretificate authority in acm"
+  default     = "your-ca"
 }
 
 variable "assume_role_arn" {
@@ -110,6 +110,6 @@ variable "slug" {
 
 ### dns
 variable "dns_zone" {
-  description = "The hosted zone name for internal dns, e.g., $${var.dns_zone}.internal"
+  description = "The hosted zone name for internal dns, e.g., app.internal"
 }
 

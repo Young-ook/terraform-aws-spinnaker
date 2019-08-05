@@ -1,5 +1,4 @@
-# iam.tf
-# identity and access management
+# security/policy
 
 ### bake 
 data "aws_iam_policy_document" "rosco-bake" {

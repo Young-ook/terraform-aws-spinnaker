@@ -8,13 +8,10 @@ resource "random_string" "password" {
 }
 
 resource "aws_security_group" "db" {
-  name        = "local.name-db"
-  description = "security group for local.name-db"
+  name        = format("%s-db", local.name)
+  description = format("security group for %s-db", local.name)
   vpc_id      = aws_vpc.vpc.id
-
-  tags = merge(
-    map("Name", "local.name-db"),
-  var.tags)
+  tags        = merge(map("Name", format("%s-db", local.name)), var.tags)
 }
 
 resource "aws_security_group_rule" "db-ingress-rules" {
@@ -30,7 +27,7 @@ resource "aws_security_group_rule" "db-ingress-rules" {
 resource "aws_db_subnet_group" "db" {
   name       = "local.name-db"
   subnet_ids = aws_subnet.private.*.id
-  tags       = merge(map("Name", "local.name-db"), var.tags)
+  tags       = merge(map("Name", format("%s-db", local.name)), var.tags)
 }
 
 # parameter groups
@@ -87,7 +84,7 @@ resource "aws_rds_cluster" "db" {
   db_subnet_group_name            = aws_db_subnet_group.db.name
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.db.name
   vpc_security_group_ids          = [aws_security_group.db.id]
-  tags                            = merge(map("Name", "local.name-db"), var.tags)
+  tags                            = merge(map("Name", format("%s-db", local.name)), var.tags)
 
   lifecycle {
     ignore_changes        = ["snapshot_identifier", "master_password"]
@@ -110,7 +107,7 @@ resource "aws_rds_cluster_instance" "db" {
 # dns records
 resource "aws_route53_record" "db" {
   zone_id = aws_route53_zone.vpc.zone_id
-  name    = "local.cluster-name-db.var.dns_zone"
+  name    = format("$s-db.$s", local.cluster-name, var.dns_zone)
   type    = "CNAME"
   ttl     = 300
   records = coalescelist(aws_rds_cluster.db.*.endpoint, list(""))

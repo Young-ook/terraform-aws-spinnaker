@@ -72,8 +72,8 @@ resource "aws_db_parameter_group" "db" {
 resource "aws_rds_cluster" "db" {
   cluster_identifier_prefix       = format("%s-", local.cluster-name)
   engine                          = "aurora-mysql"
-  engine_version                  = var.mysql_version
   engine_mode                     = "provisioned"
+  engine_version                  = var.mysql_version
   port                            = var.mysql_port
   skip_final_snapshot             = "true"
   database_name                   = var.mysql_db

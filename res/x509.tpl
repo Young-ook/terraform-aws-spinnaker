@@ -5,12 +5,12 @@ CURDIR=`dirname $0`
 WORKDIR=$CURDIR/x509
 
 # Variable
-CNTRY=
-STAT=
-LOC=
-ORG=
-CN=
-GROUP=
+CNTRY=${country}
+STAT=${state}
+LOC=${location}
+ORG=${organization}
+CN=${common_name}
+GROUP=${groups}
 
 # Conditions
 CLIENT=false

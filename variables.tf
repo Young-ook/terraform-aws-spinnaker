@@ -81,6 +81,18 @@ variable "assume_role_arn" {
   default     = []
 }
 
+variable "x509_prop" {
+  description = "Properties for generating self-signed certificates"
+  default = {
+    "country"      = "KR"
+    "state"        = "SEL"
+    "location"     = "SEL"
+    "organization" = "ORG"
+    "common_name"  = "your@email.com"
+    "groups"       = "admin"
+  }
+}
+
 ### rdb cluster (aurora-mysql)
 variable "mysql_version" {
   description = "The target version of mysql cluster"
@@ -119,6 +131,11 @@ variable "mysql_snapshot" {
   default     = ""
 }
 
+### dns
+variable "dns_zone" {
+  description = "The hosted zone name for internal dns, e.g., app.internal"
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"
@@ -138,9 +155,4 @@ variable "detail" {
 variable "slug" {
   description = "A random string to be end of tail of module name"
   default     = ""
-}
-
-### dns
-variable "dns_zone" {
-  description = "The hosted zone name for internal dns, e.g., app.internal"
 }

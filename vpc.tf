@@ -8,9 +8,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = "true"
 
   tags = merge(
-    {
-      "Name" = "local.name-vpc"
-    },
+    local.vpc-name-tag,
     local.vpc-k8s-shared-tag,
     var.tags,
   )
@@ -21,9 +19,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
-    {
-      "Name" = "local.name-igw"
-    },
+    local.igw-name-tag,
     var.tags,
   )
 }
@@ -38,9 +34,7 @@ resource "aws_nat_gateway" "ngw" {
   subnet_id     = element(compact(aws_subnet.public.*.id), 0)
 
   tags = merge(
-    {
-      "Name" = "local.name-ngw"
-    },
+    local.ngw-name-tag,
     var.tags,
   )
 
@@ -59,9 +53,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = "true"
 
   tags = merge(
-    {
-      "Name" = "local.name.public.element(var.azs, count.index)"
-    },
+    { "Name" = format("%s.public.$s", local.name, element(var.azs, count.index)) },
     local.vpc-k8s-shared-tag,
     var.tags,
   )
@@ -79,9 +71,7 @@ resource "aws_subnet" "private" {
   cidr_block        = cidrsubnet(var.cidr, 8, 7 * 1 + count.index)
 
   tags = merge(
-    {
-      "Name" = "local.name.private.element(var.azs, count.index)"
-    },
+    { "Name" = format("%s.private.$s", local.name, element(var.azs, count.index)) },
     local.vpc-k8s-shared-tag,
     var.tags,
   )
@@ -96,9 +86,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
-    {
-      "Name" = "local.name-public-route-count.index"
-    },
+    local.public-route-name-tag,
     var.tags,
   )
 }
@@ -107,9 +95,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
-    {
-      "Name" = "local.name-private-route-count.index"
-    },
+    local.private-route-name-tag,
     var.tags,
   )
 }

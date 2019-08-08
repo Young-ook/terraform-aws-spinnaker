@@ -41,9 +41,7 @@ resource "aws_security_group" "eks" {
   vpc_id      = aws_vpc.vpc.id
 
   tags = merge(
-    {
-      "Name" = local.eks-name
-    },
+    local.eks-name-tag,
     local.vpc-k8s-shared-tag,
   )
 }

@@ -53,7 +53,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = "true"
 
   tags = merge(
-    { "Name" = format("%s.public.$s", local.name, element(var.azs, count.index)) },
+    { "Name" = join(".", [local.name, "public", element(var.azs, count.index)]) },
     local.vpc-k8s-shared-tag,
     var.tags,
   )
@@ -68,10 +68,10 @@ resource "aws_subnet" "private" {
   count             = length(var.azs)
   vpc_id            = aws_vpc.vpc.id
   availability_zone = element(var.azs, count.index)
-  cidr_block        = cidrsubnet(var.cidr, 8, 7 * 1 + count.index)
+  cidr_block        = cidrsubnet(var.cidr, 8, 7 * (1 + count.index))
 
   tags = merge(
-    { "Name" = format("%s.private.$s", local.name, element(var.azs, count.index)) },
+    { "Name" = join(".", [local.name, "private", element(var.azs, count.index)]) },
     local.vpc-k8s-shared-tag,
     var.tags,
   )

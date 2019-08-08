@@ -95,7 +95,7 @@ resource "aws_rds_cluster" "db" {
 # rds instances
 resource "aws_rds_cluster_instance" "db" {
   count                   = var.mysql_node_count
-  identifier              = format("%s-%d", local.cluster-name, count.index)
+  identifier              = format("%s-%s", local.cluster-name, count.index)
   cluster_identifier      = aws_rds_cluster.db.id
   instance_class          = var.mysql_node_type
   engine                  = "aurora-mysql"
@@ -107,7 +107,7 @@ resource "aws_rds_cluster_instance" "db" {
 # dns records
 resource "aws_route53_record" "db" {
   zone_id = aws_route53_zone.vpc.zone_id
-  name    = format("$s-db.$s", local.cluster-name, var.dns_zone)
+  name    = format("%s-db.%s", local.cluster-name, var.dns_zone)
   type    = "CNAME"
   ttl     = 300
   records = coalescelist(aws_rds_cluster.db.*.endpoint, list(""))

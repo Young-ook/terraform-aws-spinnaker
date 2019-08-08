@@ -78,7 +78,7 @@ variable "ssl_cert_arn" {
 
 variable "assume_role_arn" {
   description = "The list of arns to allow assume role from spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
-  default     = []
+  default     = ["arn:aws:iam::12345678987:role/spinnaker-managed-dev"]
 }
 
 variable "x509_prop" {

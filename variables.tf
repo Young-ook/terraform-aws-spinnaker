@@ -81,6 +81,44 @@ variable "assume_role_arn" {
   default     = []
 }
 
+### rdb cluster (aurora-mysql)
+variable "mysql_version" {
+  description = "The target version of mysql cluster"
+  default     = "5.7.12"
+}
+
+variable "mysql_port" {
+  description = "The port number of mysql"
+  default     = "3306"
+}
+
+variable "mysql_node_type" {
+  description = "The instance type for mysql cluster"
+  default     = "db.r4.large"
+}
+
+variable "mysql_node_count" {
+  description = "The instance count for mysql (aurora) cluster"
+  default     = "1"
+}
+
+variable "mysql_master_user" {
+  description = "The name of master user of mysql"
+  default     = "yourid"
+}
+
+variable "mysql_db" {
+  description = "The name of initial database in mysql"
+  default     = "yourdb"
+}
+
+#  [CAUTION] Changing the snapshot will force a new resource.
+
+variable "mysql_snapshot" {
+  description = "The name of snapshot to be source of new mysql cluster"
+  default     = ""
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"
@@ -106,4 +144,3 @@ variable "slug" {
 variable "dns_zone" {
   description = "The hosted zone name for internal dns, e.g., app.internal"
 }
-

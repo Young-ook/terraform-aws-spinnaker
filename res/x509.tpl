@@ -5,12 +5,12 @@ CURDIR=`dirname $0`
 WORKDIR=$CURDIR/x509
 
 # Variable
-CNTRY=
-STAT=
-LOC=
-ORG=
-CN=
-GROUP=
+CNTRY=${country}
+STAT=${state}
+LOC=${location}
+ORG=${organization}
+CN=${common_name}
+GROUP=${groups}
 
 # Conditions
 CLIENT=false
@@ -18,7 +18,8 @@ SERVER=false
 
 # password auto-generation
 PASSWD=$(pwgen 20 1)
-echo $PASSWD
+echo $PASSWD > secret.key
+chmod 600 secret.key
 
 # print help
 function print_usage() {

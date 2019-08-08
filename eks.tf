@@ -92,7 +92,7 @@ resource "aws_eks_cluster" "eks" {
 
 # kube config
 data "template_file" "kube-config" {
-  template = file("${path.module}/res/kube-config.tpl")
+  template = file(format("%s/res/kube-config.tpl", path.module))
 
   vars = {
     cluster_name       = local.cluster-name
@@ -105,11 +105,11 @@ data "template_file" "kube-config" {
 
 resource "local_file" "update-kubeconfig" {
   content  = data.template_file.kube-config.rendered
-  filename = "${path.cwd}/${local.cluster-name}/update-kubeconfig.sh"
+  filename = format("%s/%s/update-kubeconfig.sh", path.cwd, local.cluster-name)
 }
 
 data "template_file" "kube-svc" {
-  template = file("${path.module}/res/kube-svc.tpl")
+  template = file(format("%s/res/kube-svc.tpl", path.module))
 
   vars = {
     cluster_name   = local.cluster-name
@@ -120,5 +120,5 @@ data "template_file" "kube-svc" {
 
 resource "local_file" "create-svc-lb" {
   content  = data.template_file.kube-svc.rendered
-  filename = "${path.cwd}/${local.cluster-name}/create-kubelb.sh"
+  filename = format("%s/%s/create-kubelb.sh", path.cwd, local.cluster-name)
 }

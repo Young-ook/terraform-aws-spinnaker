@@ -60,9 +60,7 @@ resource "aws_security_group" "nodes" {
   vpc_id      = aws_vpc.vpc.id
 
   tags = merge(
-    {
-      "Name" = local.nodes-name
-    },
+    local.nodes-name-tag,
     local.vpc-k8s-shared-tag,
   )
 }

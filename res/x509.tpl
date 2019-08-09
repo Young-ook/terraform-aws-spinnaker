@@ -18,8 +18,7 @@ SERVER=false
 
 # password auto-generation
 PASSWD=$(pwgen 20 1)
-echo $PASSWD > secret.key
-chmod 600 secret.key
+echo $PASSWD > x509pass.secret | chmod 600 x509pass.secret
 
 # print help
 function print_usage() {

@@ -138,3 +138,18 @@ resource "aws_vpc_endpoint_route_table_association" "s3" {
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
   route_table_id  = aws_route_table.private.id
 }
+
+## hosted zone of internal dns
+resource "aws_route53_zone" "vpc" {
+  name = var.dns_zone
+  tags = merge(
+    {
+      "Name" = "${local.name}-r53"
+    },
+    var.tags,
+  )
+
+  vpc {
+    vpc_id = aws_vpc.vpc.id
+  }
+}

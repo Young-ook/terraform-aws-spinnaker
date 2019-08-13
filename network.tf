@@ -143,9 +143,7 @@ resource "aws_vpc_endpoint_route_table_association" "s3" {
 resource "aws_route53_zone" "vpc" {
   name = var.dns_zone
   tags = merge(
-    {
-      "Name" = "${local.name}-r53"
-    },
+    local.private-dns-name-tag,
     var.tags,
   )
 

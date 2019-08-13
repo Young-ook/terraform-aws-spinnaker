@@ -24,6 +24,7 @@ locals {
   ngw-name-tag           = { "Name" = join("-", compact([local.name, "ngw"])) }
   public-route-name-tag  = { "Name" = join("-", compact([local.name, "public-route"])) }
   private-route-name-tag = { "Name" = join("-", compact([local.name, "private-route"])) }
+  private-dns-name-tag   = { "Name" = join("-", compact([local.name, "private-dns"])) }
 }
 
 # kubernetes tags

@@ -68,21 +68,14 @@ resource "aws_s3_bucket" "storage" {
   }
 }
 
-resource "aws_s3_bucket_object" "front50" {
-  bucket  = aws_s3_bucket.storage.id
-  key     = "front50/"
-  content = "front50/"
+locals {
+  keys = ["front50", "kayenta", "halyard"]
 }
 
-resource "aws_s3_bucket_object" "kayenta" {
-  bucket  = aws_s3_bucket.storage.id
-  key     = "kayenta/"
-  content = "kayenta/"
-}
-
-resource "aws_s3_bucket_object" "halyard" {
+resource "aws_s3_bucket_object" "keys" {
+  count                  = length(local.keys)
   bucket                 = aws_s3_bucket.storage.id
-  key                    = "halyard/"
-  content                = "halyard/"
+  key                    = format("%s/", element(local.keys, count.index))
+  content                = format("%s/", element(local.keys, count.index))
   server_side_encryption = "AES256"
 }

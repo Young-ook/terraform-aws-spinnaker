@@ -263,7 +263,6 @@ resource "aws_autoscaling_group" "nodes" {
   min_size             = var.kube_node_size
   desired_capacity     = var.kube_node_size
   vpc_zone_identifier  = aws_subnet.private.*.id
-  availability_zones   = var.azs
   launch_configuration = aws_launch_configuration.nodes.name
   termination_policies = ["Default"]
   force_delete         = true

@@ -88,7 +88,7 @@ resource "aws_eks_cluster" "eks" {
 
 # kube config
 data "template_file" "kube-config" {
-  template = file(format("%s/res/kube-config.tpl", path.module))
+  template = file(format("%s/resources/kube-config.tpl", path.module))
 
   vars = {
     cluster_name       = local.cluster-name
@@ -105,7 +105,7 @@ resource "local_file" "update-kubeconfig" {
 }
 
 data "template_file" "kube-svc" {
-  template = file(format("%s/res/kube-svc.tpl", path.module))
+  template = file(format("%s/resources/kube-svc.tpl", path.module))
 
   vars = {
     cluster_name   = local.cluster-name
@@ -228,7 +228,7 @@ resource "aws_security_group_rule" "nodes-egress-allow-all" {
 
 # bootstrap
 data "template_file" "nodes-userdata" {
-  template = file("${path.module}/res/nodes.tpl")
+  template = file("${path.module}/resources/nodes.tpl")
 
   vars = {
     name      = local.cluster-name

@@ -1,4 +1,125 @@
-# auto scaling group for nodes
+## managed kubernetes master cluster
+
+resource "aws_iam_role" "eks" {
+  name               = local.eks-name
+  assume_role_policy = data.aws_iam_policy_document.eks-trustrel.json
+}
+
+data "aws_iam_policy_document" "eks-trustrel" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "eks.amazonaws.com",
+      ]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+# security/policy
+resource "aws_iam_role_policy_attachment" "eks-cluster" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks.id
+}
+
+resource "aws_iam_role_policy_attachment" "eks-service" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  role       = aws_iam_role.eks.id
+}
+
+# security/firewall
+resource "aws_security_group" "eks" {
+  name        = local.eks-name
+  description = format("security group for eks node of %s", local.cluster-name)
+  vpc_id      = aws_vpc.vpc.id
+
+  tags = merge(
+    local.eks-name-tag,
+    local.vpc-k8s-shared-tag,
+  )
+}
+
+resource "aws_security_group_rule" "eks-ingress-allow-node-pool" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "https traffic from node pool"
+  source_security_group_id = aws_security_group.nodes.id
+  security_group_id        = aws_security_group.eks.id
+}
+
+resource "aws_security_group_rule" "eks-egress-allow-node-pool" {
+  type                     = "egress"
+  from_port                = 1025
+  to_port                  = 65535
+  protocol                 = "tcp"
+  description              = "tcp traffics to node pool"
+  source_security_group_id = aws_security_group.nodes.id
+  security_group_id        = aws_security_group.eks.id
+}
+
+# eks cluster
+resource "aws_eks_cluster" "eks" {
+  name     = local.cluster-name
+  role_arn = aws_iam_role.eks.arn
+  version  = var.kube_version
+
+  vpc_config {
+    subnet_ids         = aws_subnet.private.*.id
+    security_group_ids = [aws_security_group.eks.id]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks-cluster,
+    aws_iam_role_policy_attachment.eks-service,
+    aws_subnet.private,
+  ]
+}
+
+# kube config
+data "template_file" "kube-config" {
+  template = file(format("%s/resources/kube-config.tpl", path.module))
+
+  vars = {
+    cluster_name       = local.cluster-name
+    cluster_arn        = aws_eks_cluster.eks.arn
+    node_pool_role_arn = aws_iam_role.nodes.arn
+    aws_region         = var.region
+    aws_profile        = var.aws_profile
+  }
+}
+
+resource "local_file" "update-kubeconfig" {
+  content  = data.template_file.kube-config.rendered
+  filename = format("%s/%s/update-kubeconfig.sh", path.cwd, local.cluster-name)
+}
+
+data "template_file" "kube-svc" {
+  template = file(format("%s/resources/kube-svc.tpl", path.module))
+
+  vars = {
+    cluster_name   = local.cluster-name
+    elb_sec_policy = var.elb_sec_policy
+    ssl_cert_arn   = var.ssl_cert_arn
+  }
+}
+
+resource "local_file" "create-svc-lb" {
+  content  = data.template_file.kube-svc.rendered
+  filename = format("%s/%s/create-kubelb.sh", path.cwd, local.cluster-name)
+}
+
+## auto scaling group for node-pool of kubernetes
 
 # container optimized ami
 data "aws_ami" "eks-linux-ami" {
@@ -11,7 +132,7 @@ data "aws_ami" "eks-linux-ami" {
   }
 }
 
-### kuberetes nodes
+# security/policy
 resource "aws_iam_role" "nodes" {
   name               = local.nodes-name
   assume_role_policy = data.aws_iam_policy_document.nodes-trustrel.json
@@ -107,7 +228,7 @@ resource "aws_security_group_rule" "nodes-egress-allow-all" {
 
 # bootstrap
 data "template_file" "nodes-userdata" {
-  template = file("${path.module}/res/nodes.tpl")
+  template = file("${path.module}/resources/nodes.tpl")
 
   vars = {
     name      = local.cluster-name

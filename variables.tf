@@ -1,5 +1,3 @@
-# variables.tf
-
 ### network
 variable "region" {
   description = "The aws region to deploy the service into"
@@ -46,11 +44,6 @@ variable "kube_node_vol_type" {
 variable "kube_node_ami" {
   description = "The specific ami id what you want to be a source image of kubernetes worker nodes"
   default     = ""
-}
-
-### docker registry
-variable "ecr_repos" {
-  default = []
 }
 
 ### credentials

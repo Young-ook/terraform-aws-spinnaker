@@ -2,7 +2,7 @@
 
 # x509 certificates authority
 data "template_file" "x509" {
-  template = file(format("%s/res/x509.tpl", path.module))
+  template = file(format("%s/resources/x509.tpl", path.module))
 
   vars = {
     country      = lookup(var.x509_prop, "country", "KR")

@@ -46,11 +46,6 @@ variable "kube_node_ami" {
   default     = ""
 }
 
-### docker registry
-variable "ecr_repos" {
-  default = []
-}
-
 ### credentials
 variable "aws_profile" {
   description = "A profile name for aws cli"

@@ -1,4 +1,7 @@
-# s3 admin
+
+## s3 bucket for front50 storage
+
+# security/role
 data "aws_iam_policy_document" "s3admin" {
   statement {
     effect    = "Allow"

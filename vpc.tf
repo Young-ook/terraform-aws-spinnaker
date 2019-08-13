@@ -1,4 +1,4 @@
-# virtual private cloud
+## virtual private cloud
 
 # vpc
 resource "aws_vpc" "vpc" {

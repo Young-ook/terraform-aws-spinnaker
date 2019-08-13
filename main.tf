@@ -1,4 +1,13 @@
-# name and description
+## name and description
+
+# names
+locals {
+  name         = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
+  cluster-name = local.name
+  eks-name     = join("-", compact([local.cluster-name, "eks"]))
+  nodes-name   = join("-", compact([local.cluster-name, "nodes"]))
+  suffix       = random_string.suffix.result
+}
 
 resource "random_string" "suffix" {
   length  = 4
@@ -6,15 +15,6 @@ resource "random_string" "suffix" {
   lower   = true
   number  = false
   special = false
-}
-
-# frigga name
-locals {
-  name         = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
-  cluster-name = local.name
-  eks-name     = join("-", compact([local.cluster-name, "eks"]))
-  nodes-name   = join("-", compact([local.cluster-name, "nodes"]))
-  suffix       = random_string.suffix.result
 }
 
 # vpc tags
@@ -39,8 +39,3 @@ locals {
     "propagate_at_launch" = "true"
   }
 }
-
-terraform {
-  required_version = ">= 0.11.0"
-}
-

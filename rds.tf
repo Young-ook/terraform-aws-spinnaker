@@ -1,6 +1,6 @@
-# aurora-mysql
+## aurora cluster for orca-mysql
 
-### security/firewall
+# security/firewall
 resource "random_string" "password" {
   length           = 16
   special          = true

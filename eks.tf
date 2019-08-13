@@ -1,6 +1,5 @@
-# ecs for kubernetes
+## managed kubernetes master cluster
 
-# kubernetes eks
 resource "aws_iam_role" "eks" {
   name               = local.eks-name
   assume_role_policy = data.aws_iam_policy_document.eks-trustrel.json
@@ -22,13 +21,12 @@ data "aws_iam_policy_document" "eks-trustrel" {
   }
 }
 
-# eks cluster policy/role 
+# security/policy
 resource "aws_iam_role_policy_attachment" "eks-cluster" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.eks.id
 }
 
-# eks service policy/role 
 resource "aws_iam_role_policy_attachment" "eks-service" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
   role       = aws_iam_role.eks.id

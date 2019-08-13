@@ -1,4 +1,4 @@
-# auto scaling group for nodes
+## auto scaling group for node-pool of kubernetes
 
 # container optimized ami
 data "aws_ami" "eks-linux-ami" {
@@ -11,7 +11,7 @@ data "aws_ami" "eks-linux-ami" {
   }
 }
 
-### kuberetes nodes
+# security/policy
 resource "aws_iam_role" "nodes" {
   name               = local.nodes-name
   assume_role_policy = data.aws_iam_policy_document.nodes-trustrel.json

@@ -1,4 +1,4 @@
-# internal dns
+# internal dns reocords
 resource "aws_route53_zone" "vpc" {
   name = var.dns_zone
   tags = merge(

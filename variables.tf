@@ -1,5 +1,3 @@
-# variables.tf
-
 ### network
 variable "region" {
   description = "The aws region to deploy the service into"

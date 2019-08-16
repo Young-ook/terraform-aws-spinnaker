@@ -1,7 +1,7 @@
-# s3.tf
-# simple storage service
 
-### s3 admin
+## s3 bucket for front50 storage
+
+# security/role
 data "aws_iam_policy_document" "s3admin" {
   statement {
     effect    = "Allow"
@@ -36,25 +36,25 @@ data "aws_iam_policy_document" "s3admin" {
 
 resource "aws_iam_policy" "s3admin" {
   name   = "${local.name}-s3admin"
-  policy = "${data.aws_iam_policy_document.s3admin.json}"
+  policy = data.aws_iam_policy_document.s3admin.json
 }
 
 resource "aws_s3_bucket" "storage" {
-  bucket = "${local.name}"
-  tags   = "${var.tags}"
+  bucket = local.name
+  tags   = var.tags
 
   lifecycle_rule {
-    id      = "${local.name}"
+    id      = local.name
     enabled = true
 
     tags = {
-      "rule"      = "transit the current version object to IA after 90 days"
+      "rule"      = "transit the current version object to IA after 180 days"
       "rule"      = "permanently delete the previous version object after 120 days"
       "autoclean" = "true"
     }
 
     transition {
-      days          = 90
+      days          = 180
       storage_class = "STANDARD_IA"
     }
 
@@ -68,9 +68,14 @@ resource "aws_s3_bucket" "storage" {
   }
 }
 
-resource "aws_s3_bucket_object" "prefix_objects" {
-  count   = "${length(var.s3_prefixies)}"
-  bucket  = "${aws_s3_bucket.storage.id}"
-  key     = "${var.s3_prefixies[count.index]}/"
-  content = "${var.s3_prefixies[count.index]}/"
+locals {
+  keys = ["front50", "kayenta", "halyard"]
+}
+
+resource "aws_s3_bucket_object" "keys" {
+  count                  = length(local.keys)
+  bucket                 = aws_s3_bucket.storage.id
+  key                    = format("%s/", element(local.keys, count.index))
+  content                = format("%s/", element(local.keys, count.index))
+  server_side_encryption = "AES256"
 }

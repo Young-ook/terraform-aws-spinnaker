@@ -1,5 +1,3 @@
-# variables.tf
-
 ### network
 variable "region" {
   description = "The aws region to deploy the service into"
@@ -8,7 +6,7 @@ variable "region" {
 
 variable "azs" {
   description = "A list of availability zones for the vpc"
-  type        = "list"
+  type        = list(string)
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
@@ -48,17 +46,6 @@ variable "kube_node_ami" {
   default     = ""
 }
 
-### s3 storage
-variable "s3_prefixies" {
-  description = "The list of key objects to be pregenerated when bucket creating"
-  default     = ["front50", "kayenta"]
-}
-
-### docker registry
-variable "ecr_repos" {
-  default = []
-}
-
 ### credentials
 variable "aws_profile" {
   description = "A profile name for aws cli"
@@ -68,7 +55,7 @@ variable "aws_profile" {
 ### tags
 variable "tags" {
   description = "The key-value maps for tagging"
-  type        = "map"
+  type        = map(string)
 }
 
 ### security
@@ -78,13 +65,68 @@ variable "elb_sec_policy" {
 }
 
 variable "ssl_cert_arn" {
-  description = "Registered ssl cretification for internal services"
-  default     = ""
+  description = "The arn of registered ssl cretificate authority in acm"
+  default     = "your-ca"
 }
 
 variable "assume_role_arn" {
   description = "The list of arns to allow assume role from spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
-  default     = []
+  default     = ["arn:aws:iam::12345678987:role/spinnaker-managed-dev"]
+}
+
+variable "x509_prop" {
+  description = "Properties for generating self-signed certificates"
+  default = {
+    "country"      = "KR"
+    "state"        = "SEL"
+    "location"     = "SEL"
+    "organization" = "ORG"
+    "common_name"  = "your@email.com"
+    "groups"       = "admin"
+  }
+}
+
+### rdb cluster (aurora-mysql)
+variable "mysql_version" {
+  description = "The target version of mysql cluster"
+  default     = "5.7.12"
+}
+
+variable "mysql_port" {
+  description = "The port number of mysql"
+  default     = "3306"
+}
+
+variable "mysql_node_type" {
+  description = "The instance type for mysql cluster"
+  default     = "db.r4.large"
+}
+
+variable "mysql_node_count" {
+  description = "The instance count for mysql (aurora) cluster"
+  default     = "1"
+}
+
+variable "mysql_master_user" {
+  description = "The name of master user of mysql"
+  default     = "yourid"
+}
+
+variable "mysql_db" {
+  description = "The name of initial database in mysql"
+  default     = "yourdb"
+}
+
+#  [CAUTION] Changing the snapshot will force a new resource.
+
+variable "mysql_snapshot" {
+  description = "The name of snapshot to be source of new mysql cluster"
+  default     = ""
+}
+
+### dns
+variable "dns_zone" {
+  description = "The hosted zone name for internal dns, e.g., app.internal"
 }
 
 ### description
@@ -106,9 +148,4 @@ variable "detail" {
 variable "slug" {
   description = "A random string to be end of tail of module name"
   default     = ""
-}
-
-### dns
-variable "dns_zone" {
-  description = "The hosted zone name for internal dns, e.g., ${var.dns_zone}.internal"
 }

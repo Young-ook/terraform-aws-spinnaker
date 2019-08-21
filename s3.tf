@@ -69,8 +69,9 @@ resource "aws_s3_bucket" "storage" {
 }
 
 resource "aws_s3_bucket_object" "prefix_objects" {
-  count   = "${length(var.s3_prefixies)}"
-  bucket  = "${aws_s3_bucket.storage.id}"
-  key     = "${var.s3_prefixies[count.index]}/"
-  content = "${var.s3_prefixies[count.index]}/"
+  count                  = "${length(var.s3_prefixies)}"
+  bucket                 = "${aws_s3_bucket.storage.id}"
+  key                    = "${var.s3_prefixies[count.index]}/"
+  content                = "${var.s3_prefixies[count.index]}/"
+  server_side_encryption = "AES256"
 }

@@ -102,6 +102,7 @@ resource "aws_rds_cluster_instance" "db" {
   engine_version          = var.mysql_version
   db_parameter_group_name = aws_db_parameter_group.db.name
   db_subnet_group_name    = aws_db_subnet_group.db.name
+  apply_immediately       = var.mysql_apply_immediately
 }
 
 # dns records

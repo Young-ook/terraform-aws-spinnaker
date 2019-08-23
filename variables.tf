@@ -124,6 +124,11 @@ variable "mysql_snapshot" {
   default     = ""
 }
 
+variable "mysql_apply_immediately" {
+  description = "specifies whether any database modifications are applied immediately, or during the next maintenance window"
+  default     = false
+}
+
 ### dns
 variable "dns_zone" {
   description = "The hosted zone name for internal dns, e.g., app.internal"

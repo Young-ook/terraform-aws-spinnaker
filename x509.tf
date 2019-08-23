@@ -6,9 +6,9 @@ data "template_file" "x509" {
 
   vars = {
     country      = lookup(var.x509_prop, "country", "KR")
-    state        = lookup(var.x509_prop, "country", "SEL")
-    location     = lookup(var.x509_prop, "country", "SEL")
-    organization = lookup(var.x509_prop, "country", "ORG")
+    state        = lookup(var.x509_prop, "state", "ICN")
+    location     = lookup(var.x509_prop, "location", "ICN")
+    organization = lookup(var.x509_prop, "organization", "ORG")
     common_name  = lookup(var.x509_prop, "common_name", "your@email.com")
     groups       = lookup(var.x509_prop, "groups", "admin")
   }

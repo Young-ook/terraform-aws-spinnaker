@@ -86,9 +86,9 @@ resource "aws_eks_cluster" "eks" {
   ]
 }
 
-# kube config
-data "template_file" "kube-config" {
-  template = file(format("%s/resources/kube-config.tpl", path.module))
+# helm
+data "template_file" "helm-init" {
+  template = file(format("%s/resources/helm-init.tpl", path.module))
 
   vars = {
     cluster_name       = local.cluster-name
@@ -99,9 +99,9 @@ data "template_file" "kube-config" {
   }
 }
 
-resource "local_file" "update-kubeconfig" {
-  content  = data.template_file.kube-config.rendered
-  filename = format("%s/%s/update-kubeconfig.sh", path.cwd, local.cluster-name)
+resource "local_file" "helm-init" {
+  content  = data.template_file.helm-init.rendered
+  filename = format("%s/%s/helm-init.sh", path.cwd, local.cluster-name)
 }
 
 data "template_file" "kube-svc" {

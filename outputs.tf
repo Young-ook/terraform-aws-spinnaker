@@ -46,6 +46,6 @@ output "hosted_zone_id" {
 }
 
 output "db_endpoint" {
-  value       = aws_route53_record.db.name
+  value       = aws_route53_record.db[0].name
   description = "The enpoint of aurora mysql cluster"
 }

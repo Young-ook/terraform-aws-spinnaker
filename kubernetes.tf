@@ -244,6 +244,7 @@ resource "aws_launch_configuration" "nodes" {
   name_prefix          = "${local.nodes-name}-"
   security_groups      = [aws_security_group.nodes.id]
   iam_instance_profile = aws_iam_instance_profile.nodes.name
+  enable_monitoring    = false
   user_data            = data.template_file.nodes-userdata.rendered
 
   root_block_device {

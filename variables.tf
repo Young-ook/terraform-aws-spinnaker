@@ -102,8 +102,8 @@ variable "mysql_node_type" {
   default     = "db.r4.large"
 }
 
-variable "mysql_node_count" {
-  description = "The instance count for mysql (aurora) cluster"
+variable "mysql_node_size" {
+  description = "The instance count of mysql (aurora) cluster"
   default     = "1"
 }
 

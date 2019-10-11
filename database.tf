@@ -2,6 +2,7 @@
 
 # security/password
 resource "random_password" "password" {
+  count            = (var.mysql_node_size > 0) ? 1 : 0
   length           = 16
   special          = true
   override_special = "^"
@@ -9,6 +10,7 @@ resource "random_password" "password" {
 
 # security/firewall
 resource "aws_security_group" "db" {
+  count       = (var.mysql_node_size > 0) ? 1 : 0
   name        = format("%s-db", local.name)
   description = format("security group for %s-db", local.name)
   vpc_id      = aws_vpc.vpc.id
@@ -16,24 +18,27 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_security_group_rule" "db-ingress-rules" {
+  count                    = (var.mysql_node_size > 0) ? 1 : 0
   type                     = "ingress"
   from_port                = var.mysql_port
   to_port                  = var.mysql_port
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.nodes.id
-  security_group_id        = aws_security_group.db.id
+  security_group_id        = aws_security_group.db[0].id
 }
 
 # subnet group
 resource "aws_db_subnet_group" "db" {
-  name       = "local.name-db"
+  count      = (var.mysql_node_size > 0) ? 1 : 0
+  name       = format("%s-db", local.name)
   subnet_ids = aws_subnet.private.*.id
   tags       = merge(map("Name", format("%s-db", local.name)), var.tags)
 }
 
 # parameter groups
 resource "aws_rds_cluster_parameter_group" "db" {
-  name = format("%s-db-cluster-params", local.name)
+  count = (var.mysql_node_size > 0) ? 1 : 0
+  name  = format("%s-db-cluster-params", local.name)
 
   family = format("aurora-mysql%s.%s",
     element(split(".", var.mysql_version), 0),
@@ -57,7 +62,8 @@ resource "aws_rds_cluster_parameter_group" "db" {
 }
 
 resource "aws_db_parameter_group" "db" {
-  name = format("%s-db-params", local.name)
+  count = (var.mysql_node_size > 0) ? 1 : 0
+  name  = format("%s-db-params", local.name)
 
   family = format("aurora-mysql%s.%s",
     element(split(".", var.mysql_version), 0),
@@ -71,6 +77,7 @@ resource "aws_db_parameter_group" "db" {
 
 # rds (aurora)
 resource "aws_rds_cluster" "db" {
+  count                           = (var.mysql_node_size > 0) ? 1 : 0
   cluster_identifier_prefix       = format("%s-", local.cluster-name)
   engine                          = "aurora-mysql"
   engine_mode                     = "provisioned"
@@ -79,12 +86,12 @@ resource "aws_rds_cluster" "db" {
   skip_final_snapshot             = "true"
   database_name                   = var.mysql_db
   master_username                 = var.mysql_master_user
-  master_password                 = random_password.password.result
+  master_password                 = random_string.password[0].result
   snapshot_identifier             = var.mysql_snapshot
   backup_retention_period         = "5"
-  db_subnet_group_name            = aws_db_subnet_group.db.name
-  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.db.name
-  vpc_security_group_ids          = [aws_security_group.db.id]
+  db_subnet_group_name            = aws_db_subnet_group.db[0].name
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.db[0].name
+  vpc_security_group_ids          = coalescelist(aws_security_group.db.*.id, list(""))
   tags                            = merge(map("Name", format("%s-db", local.name)), var.tags)
 
   lifecycle {
@@ -95,19 +102,20 @@ resource "aws_rds_cluster" "db" {
 
 # rds instances
 resource "aws_rds_cluster_instance" "db" {
-  count                   = var.mysql_node_count
+  count                   = var.mysql_node_size
   identifier              = format("%s-%s", local.cluster-name, count.index)
-  cluster_identifier      = aws_rds_cluster.db.id
+  cluster_identifier      = aws_rds_cluster.db[0].id
   instance_class          = var.mysql_node_type
   engine                  = "aurora-mysql"
   engine_version          = var.mysql_version
-  db_parameter_group_name = aws_db_parameter_group.db.name
-  db_subnet_group_name    = aws_db_subnet_group.db.name
+  db_parameter_group_name = aws_db_parameter_group.db[0].name
+  db_subnet_group_name    = aws_db_subnet_group.db[0].name
   apply_immediately       = var.mysql_apply_immediately
 }
 
 # dns records
 resource "aws_route53_record" "db" {
+  count   = (var.mysql_node_size > 0) ? 1 : 0
   zone_id = aws_route53_zone.vpc.zone_id
   name    = format("%s-db.%s", local.cluster-name, var.dns_zone)
   type    = "CNAME"

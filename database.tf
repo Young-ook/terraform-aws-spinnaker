@@ -1,13 +1,14 @@
 ## aurora cluster for orca-mysql
 
-# security/firewall
-resource "random_string" "password" {
+# security/password
+resource "random_password" "password" {
   count            = (var.mysql_node_size > 0) ? 1 : 0
   length           = 16
   special          = true
   override_special = "^"
 }
 
+# security/firewall
 resource "aws_security_group" "db" {
   count       = (var.mysql_node_size > 0) ? 1 : 0
   name        = format("%s-db", local.name)

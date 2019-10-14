@@ -100,8 +100,17 @@ data "template_file" "helm-init" {
 }
 
 resource "local_file" "helm-init" {
-  content  = data.template_file.helm-init.rendered
-  filename = format("%s/%s/helm-init.sh", path.cwd, local.cluster-name)
+  content         = data.template_file.helm-init.rendered
+  filename        = format("%s/%s/helm-init.sh", path.cwd, local.cluster-name)
+  file_permission = "0600"
+}
+
+# initial helm/tiller
+resource "null_resource" "helm-init" {
+  depends_on = [local_file.helm-init, aws_eks_cluster.eks]
+  provisioner "local-exec" {
+    command = "bash -e ${format("%s/%s/helm-init.sh", path.cwd, local.cluster-name)}"
+  }
 }
 
 data "template_file" "kube-svc" {

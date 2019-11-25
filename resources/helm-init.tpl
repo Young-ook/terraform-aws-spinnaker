@@ -14,7 +14,7 @@ export KUBECONFIG=$KUBE_HOME/config
 
 #
 # Initialize kubernetes config file using aws cli
-function init-kube() {
+function init_kube() {
   # Make new home directory for kubernetes configuration
   if [ -d $KUBE_HOME ]; then
     rm -r $KUBE_HOME
@@ -46,7 +46,7 @@ EOF
 
 #
 # Initialize tiller on kubernetes
-function init-tiller() {
+function init_tiller() {
   # configure minimal RBAC permissions for helm/tiller
   cat  << EOF | kubectl apply -f -
 apiVersion: v1
@@ -104,7 +104,7 @@ EOF
   minify $CONTEXT
 
   # generate new x509 ca for helm/tiller communication
-  gen-certs
+  gen_certs
 }
 
 #
@@ -129,7 +129,7 @@ function minify () {
 
 #
 # x509 certification
-function gen-certs () {
+function gen_certs () {
   # Make new home directory for helm/tiller
   if [ -d $HELM_HOME ]; then
     rm -r $HELM_HOME
@@ -179,7 +179,7 @@ EOF
 
 #
 # Initialize helm
-function init-helm () {
+function init_helm () {
   helm init \
     --tiller-tls \
     --tiller-tls-cert $HELM_HOME/tiller.crt \
@@ -194,9 +194,9 @@ function init-helm () {
 
 #
 # Initialize kubernetes and helm/tiller
-init-kube
-init-tiller
-init-helm
+init_kube
+init_tiller
+init_helm
 
 ##
 # Clean up the environment variables

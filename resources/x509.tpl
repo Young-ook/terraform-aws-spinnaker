@@ -2,7 +2,7 @@
 
 # Environment
 CURDIR=`dirname $0`
-WORKDIR=$CURDIR/x509
+SPIN_HOME=$CURDIR/spin
 
 # Variable
 CNTRY=${country}
@@ -57,24 +57,24 @@ function process_args() {
 
 # clean up
 function clean_up() {
-  if [ -e $WORKDIR ]; then
+  if [ -e $SPIN_HOME ]; then
     if $CLIENT; then
-      find "$WORKDIR/" -name "client.*" -type f -delete
-      find "$WORKDIR/" -name "openssl.conf" -type f -delete
+      find "$SPIN_HOME/" -name "client.*" -type f -delete
+      find "$SPIN_HOME/" -name "openssl.conf" -type f -delete
     fi
 
     if $SERVER; then
-      find "$WORKDIR/" -name "server.*" -type f -delete
-      find "$WORKDIR/" -name "keystore.jks" -type f -delete
+      find "$SPIN_HOME/" -name "server.*" -type f -delete
+      find "$SPIN_HOME/" -name "keystore.jks" -type f -delete
     fi
 
     if $CLIENT && $SERVER; then
       # remove the workspace
-      rm -r "$WORKDIR"
-      mkdir -p "$WORKDIR"
+      rm -r "$SPIN_HOME"
+      mkdir -p "$SPIN_HOME"
     fi
   else
-    mkdir -p "$WORKDIR"
+    mkdir -p "$SPIN_HOME"
   fi
 }
 
@@ -82,39 +82,39 @@ function clean_up() {
 function create_ca() {
   echo "Create self signed certificates authority"
 
-  openssl genrsa -out $WORKDIR/ca.key 4096
-  openssl req -new -x509 -days 365 -key $WORKDIR/ca.key -out $WORKDIR/ca.crt \
+  openssl genrsa -out $SPIN_HOME/ca.key 4096
+  openssl req -new -x509 -days 365 -key $SPIN_HOME/ca.key -out $SPIN_HOME/ca.crt \
     -subj "/C=$CNTRY/ST=$STAT/L=$LOC/O=$ORG/OU=$ORG/CN=$CN"
 }
 
 # create new server side certificates
 function generate_server_cert() {
-  openssl genrsa -out $WORKDIR/server.key 4096
-  openssl req -new -key $WORKDIR/server.key -out $WORKDIR/server.csr \
+  openssl genrsa -out $SPIN_HOME/server.key 4096
+  openssl req -new -key $SPIN_HOME/server.key -out $SPIN_HOME/server.csr \
     -subj "/C=$CNTRY/ST=$STAT/L=$LOC/O=$ORG/OU=$ORG/CN=$CN"
  
-  openssl x509 -req -days 365 -in $WORKDIR/server.csr -CA $WORKDIR/ca.crt -CAkey $WORKDIR/ca.key \
-    -CAcreateserial -out $WORKDIR/server.crt
+  openssl x509 -req -days 365 -in $SPIN_HOME/server.csr -CA $SPIN_HOME/ca.crt -CAkey $SPIN_HOME/ca.key \
+    -CAcreateserial -out $SPIN_HOME/server.crt
 
   # Create server keystore
-  openssl pkcs12 -export -clcerts -in $WORKDIR/server.crt \
-    -inkey $WORKDIR/server.key -out $WORKDIR/server.p12 \
+  openssl pkcs12 -export -clcerts -in $SPIN_HOME/server.crt \
+    -inkey $SPIN_HOME/server.key -out $SPIN_HOME/server.p12 \
     -name spinnaker -password pass:$PASSWD
 
-  keytool -keystore $WORKDIR/keystore.jks -import -trustcacerts -alias ca \
-    -file $WORKDIR/ca.crt -storepass $PASSWD
+  keytool -keystore $SPIN_HOME/keystore.jks -import -trustcacerts -alias ca \
+    -file $SPIN_HOME/ca.crt -storepass $PASSWD
 
   keytool -importkeystore \
-    -srcalias spinnaker -srckeystore $WORKDIR/server.p12 -srcstoretype pkcs12 \
+    -srcalias spinnaker -srckeystore $SPIN_HOME/server.p12 -srcstoretype pkcs12 \
     -srcstorepass $PASSWD \
-    -destalias server -destkeystore $WORKDIR/keystore.jks -deststoretype jks \
+    -destalias server -destkeystore $SPIN_HOME/keystore.jks -deststoretype jks \
     -deststorepass $PASSWD -destkeypass $PASSWD
 }
 
 # create new client certificates
 function generate_client_cert() {
   # x509 config file
-cat << EOF > $WORKDIR/openssl.conf
+cat << EOF > $SPIN_HOME/openssl.conf
 [ req ]
 #default_bits		= 2048
 #default_md		= sha256
@@ -141,13 +141,13 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 1.2.840.10070.8.1 = ASN1:UTF8String:$GROUP
 EOF
 
-  openssl req -nodes -newkey rsa:2048 -keyout $WORKDIR/client.key -out $WORKDIR/client.csr \
-    -subj "/C=$CNTRY/ST=$STAT/L=$LOC/O=$ORG/OU=$ORG/CN=$CN" -config $WORKDIR/openssl.conf
+  openssl req -nodes -newkey rsa:2048 -keyout $SPIN_HOME/client.key -out $SPIN_HOME/client.csr \
+    -subj "/C=$CNTRY/ST=$STAT/L=$LOC/O=$ORG/OU=$ORG/CN=$CN" -config $SPIN_HOME/openssl.conf
 
   # create x509 certificates chain
-  openssl x509 -req -days 365 -in $WORKDIR/client.csr -out $WORKDIR/client.crt \
-    -CA $WORKDIR/ca.crt -CAkey $WORKDIR/ca.key -CAcreateserial \
-    -extfile $WORKDIR/openssl.conf -extensions v3_req
+  openssl x509 -req -days 365 -in $SPIN_HOME/client.csr -out $SPIN_HOME/client.crt \
+    -CA $SPIN_HOME/ca.crt -CAkey $SPIN_HOME/ca.key -CAcreateserial \
+    -extfile $SPIN_HOME/openssl.conf -extensions v3_req
 }
 
 

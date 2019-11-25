@@ -56,7 +56,7 @@ function process_args() {
 }
 
 # clean up
-function clean_up() {
+function cleanup() {
   if [ -e $WORKDIR ]; then
     if $CLIENT; then
       find "$WORKDIR/" -name "client.*" -type f -delete
@@ -153,8 +153,7 @@ EOF
 
 ### main 
 process_args "$@"
-
-clean_up
+cleanup
 
 if $SERVER && $CLIENT; then
   create_ca

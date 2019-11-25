@@ -15,6 +15,7 @@ data "template_file" "x509" {
 }
 
 resource "local_file" "gen-x509-ca" {
-  content  = data.template_file.x509.rendered
-  filename = format("%s/%s/gen-x509.sh", path.cwd, local.cluster-name)
+  content         = data.template_file.x509.rendered
+  filename        = format("%s/%s/x509.sh", path.cwd, local.cluster-name)
+  file_permission = "0600"
 }

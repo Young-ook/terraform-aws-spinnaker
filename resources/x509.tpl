@@ -56,8 +56,8 @@ function process_args() {
 }
 
 # clean up
-function clean_up() {
-  if [ -e $SPIN_HOME ]; then
+function cleanup() {
+  if [ -e $WORKDIR ]; then
     if $CLIENT; then
       find "$SPIN_HOME/" -name "client.*" -type f -delete
       find "$SPIN_HOME/" -name "openssl.conf" -type f -delete
@@ -153,8 +153,7 @@ EOF
 
 ### main 
 process_args "$@"
-
-clean_up
+cleanup
 
 if $SERVER && $CLIENT; then
   create_ca

@@ -86,7 +86,7 @@ resource "aws_rds_cluster" "db" {
   skip_final_snapshot             = "true"
   database_name                   = var.mysql_db
   master_username                 = var.mysql_master_user
-  master_password                 = random_string.password[0].result
+  master_password                 = random_password.password[0].result
   snapshot_identifier             = var.mysql_snapshot
   backup_retention_period         = "5"
   db_subnet_group_name            = aws_db_subnet_group.db[0].name

@@ -1,19 +1,21 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
-# env
-export KUBECONFIG=./config-${cluster_name}
+##
+# Environment variables
+CURDIR=`dirname $0`
+KUBE_HOME=$CURDIR/kube
+SERVICEACCOUNT=tiller-account
+NAMESPACE=spinnaker
 
-# conditions
-SPIN_CLI=false
+## Conditions
+API_CLI=false
 API_SSL=false
 
-# change the context of kubernetes cluster
-kubectl config use-context ${cluster_name}
+export KUBECONFIG=$KUBE_HOME/config
 
-###
+#
 # create a spin-ui loadbalancer
-###
-function create-ui-lb () {
+function expose-ui () {
   # create ui loadbalancer
   cat  << EOF | kubectl apply -f -
 kind: Service
@@ -41,11 +43,9 @@ spec:
 EOF
 }
 
-###
+#
 # create a spin-api loadbalancer
-###
-function create-api-lb () {
-  # create api loadbalancer
+function expose-api () {
   cat  << EOF | kubectl apply -f -
 kind: Service
 apiVersion: v1
@@ -72,11 +72,9 @@ spec:
 EOF
 }
 
-###
+#
 # create a spin-cli loadbalancer
-###
-function create-cli-lb () {
-  # create api loadbalancer
+function expose-cli () {
   cat  << EOF | kubectl apply -f -
 kind: Service
 apiVersion: v1
@@ -100,17 +98,21 @@ spec:
 EOF
 }
 
+#
+# delete the spin-cli loadbalancer
+function disable-cli () {
+  kubectl delete svc spin-cli
+}
+
 # spinnaker loadbalancers to expose service
-create-ui-lb
+expose-ui
 
-if [ $API_SSL = 'true' ]; then
-create-api-lb ssl
+if [ $API_CLI = 'true' ]; then
+expose-cli
+expose-api ssl
 else
-create-api-lb http
-fi
-
-if [ $SPIN_CLI = 'true' ]; then
-create-cli-lb
+disable-cli
+expose-api http
 fi
 
 # clean up env

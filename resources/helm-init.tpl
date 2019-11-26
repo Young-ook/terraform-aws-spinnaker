@@ -8,7 +8,6 @@ HELM_HOME=$CURDIR/helm
 SERVICEACCOUNT=tiller-account
 NAMESPACE=spinnaker
 
-export AWS_PROFILE=${aws_profile}
 export AWS_DEFAULT_REGION=${aws_region}
 export KUBECONFIG=$KUBE_HOME/config
 
@@ -200,6 +199,5 @@ init_helm
 
 ##
 # Clean up the environment variables
-unset AWS_PROFILE
 unset AWS_DEFAULT_REGION
 unset KUBECONFIG

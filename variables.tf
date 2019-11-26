@@ -46,12 +46,6 @@ variable "kube_node_ami" {
   default     = ""
 }
 
-### credentials
-variable "aws_profile" {
-  description = "A profile name for aws cli"
-  default     = "default"
-}
-
 ### tags
 variable "tags" {
   description = "The key-value maps for tagging"

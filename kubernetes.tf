@@ -95,13 +95,12 @@ data "template_file" "helm-init" {
     cluster_arn        = aws_eks_cluster.eks.arn
     node_pool_role_arn = aws_iam_role.nodes.arn
     aws_region         = var.region
-    aws_profile        = var.aws_profile
   }
 }
 
 resource "local_file" "helm-init" {
   content         = data.template_file.helm-init.rendered
-  filename        = format("%s/%s/helm-init.sh", path.cwd, local.cluster-name)
+  filename        = format("%s/%s/helm.sh", path.cwd, local.cluster-name)
   file_permission = "0600"
 }
 

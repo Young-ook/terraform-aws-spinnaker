@@ -4,7 +4,7 @@
 # Environment variables
 CURDIR=`dirname $0`
 KUBE_HOME=$CURDIR/kube
-SERVICEACCOUNT=tiller-account
+SERVICEACCOUNT=spinnaker-tiller
 NAMESPACE=spinnaker
 
 ## Conditions

@@ -5,8 +5,10 @@
 CURDIR=`dirname $0`
 KUBE_HOME=$CURDIR/kube
 HELM_HOME=$CURDIR/helm
-SERVICEACCOUNT=tiller-account
-NAMESPACE=spinnaker
+NAMESPACES="spinnaker prometheus"
+
+EKS_NAME=${cluster_name}
+EKS_ARN=${cluster_arn}
 
 export AWS_DEFAULT_REGION=${aws_region}
 export KUBECONFIG=$KUBE_HOME/config
@@ -21,10 +23,10 @@ function init_kube() {
   mkdir -p $KUBE_HOME
 
   # update kubeconfig
-  aws eks update-kubeconfig --name ${cluster_name}
+  aws eks update-kubeconfig --name $EKS_NAME
 
   # change the context of kubernetes cluster
-  kubectl config use-context ${cluster_arn}
+  kubectl config use-context $EKS_ARN
 
   # register worker nodes to master
   cat  << EOF | kubectl apply -f -
@@ -46,6 +48,10 @@ EOF
 #
 # Initialize tiller on kubernetes
 function init_tiller() {
+  local NAMESPACE=$1
+  local SERVICEACCOUNT=$NAMESPACE-tiller
+  local CONTEXT=$SERVICEACCOUNT
+
   # configure minimal RBAC permissions for helm/tiller
   cat  << EOF | kubectl apply -f -
 apiVersion: v1
@@ -84,7 +90,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 EOF
 
-  CONTEXT=${cluster_name}
   TOKEN=$(kubectl get secret \
            $(kubectl get serviceaccount $SERVICEACCOUNT \
             -n $NAMESPACE \
@@ -94,16 +99,9 @@ EOF
 
   kubectl config set-credentials $SERVICEACCOUNT --token $TOKEN
   kubectl config set-context $CONTEXT \
-          --cluster=${cluster_arn} \
+          --cluster=$EKS_ARN \
           --user=$SERVICEACCOUNT \
           --namespace=$NAMESPACE
-  kubectl config use-context $CONTEXT
-
-  # make a minified kubeconfig
-  minify $CONTEXT
-
-  # generate new x509 ca for helm/tiller communication
-  gen_certs
 }
 
 #
@@ -179,6 +177,9 @@ EOF
 #
 # Initialize helm
 function init_helm () {
+  local NAMESPACE=$1
+  local SERVICEACCOUNT=$NAMESPACE-tiller
+
   helm init \
     --tiller-tls \
     --tiller-tls-cert $HELM_HOME/tiller.crt \
@@ -191,11 +192,19 @@ function init_helm () {
     --home $HELM_HOME
 }
 
-#
-# Initialize kubernetes and helm/tiller
+
+# initialize kubernetes
 init_kube
-init_tiller
-init_helm
+
+# generate new x509 ca for helm/tiller communication
+gen_certs
+
+#
+# initialize helm/tiller
+for namespace in $NAMESPACES; do
+  init_tiller $namespace
+  init_helm $namespace
+done
 
 ##
 # Clean up the environment variables

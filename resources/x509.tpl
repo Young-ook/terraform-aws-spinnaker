@@ -16,10 +16,6 @@ GROUP=${groups}
 CLIENT=false
 SERVER=false
 
-# password auto-generation
-PASSWD=$(pwgen 20 1)
-echo $PASSWD > x509pass.secret | chmod 600 x509pass.secret
-
 # print help
 function print_usage() {
   echo "Usage: x509.sh --server_only | --client_only | --all"
@@ -78,7 +74,7 @@ function cleanup() {
   fi
 }
 
-# create new self-signed certificate authority (CA) 
+# create new self-signed certificate authority (CA)
 function create_ca() {
   echo "Create self signed certificates authority"
 
@@ -88,13 +84,17 @@ function create_ca() {
 }
 
 # create new server side certificates
-function generate_server_cert() {
+function gen_server_crt() {
   openssl genrsa -out $SPIN_HOME/server.key 4096
   openssl req -new -key $SPIN_HOME/server.key -out $SPIN_HOME/server.csr \
     -subj "/C=$CNTRY/ST=$STAT/L=$LOC/O=$ORG/OU=$ORG/CN=$CN"
  
   openssl x509 -req -days 365 -in $SPIN_HOME/server.csr -CA $SPIN_HOME/ca.crt -CAkey $SPIN_HOME/ca.key \
     -CAcreateserial -out $SPIN_HOME/server.crt
+
+  # password auto-generation
+  local PASSWD=$(pwgen 20 1)
+  echo $PASSWD > $SPIN_HOME/server.secret | chmod 600 $SPIN_HOME/server.secret
 
   # Create server keystore
   openssl pkcs12 -export -clcerts -in $SPIN_HOME/server.crt \
@@ -112,7 +112,7 @@ function generate_server_cert() {
 }
 
 # create new client certificates
-function generate_client_cert() {
+function gen_client_crt() {
   # x509 config file
 cat << EOF > $SPIN_HOME/openssl.conf
 [ req ]
@@ -151,7 +151,7 @@ EOF
 }
 
 
-### main 
+### main
 process_args "$@"
 cleanup
 
@@ -160,9 +160,9 @@ if $SERVER && $CLIENT; then
 fi
 
 if $SERVER; then
-  generate_server_cert
+  gen_server_crt
 fi
 
 if $CLIENT; then
-  generate_client_cert
+  gen_client_crt
 fi

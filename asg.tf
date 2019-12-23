@@ -147,6 +147,11 @@ resource "aws_autoscaling_group" "node-pool" {
   launch_configuration = "${aws_launch_configuration.node-pool.name}"
   termination_policies = ["Default"]
   force_delete         = true
+  enabled_metrics = [
+    "GroupMinSize", "GroupMaxSize", "GroupDesiredCapacity",
+    "GroupInServiceInstances", "GroupPendingInstances", "GroupStandbyInstances",
+    "GroupTerminatingInstances", "GroupTotalInstances"
+  ]
 
   lifecycle {
     create_before_destroy = true

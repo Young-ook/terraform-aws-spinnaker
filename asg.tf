@@ -7,7 +7,8 @@ data "aws_ami" "eks-linux-ami" {
   most_recent = true
 
   filter {
-    name   = "name"
+    name = "name"
+
     values = ["amazon-eks-node-${var.kube_version}-*"]
   }
 }
@@ -147,10 +148,16 @@ resource "aws_autoscaling_group" "node-pool" {
   launch_configuration = "${aws_launch_configuration.node-pool.name}"
   termination_policies = ["Default"]
   force_delete         = true
+
   enabled_metrics = [
-    "GroupMinSize", "GroupMaxSize", "GroupDesiredCapacity",
-    "GroupInServiceInstances", "GroupPendingInstances", "GroupStandbyInstances",
-    "GroupTerminatingInstances", "GroupTotalInstances"
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+    "GroupTotalInstances",
   ]
 
   lifecycle {
@@ -186,6 +193,12 @@ resource "aws_iam_role_policy_attachment" "spin-ec2read" {
 
 resource "aws_iam_role_policy_attachment" "spin-assume" {
   policy_arn = "${aws_iam_policy.spin-assume.arn}"
+  role       = "${aws_iam_role.node-pool.name}"
+}
+
+resource "aws_iam_role_policy_attachment" "spin-kms" {
+  count      = "${length(var.kms_key_arn) > 0 ? 1 :0}"
+  policy_arn = "${element(aws_iam_policy.rosco-kms.*.arn, 1)}"
   role       = "${aws_iam_role.node-pool.name}"
 }
 

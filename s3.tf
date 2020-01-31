@@ -45,7 +45,7 @@ resource "aws_s3_bucket" "storage" {
 
   lifecycle_rule {
     id      = "${local.name}"
-    enabled = true
+    enabled = false
 
     tags = {
       "rule"      = "transit the current version object to IA after 90 days"

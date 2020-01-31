@@ -54,6 +54,27 @@ resource "aws_iam_policy" "rosco-bake" {
   policy = "${data.aws_iam_policy_document.rosco-bake.json}"
 }
 
+data "aws_iam_policy_document" "rosco-kms" {
+  count = "${length(var.kms_key_arn) > 0 ? 1 :0}"
+
+  statement {
+    actions = [
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:GenerateDataKeyWithoutPlaintext",
+    ]
+
+    effect    = "Allow"
+    resources = ["${var.kms_key_arn}"]
+  }
+}
+
+resource "aws_iam_policy" "rosco-kms" {
+  count  = "${length(var.kms_key_arn) > 0 ? 1 :0}"
+  name   = "${local.name}-kms"
+  policy = "${data.aws_iam_policy_document.rosco-kms.json}"
+}
+
 ### describes ec2
 data "aws_iam_policy_document" "spin-ec2read" {
   statement {

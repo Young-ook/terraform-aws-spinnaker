@@ -87,6 +87,11 @@ variable "assume_role_arn" {
   default     = []
 }
 
+variable "kms_key_arn" {
+  description = "The list of arns to use them in baking. e.g.,) arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef"
+  default     = []
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"

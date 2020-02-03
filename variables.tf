@@ -18,7 +18,7 @@ variable "cidr" {
 ### kubernetes cluster
 variable "kube_version" {
   description = "The target version of kubernetes"
-  default     = "1.11"
+  default     = "1.14"
 }
 
 variable "kube_node_type" {

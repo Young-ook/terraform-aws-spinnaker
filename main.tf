@@ -1,6 +1,13 @@
-## name and description
 
-# names
+# current region
+data "aws_region" "current" {}
+
+locals {
+  alias_region  = substr(data.aws_region.current.name, 0, 2) == "cn" ? ".cn" : ""
+  alias_service = "amazonaws.com${local.alias_region}"
+}
+
+# name and description
 locals {
   name         = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
   cluster-name = local.name

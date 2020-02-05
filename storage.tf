@@ -5,14 +5,13 @@
 data "aws_iam_policy_document" "s3admin" {
   statement {
     effect    = "Allow"
-    resources = ["arn:aws:s3:::${local.name}/*"]
+    resources = [format("arn:aws:s3:::%s/*", local.name)]
     actions   = ["s3:*"]
   }
 
   statement {
     effect    = "Allow"
-    resources = ["arn:aws:s3:::${local.name}"]
-
+    resources = [format("arn:aws:s3:::%s", local.name)]
     actions = [
       "s3:ListBucketByTags",
       "s3:ListBucketMultipartUploads",
@@ -35,7 +34,7 @@ data "aws_iam_policy_document" "s3admin" {
 }
 
 resource "aws_iam_policy" "s3admin" {
-  name   = "${local.name}-s3admin"
+  name   = format("%s-s3admin", local.name)
   policy = data.aws_iam_policy_document.s3admin.json
 }
 

@@ -95,7 +95,7 @@ resource "aws_rds_cluster" "db" {
   tags                            = merge(map("Name", format("%s-db", local.name)), var.tags)
 
   lifecycle {
-    ignore_changes        = ["snapshot_identifier", "master_password"]
+    ignore_changes        = [snapshot_identifier, master_password]
     create_before_destroy = true
   }
 }

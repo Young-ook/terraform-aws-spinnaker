@@ -129,7 +129,7 @@ data "aws_ami" "eks-linux-ami" {
 
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${var.kube_version}-*"]
+    values = [format("amazon-eks-node-%s-*", var.kube_version)]
   }
 }
 
@@ -229,7 +229,7 @@ resource "aws_security_group_rule" "nodes-egress-allow-all" {
 
 # bootstrap
 data "template_file" "nodes-userdata" {
-  template = file("${path.module}/resources/nodes.tpl")
+  template = file(format("%s/resources/nodes.tpl", path.module))
 
   vars = {
     name      = local.cluster-name
@@ -242,7 +242,7 @@ data "template_file" "nodes-userdata" {
 resource "aws_launch_configuration" "nodes" {
   image_id             = var.kube_node_ami == "" ? data.aws_ami.eks-linux-ami.id : var.kube_node_ami
   instance_type        = var.kube_node_type
-  name_prefix          = "${local.nodes-name}-"
+  name_prefix          = format("%s-", local.nodes-name)
   security_groups      = [aws_security_group.nodes.id]
   iam_instance_profile = aws_iam_instance_profile.nodes.name
   enable_monitoring    = false
@@ -340,7 +340,7 @@ data "aws_iam_policy_document" "rosco-bake" {
 }
 
 resource "aws_iam_policy" "rosco-bake" {
-  name   = "${local.name}-bake"
+  name   = format("%s-bake", local.name)
   policy = data.aws_iam_policy_document.rosco-bake.json
 }
 
@@ -359,7 +359,7 @@ data "aws_iam_policy_document" "spin-ec2read" {
 }
 
 resource "aws_iam_policy" "spin-ec2read" {
-  name   = "${local.name}-ec2read"
+  name   = format("%s-ec2read", local.name)
   policy = data.aws_iam_policy_document.spin-ec2read.json
 }
 
@@ -375,7 +375,7 @@ data "aws_iam_policy_document" "spin-assume" {
 }
 
 resource "aws_iam_policy" "spin-assume" {
-  name   = "${local.name}-assume"
+  name   = format("%s-assume", local.name)
   policy = data.aws_iam_policy_document.spin-assume.json
 }
 
@@ -404,13 +404,13 @@ resource "aws_iam_role_policy_attachment" "spin-assume" {
 
 # security/firewall
 resource "aws_security_group" "rosco-bake" {
-  name        = "${local.nodes-name}-bake"
-  description = "security group for image baker of ${local.cluster-name}"
+  name        = format("%s-bake", local.nodes-name)
+  description = format("security group for image baker of %s", local.cluster-name)
   vpc_id      = aws_vpc.vpc.id
 
   tags = merge(
     {
-      "Name" = "${local.nodes-name}-bake"
+      "Name" = format("%s-bake", local.nodes-name)
     },
     local.vpc-k8s-shared-tag,
   )

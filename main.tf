@@ -4,7 +4,7 @@ data "aws_region" "current" {}
 
 locals {
   alias_region  = substr(data.aws_region.current.name, 0, 2) == "cn" ? ".cn" : ""
-  alias_service = "amazonaws.com${local.alias_region}"
+  alias_service = format("amazonaws.com%s", local.alias_region)
 }
 
 # name and description
@@ -39,10 +39,10 @@ locals {
   eks-name-tag   = { "Name" = local.eks-name }
   nodes-name-tag = { "Name" = local.nodes-name }
   vpc-k8s-shared-tag = {
-    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
+    format("kubernetes.io/cluster/%s", local.cluster-name) = "shared"
   }
   vpc-k8s-owned-tag = {
-    "key"                 = "kubernetes.io/cluster/${local.cluster-name}"
+    "key"                 = format("kubernetes.io/cluster/%s", local.cluster-name)
     "value"               = "owned"
     "propagate_at_launch" = "true"
   }

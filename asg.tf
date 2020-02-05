@@ -181,11 +181,6 @@ resource "aws_iam_role_policy_attachment" "spin-s3admin" {
   role       = "${aws_iam_role.node-pool.name}"
 }
 
-resource "aws_iam_role_policy_attachment" "spin-s3admin-artifact" {
-  policy_arn = "${aws_iam_policy.s3admin-artifact.arn}"
-  role       = "${aws_iam_role.node-pool.name}"
-}
-
 resource "aws_iam_role_policy_attachment" "spin-bake" {
   policy_arn = "${aws_iam_policy.rosco-bake.arn}"
   role       = "${aws_iam_role.node-pool.name}"

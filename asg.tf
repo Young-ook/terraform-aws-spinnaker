@@ -202,6 +202,11 @@ resource "aws_iam_role_policy_attachment" "spin-kms" {
   role       = "${aws_iam_role.node-pool.name}"
 }
 
+resource "aws_iam_role_policy_attachment" "spin-awslogs" {
+  policy_arn = "${aws_iam_policy.spin-awslogs.arn}"
+  role       = "${aws_iam_role.node-pool.name}"
+}
+
 # security/firewall
 resource "aws_security_group" "rosco-bake" {
   name        = "${local.node_pool_name}-bake"

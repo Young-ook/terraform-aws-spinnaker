@@ -105,3 +105,24 @@ resource "aws_iam_policy" "spin-assume" {
   name   = "${local.name}-assume"
   policy = "${data.aws_iam_policy_document.spin-assume.json}"
 }
+
+### aws cloudwatch logs
+data "aws_iam_policy_document" "spin-awslogs" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+    ]
+
+    effect    = "Allow"
+    resources = ["arn:aws:logs:*:*:*"]
+  }
+}
+
+resource "aws_iam_policy" "spin-awslogs" {
+  name   = "${local.name}-awslogs"
+  policy = "${data.aws_iam_policy_document.spin-awslogs.json}"
+}

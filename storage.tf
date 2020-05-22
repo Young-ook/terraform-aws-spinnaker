@@ -5,13 +5,13 @@
 data "aws_iam_policy_document" "s3admin" {
   statement {
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s/*", local.name)]
+    resources = [format("arn:%s:s3:::%s/*", data.aws_partition.current.partition, local.name)]
     actions   = ["s3:*"]
   }
 
   statement {
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s", local.name)]
+    resources = [format("arn:%s:s3:::%s", data.aws_partition.current.partition, local.name)]
     actions = [
       "s3:ListBucketByTags",
       "s3:ListBucketMultipartUploads",

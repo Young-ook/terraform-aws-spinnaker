@@ -2,6 +2,9 @@
 # current region
 data "aws_region" "current" {}
 
+# Use this data source to lookup information about the current AWS partition in which Terraform is working.
+data "aws_partition" "current" {}
+
 locals {
   alias_region  = substr(data.aws_region.current.name, 0, 2) == "cn" ? ".cn" : ""
   alias_service = format("amazonaws.com%s", local.alias_region)

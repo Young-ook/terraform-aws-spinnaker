@@ -23,12 +23,12 @@ data "aws_iam_policy_document" "eks-trustrel" {
 
 # security/policy
 resource "aws_iam_role_policy_attachment" "eks-cluster" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSClusterPolicy", data.aws_partition.current.partition)
   role       = aws_iam_role.eks.id
 }
 
 resource "aws_iam_role_policy_attachment" "eks-service" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSServicePolicy", data.aws_partition.current.partition)
   role       = aws_iam_role.eks.id
 }
 
@@ -124,7 +124,7 @@ resource "local_file" "kube-svc-lb" {
 
 # container optimized ami
 data "aws_ami" "eks-linux-ami" {
-  owners      = ["602401143452"] # Amazon EKS AMI Account ID
+  owners      = [var.eks_linux_ami_owner] # Amazon EKS AMI Account ID
   most_recent = true
 
   filter {
@@ -156,17 +156,17 @@ data "aws_iam_policy_document" "nodes-trustrel" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks-nodes" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSWorkerNodePolicy", data.aws_partition.current.partition)
   role       = aws_iam_role.nodes.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks-cni" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKS_CNI_Policy", data.aws_partition.current.partition)
   role       = aws_iam_role.nodes.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks-ecr-read" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
   role       = aws_iam_role.nodes.name
 }
 

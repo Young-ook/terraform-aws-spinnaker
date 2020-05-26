@@ -18,13 +18,13 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_security_group_rule" "db-ingress-rules" {
-  count                    = (var.mysql_node_size > 0) ? 1 : 0
-  type                     = "ingress"
-  from_port                = var.mysql_port
-  to_port                  = var.mysql_port
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.nodes.id
-  security_group_id        = aws_security_group.db[0].id
+  count             = (var.mysql_node_size > 0) ? 1 : 0
+  type              = "ingress"
+  from_port         = var.mysql_port
+  to_port           = var.mysql_port
+  protocol          = "tcp"
+  cidr_blocks       = aws_vpc.vpc.cidr_block
+  security_group_id = aws_security_group.db[0].id
 }
 
 # subnet group
@@ -78,7 +78,7 @@ resource "aws_db_parameter_group" "db" {
 # rds (aurora)
 resource "aws_rds_cluster" "db" {
   count                           = (var.mysql_node_size > 0) ? 1 : 0
-  cluster_identifier_prefix       = format("%s-", local.cluster-name)
+  cluster_identifier_prefix       = format("%s-", local.name)
   engine                          = "aurora-mysql"
   engine_mode                     = "provisioned"
   engine_version                  = var.mysql_version
@@ -103,7 +103,7 @@ resource "aws_rds_cluster" "db" {
 # rds instances
 resource "aws_rds_cluster_instance" "db" {
   count                   = var.mysql_node_size
-  identifier              = format("%s-%s", local.cluster-name, count.index)
+  identifier              = format("%s-%s", local.name, count.index)
   cluster_identifier      = aws_rds_cluster.db[0].id
   instance_class          = var.mysql_node_type
   engine                  = "aurora-mysql"
@@ -117,7 +117,7 @@ resource "aws_rds_cluster_instance" "db" {
 resource "aws_route53_record" "db" {
   count   = (var.mysql_node_size > 0) ? 1 : 0
   zone_id = aws_route53_zone.vpc.zone_id
-  name    = format("%s-db.%s", local.cluster-name, var.dns_zone)
+  name    = format("%s-db.%s", local.name, var.dns_zone)
   type    = "CNAME"
   ttl     = 300
   records = coalescelist(aws_rds_cluster.db.*.endpoint, list(""))

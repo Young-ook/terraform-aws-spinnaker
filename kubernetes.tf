@@ -1,27 +1,20 @@
 ## managed kubernetes master cluster
 
-resource "aws_iam_role" "eks" {
-  name               = local.eks-name
-  assume_role_policy = data.aws_iam_policy_document.eks-trustrel.json
-}
-
-data "aws_iam_policy_document" "eks-trustrel" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type = "Service"
-
-      identifiers = [
-        "eks.amazonaws.com",
-      ]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
 # security/policy
+resource "aws_iam_role" "eks" {
+  name = local.name
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "eks.amazonaws.com"
+      }
+    }]
+    Version = "2012-10-17"
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "eks-cluster" {
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSClusterPolicy", data.aws_partition.current.partition)
   role       = aws_iam_role.eks.id
@@ -32,47 +25,15 @@ resource "aws_iam_role_policy_attachment" "eks-service" {
   role       = aws_iam_role.eks.id
 }
 
-# security/firewall
-resource "aws_security_group" "eks" {
-  name        = local.eks-name
-  description = format("security group for eks node of %s", local.cluster-name)
-  vpc_id      = aws_vpc.vpc.id
-
-  tags = merge(
-    local.eks-name-tag,
-    local.vpc-k8s-shared-tag,
-  )
-}
-
-resource "aws_security_group_rule" "eks-ingress-allow-node-pool" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  description              = "https traffic from node pool"
-  source_security_group_id = aws_security_group.nodes.id
-  security_group_id        = aws_security_group.eks.id
-}
-
-resource "aws_security_group_rule" "eks-egress-allow-node-pool" {
-  type                     = "egress"
-  from_port                = 1025
-  to_port                  = 65535
-  protocol                 = "tcp"
-  description              = "tcp traffics to node pool"
-  source_security_group_id = aws_security_group.nodes.id
-  security_group_id        = aws_security_group.eks.id
-}
-
 # eks cluster
 resource "aws_eks_cluster" "eks" {
-  name     = local.cluster-name
+  name     = local.name
   role_arn = aws_iam_role.eks.arn
   version  = var.kube_version
+  tags     = merge(local.name-tag, var.tags)
 
   vpc_config {
-    subnet_ids         = aws_subnet.private.*.id
-    security_group_ids = [aws_security_group.eks.id]
+    subnet_ids = aws_subnet.private.*.id
   }
 
   lifecycle {
@@ -86,21 +47,81 @@ resource "aws_eks_cluster" "eks" {
   ]
 }
 
+# security/policy
+resource "aws_iam_role" "ng" {
+  name = format("%s-ng", aws_eks_cluster.eks.name)
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+    Version = "2012-10-17"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ng-eks" {
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSWorkerNodePolicy", data.aws_partition.current.partition)
+  role       = aws_iam_role.ng.name
+}
+
+resource "aws_iam_role_policy_attachment" "ng-cni" {
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKS_CNI_Policy", data.aws_partition.current.partition)
+  role       = aws_iam_role.ng.name
+}
+
+resource "aws_iam_role_policy_attachment" "ng-ecr-read" {
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
+  role       = aws_iam_role.ng.name
+}
+
+# eks node group
+resource "aws_eks_node_group" "ng" {
+  cluster_name    = aws_eks_cluster.eks.name
+  node_group_name = aws_eks_cluster.eks.name
+  node_role_arn   = aws_iam_role.ng.arn
+  subnet_ids      = aws_subnet.private.*.id
+  disk_size       = var.kube_node_vol_size
+  instance_types  = [var.kube_node_type]
+  version         = aws_eks_cluster.eks.version
+  tags            = merge(local.name-tag, var.tags)
+
+  scaling_config {
+    max_size     = var.kube_node_size
+    min_size     = var.kube_node_size
+    desired_size = var.kube_node_size
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [scaling_config]
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.ng-eks,
+    aws_iam_role_policy_attachment.ng-cni,
+    aws_iam_role_policy_attachment.ng-ecr-read,
+  ]
+}
+
+
 # helm
 data "template_file" "helm-init" {
   template = file(format("%s/resources/helm-init.tpl", path.module))
 
   vars = {
-    cluster_name       = local.cluster-name
+    cluster_name       = aws_eks_cluster.eks.name
     cluster_arn        = aws_eks_cluster.eks.arn
-    node_pool_role_arn = aws_iam_role.nodes.arn
+    node_pool_role_arn = aws_iam_role.ng.arn
     aws_region         = var.region
   }
 }
 
 resource "local_file" "helm-init" {
   content         = data.template_file.helm-init.rendered
-  filename        = format("%s/%s/helm.sh", path.cwd, local.cluster-name)
+  filename        = format("%s/%s/helm.sh", path.cwd, aws_eks_cluster.eks.name)
   file_permission = "0600"
 }
 
@@ -108,7 +129,7 @@ data "template_file" "kube-svc" {
   template = file(format("%s/resources/kube-svc.tpl", path.module))
 
   vars = {
-    cluster_name   = local.cluster-name
+    cluster_name   = aws_eks_cluster.eks.name
     elb_sec_policy = var.elb_sec_policy
     ssl_cert_arn   = var.ssl_cert_arn
   }
@@ -116,251 +137,73 @@ data "template_file" "kube-svc" {
 
 resource "local_file" "kube-svc-lb" {
   content         = data.template_file.kube-svc.rendered
-  filename        = format("%s/%s/lb.sh", path.cwd, local.cluster-name)
+  filename        = format("%s/%s/lb.sh", path.cwd, aws_eks_cluster.eks.name)
   file_permission = "0600"
 }
 
-## auto scaling group for node-pool of kubernetes
-
-# container optimized ami
-data "aws_ami" "eks-linux-ami" {
-  owners      = [var.eks_linux_ami_owner] # Amazon EKS AMI Account ID
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = [format("amazon-eks-node-%s-*", var.kube_version)]
-  }
-}
-
 # security/policy
-resource "aws_iam_role" "nodes" {
-  name               = local.nodes-name
-  assume_role_policy = data.aws_iam_policy_document.nodes-trustrel.json
-}
-
-data "aws_iam_policy_document" "nodes-trustrel" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type = "Service"
-
-      identifiers = [
-        "ec2.amazonaws.com",
-      ]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "eks-nodes" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSWorkerNodePolicy", data.aws_partition.current.partition)
-  role       = aws_iam_role.nodes.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks-cni" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonEKS_CNI_Policy", data.aws_partition.current.partition)
-  role       = aws_iam_role.nodes.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks-ecr-read" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
-  role       = aws_iam_role.nodes.name
-}
-
-resource "aws_iam_instance_profile" "nodes" {
-  name = local.nodes-name
-  role = aws_iam_role.nodes.name
-}
-
-# security/firewall
-resource "aws_security_group" "nodes" {
-  name        = local.nodes-name
-  description = format("security group for worker node of %s", local.cluster-name)
-  vpc_id      = aws_vpc.vpc.id
-
-  tags = merge(
-    local.nodes-name-tag,
-    local.vpc-k8s-shared-tag,
-  )
-}
-
-resource "aws_security_group_rule" "nodes-ingress-allow-master-https" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  description              = "https traffic from master cluster"
-  source_security_group_id = aws_security_group.eks.id
-  security_group_id        = aws_security_group.nodes.id
-}
-
-resource "aws_security_group_rule" "nodes-ingress-allow-master-tcp" {
-  type                     = "ingress"
-  from_port                = 1025
-  to_port                  = 65535
-  protocol                 = "tcp"
-  description              = "https traffic from master cluster"
-  source_security_group_id = aws_security_group.eks.id
-  security_group_id        = aws_security_group.nodes.id
-}
-
-resource "aws_security_group_rule" "nodes-ingress-allow-each-other" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  description              = "all traffics from other nodes"
-  source_security_group_id = aws_security_group.nodes.id
-  security_group_id        = aws_security_group.nodes.id
-}
-
-resource "aws_security_group_rule" "nodes-egress-allow-all" {
-  type              = "egress"
-  cidr_blocks       = ["0.0.0.0/0"]
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  description       = "all outbound traffics"
-  security_group_id = aws_security_group.nodes.id
-}
-
-# bootstrap
-data "template_file" "nodes-userdata" {
-  template = file(format("%s/resources/nodes.tpl", path.module))
-
-  vars = {
-    name      = local.cluster-name
-    endpoint  = aws_eks_cluster.eks.endpoint
-    cert_auth = aws_eks_cluster.eks.certificate_authority[0].data
-  }
-}
-
-# launch configuration
-resource "aws_launch_configuration" "nodes" {
-  image_id             = var.kube_node_ami == "" ? data.aws_ami.eks-linux-ami.id : var.kube_node_ami
-  instance_type        = var.kube_node_type
-  name_prefix          = format("%s-", local.nodes-name)
-  security_groups      = [aws_security_group.nodes.id]
-  iam_instance_profile = aws_iam_instance_profile.nodes.name
-  enable_monitoring    = false
-  user_data            = data.template_file.nodes-userdata.rendered
-
-  root_block_device {
-    volume_type = var.kube_node_vol_type
-    volume_size = var.kube_node_vol_size
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# auto scaling group
-resource "aws_autoscaling_group" "nodes" {
-  name                 = local.nodes-name
-  max_size             = var.kube_node_size
-  min_size             = var.kube_node_size
-  desired_capacity     = var.kube_node_size
-  vpc_zone_identifier  = aws_subnet.private.*.id
-  launch_configuration = aws_launch_configuration.nodes.name
-  termination_policies = ["Default"]
-  force_delete         = true
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = concat(
-    [
-      {
-        "key"                 = "Name"
-        "value"               = local.nodes-name
-        "propagate_at_launch" = "true"
-      },
-      local.vpc-k8s-owned-tag,
-    ],
-  )
-
-  depends_on = [aws_subnet.private]
-}
-
-# security/policy
-
-###
 # bake
-###
-data "aws_iam_policy_document" "rosco-bake" {
-  statement {
-    actions = [
-      "iam:PassRole",
-      "ec2:AttachVolume",
-      "ec2:AuthorizeSecurityGroupIngress",
-      "ec2:CopyImage",
-      "ec2:CreateImage",
-      "ec2:CreateKeypair",
-      "ec2:CreateSecurityGroup",
-      "ec2:CreateSnapshot",
-      "ec2:CreateTags",
-      "ec2:CreateVolume",
-      "ec2:DeleteKeyPair",
-      "ec2:DeleteSecurityGroup",
-      "ec2:DeleteSnapshot",
-      "ec2:DeleteVolume",
-      "ec2:DeregisterImage",
-      "ec2:DescribeImageAttribute",
-      "ec2:DescribeImages",
-      "ec2:DescribeInstances",
-      "ec2:DescribeRegions",
-      "ec2:DescribeSecurityGroups",
-      "ec2:DescribeSnapshots",
-      "ec2:DescribeSubnets",
-      "ec2:DescribeTags",
-      "ec2:DescribeVolumes",
-      "ec2:DetachVolume",
-      "ec2:GetPasswordData",
-      "ec2:ModifyImageAttribute",
-      "ec2:ModifyInstanceAttribute",
-      "ec2:ModifySnapshotAttribute",
-      "ec2:RegisterImage",
-      "ec2:RunInstances",
-      "ec2:StopInstances",
-      "ec2:TerminateInstances",
-      "ec2:RequestSpotInstances",
-      "ec2:CancelSpotInstanceRequests",
-      "ec2:DescribeSpotInstanceRequests",
-      "ec2:DescribeSpotPriceHistory",
-    ]
-
-    effect    = "Allow"
-    resources = ["*"]
-  }
-}
-
 resource "aws_iam_policy" "rosco-bake" {
-  name   = format("%s-bake", local.name)
-  policy = data.aws_iam_policy_document.rosco-bake.json
+  name = format("%s-bake", aws_eks_cluster.eks.name)
+  policy = jsonencode({
+    Statement = [{
+      Action = [
+        "iam:PassRole",
+        "ec2:AttachVolume",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CopyImage",
+        "ec2:CreateImage",
+        "ec2:CreateKeypair",
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateSnapshot",
+        "ec2:CreateTags",
+        "ec2:CreateVolume",
+        "ec2:DeleteKeyPair",
+        "ec2:DeleteSecurityGroup",
+        "ec2:DeleteSnapshot",
+        "ec2:DeleteVolume",
+        "ec2:DeregisterImage",
+        "ec2:DescribeImageAttribute",
+        "ec2:DescribeImages",
+        "ec2:DescribeInstances",
+        "ec2:DescribeRegions",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeTags",
+        "ec2:DescribeVolumes",
+        "ec2:DetachVolume",
+        "ec2:GetPasswordData",
+        "ec2:ModifyImageAttribute",
+        "ec2:ModifyInstanceAttribute",
+        "ec2:ModifySnapshotAttribute",
+        "ec2:RegisterImage",
+        "ec2:RunInstances",
+        "ec2:StopInstances",
+        "ec2:TerminateInstances",
+        "ec2:RequestSpotInstances",
+        "ec2:CancelSpotInstanceRequests",
+        "ec2:DescribeSpotInstanceRequests",
+        "ec2:DescribeSpotPriceHistory",
+      ]
+      Effect   = "Allow"
+      Resource = ["*"]
+    }]
+    Version = "2012-10-17"
+  })
 }
 
-###
 # describes ec2
-###
-data "aws_iam_policy_document" "spin-ec2read" {
-  statement {
-    actions = [
-      "ec2:Describe*",
-    ]
-
-    effect    = "Allow"
-    resources = ["*"]
-  }
-}
-
 resource "aws_iam_policy" "spin-ec2read" {
-  name   = format("%s-ec2read", local.name)
-  policy = data.aws_iam_policy_document.spin-ec2read.json
+  name = format("%s-ec2read", aws_eks_cluster.eks.name)
+  policy = jsonencode({
+    Statement = [{
+      Action   = "ec2:Describe*"
+      Effect   = "Allow"
+      Resource = ["*"]
+    }]
+    Version = "2012-10-17"
+  })
 }
 
 ###
@@ -375,7 +218,7 @@ data "aws_iam_policy_document" "spin-assume" {
 }
 
 resource "aws_iam_policy" "spin-assume" {
-  name   = format("%s-assume", local.name)
+  name   = format("%s-assume", aws_eks_cluster.eks.name)
   policy = data.aws_iam_policy_document.spin-assume.json
 }
 
@@ -384,55 +227,20 @@ resource "aws_iam_policy" "spin-assume" {
 
 resource "aws_iam_role_policy_attachment" "spin-s3admin" {
   policy_arn = aws_iam_policy.s3admin.arn
-  role       = aws_iam_role.nodes.name
+  role       = aws_iam_role.ng.name
 }
 
 resource "aws_iam_role_policy_attachment" "spin-bake" {
   policy_arn = aws_iam_policy.rosco-bake.arn
-  role       = aws_iam_role.nodes.name
+  role       = aws_iam_role.ng.name
 }
 
 resource "aws_iam_role_policy_attachment" "spin-ec2read" {
   policy_arn = aws_iam_policy.spin-ec2read.arn
-  role       = aws_iam_role.nodes.name
+  role       = aws_iam_role.ng.name
 }
 
 resource "aws_iam_role_policy_attachment" "spin-assume" {
   policy_arn = aws_iam_policy.spin-assume.arn
-  role       = aws_iam_role.nodes.name
+  role       = aws_iam_role.ng.name
 }
-
-# security/firewall
-resource "aws_security_group" "rosco-bake" {
-  name        = format("%s-bake", local.nodes-name)
-  description = format("security group for image baker of %s", local.cluster-name)
-  vpc_id      = aws_vpc.vpc.id
-
-  tags = merge(
-    {
-      "Name" = format("%s-bake", local.nodes-name)
-    },
-    local.vpc-k8s-shared-tag,
-  )
-}
-
-resource "aws_security_group_rule" "rosco-bake-ingress-allow-ssh" {
-  type                     = "ingress"
-  from_port                = 22
-  to_port                  = 22
-  protocol                 = "tcp"
-  description              = "ssh traffic from packer in rosco"
-  source_security_group_id = aws_security_group.nodes.id
-  security_group_id        = aws_security_group.rosco-bake.id
-}
-
-resource "aws_security_group_rule" "rosco-bake-egress-allow-all" {
-  type              = "egress"
-  cidr_blocks       = ["0.0.0.0/0"]
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  description       = "all outbound traffics"
-  security_group_id = aws_security_group.rosco-bake.id
-}
-

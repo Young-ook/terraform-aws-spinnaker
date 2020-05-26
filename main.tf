@@ -12,11 +12,8 @@ locals {
 
 # name and description
 locals {
-  name         = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
-  cluster-name = local.name
-  eks-name     = join("-", compact([local.cluster-name, "eks"]))
-  nodes-name   = join("-", compact([local.cluster-name, "nodes"]))
-  suffix       = random_string.suffix.result
+  name   = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
+  suffix = random_string.suffix.result
 }
 
 resource "random_string" "suffix" {
@@ -29,6 +26,7 @@ resource "random_string" "suffix" {
 
 # vpc tags
 locals {
+  name-tag               = { "Name" = local.name }
   vpc-name-tag           = { "Name" = join("-", compact([local.name, "vpc"])) }
   igw-name-tag           = { "Name" = join("-", compact([local.name, "igw"])) }
   ngw-name-tag           = { "Name" = join("-", compact([local.name, "ngw"])) }
@@ -39,13 +37,11 @@ locals {
 
 # kubernetes tags
 locals {
-  eks-name-tag   = { "Name" = local.eks-name }
-  nodes-name-tag = { "Name" = local.nodes-name }
   vpc-k8s-shared-tag = {
-    format("kubernetes.io/cluster/%s", local.cluster-name) = "shared"
+    format("kubernetes.io/cluster/%s", local.name) = "shared"
   }
   vpc-k8s-owned-tag = {
-    "key"                 = format("kubernetes.io/cluster/%s", local.cluster-name)
+    "key"                 = format("kubernetes.io/cluster/%s", local.name)
     "value"               = "owned"
     "propagate_at_launch" = "true"
   }

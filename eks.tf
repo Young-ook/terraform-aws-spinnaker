@@ -25,13 +25,13 @@ data "aws_iam_policy_document" "master-trustrel" {
 
 # eks cluster policy/role 
 resource "aws_iam_role_policy_attachment" "eks-cluster" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  policy_arn = "${format("arn:%s:iam::aws:policy/AmazonEKSClusterPolicy", data.aws_partition.current.partition)}"
   role       = "${aws_iam_role.master.id}"
 }
 
 # eks service policy/role 
 resource "aws_iam_role_policy_attachment" "eks-service" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  policy_arn = "${format("arn:%s:iam::aws:policy/AmazonEKSServicePolicy", data.aws_partition.current.partition)}"
   role       = "${aws_iam_role.master.id}"
 }
 

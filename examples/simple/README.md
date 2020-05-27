@@ -5,7 +5,7 @@ You can use this module like as below. This shows how to create the resources fo
 This module will create vpc, subnets, s3 bucket, iam policies and kubernetes cluster.
 
 ### Initialise
-This is the first step to create a spinnaker cluster. Just get terraform module and apply it and this is sort of terraform command to do `terraform init`, `terraform plan`, and `terraform apply`. After then you will see so many resources like eks, s3, ec2, iam, rds, and others on aws.
+This is the first step to create a spinnaker cluster. Just get terraform module and apply it and this is sort of terraform command to do `terraform init`, `terraform plan -var-file default.tfvars`, and `terraform apply -var-file default.tfvars`. After then you will see so many resources like eks, s3, ec2, iam, rds, and others on aws.
 
 #### Easy and simple example
 ```

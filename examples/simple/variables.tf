@@ -5,10 +5,6 @@ variable "aws_account_id" {
   description = "The aws account id for the tf backend creation (e.g. 857026751867)"
 }
 
-variable "aws_profile" {
-  description = "A profile name for aws cli"
-}
-
 ### network
 variable "aws_region" {
   description = "The aws region to deploy the service into"
@@ -61,6 +57,7 @@ variable "kube_node_ami" {
 variable "tags" {
   description = "The key-value maps for tagging"
   type        = map(string)
+  default     = {}
 }
 
 ### security

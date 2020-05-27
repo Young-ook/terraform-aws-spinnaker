@@ -46,19 +46,9 @@ resource "aws_s3_bucket" "storage" {
     id      = local.name
     enabled = true
 
-    tags = {
-      "rule"      = "transit the current version object to IA after 180 days"
-      "rule"      = "permanently delete the previous version object after 120 days"
-      "autoclean" = "true"
-    }
-
     transition {
       days          = 180
       storage_class = "STANDARD_IA"
-    }
-
-    noncurrent_version_expiration {
-      days = 120
     }
   }
 

@@ -50,6 +50,7 @@ variable "kube_node_ami" {
 variable "tags" {
   description = "The key-value maps for tagging"
   type        = map(string)
+  default     = {}
 }
 
 ### security

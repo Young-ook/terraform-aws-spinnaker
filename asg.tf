@@ -36,17 +36,17 @@ data "aws_iam_policy_document" "node-pool-trustrel" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks-node-pool" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  policy_arn = "${format("arn:%s:iam::aws:policy/AmazonEKSWorkerNodePolicy", data.aws_partition.current.partition)}"
   role       = "${aws_iam_role.node-pool.name}"
 }
 
 resource "aws_iam_role_policy_attachment" "eks-cni" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  policy_arn = "${format("arn:%s:iam::aws:policy/AmazonEKS_CNI_Policy", data.aws_partition.current.partition)}"
   role       = "${aws_iam_role.node-pool.name}"
 }
 
 resource "aws_iam_role_policy_attachment" "eks-ecr-read" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  policy_arn = "${format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)}"
   role       = "${aws_iam_role.node-pool.name}"
 }
 

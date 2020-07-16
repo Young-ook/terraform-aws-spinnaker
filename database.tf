@@ -23,7 +23,7 @@ resource "aws_security_group_rule" "db-ingress-rules" {
   from_port         = var.mysql_port
   to_port           = var.mysql_port
   protocol          = "tcp"
-  cidr_blocks       = aws_vpc.vpc.cidr_block
+  cidr_blocks       = [aws_vpc.vpc.cidr_block]
   security_group_id = aws_security_group.db[0].id
 }
 

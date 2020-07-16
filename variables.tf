@@ -54,16 +54,6 @@ variable "tags" {
 }
 
 ### security
-variable "elb_sec_policy" {
-  description = "Registered security policy"
-  default     = "ELBSecurityPolicy-2016-08"
-}
-
-variable "ssl_cert_arn" {
-  description = "The arn of registered ssl cretificate authority in acm"
-  default     = "your-ca"
-}
-
 variable "assume_role_arn" {
   description = "The list of arns to allow assume role from spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
   default     = ["arn:aws:iam::12345678987:role/spinnaker-managed-dev"]

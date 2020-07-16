@@ -106,39 +106,21 @@ resource "aws_eks_node_group" "ng" {
   ]
 }
 
-
-# helm
-data "template_file" "helm-init" {
-  template = file(format("%s/resources/helm-init.tpl", path.module))
+# kubeconfig
+data "template_file" "update-kubeconfig" {
+  template = file(format("%s/resources/update-kubeconfig.tpl", path.module))
 
   vars = {
-    cluster_name       = aws_eks_cluster.eks.name
-    cluster_arn        = aws_eks_cluster.eks.arn
-    node_pool_role_arn = aws_iam_role.ng.arn
-    aws_region         = var.region
+    cluster_name = aws_eks_cluster.eks.name
+    cluster_arn  = aws_eks_cluster.eks.arn
+    aws_region   = var.region
   }
 }
 
-resource "local_file" "helm-init" {
-  content         = data.template_file.helm-init.rendered
-  filename        = format("%s/%s/helm.sh", path.cwd, aws_eks_cluster.eks.name)
-  file_permission = "0600"
-}
-
-data "template_file" "kube-svc" {
-  template = file(format("%s/resources/kube-svc.tpl", path.module))
-
-  vars = {
-    cluster_name   = aws_eks_cluster.eks.name
-    elb_sec_policy = var.elb_sec_policy
-    ssl_cert_arn   = var.ssl_cert_arn
-  }
-}
-
-resource "local_file" "kube-svc-lb" {
-  content         = data.template_file.kube-svc.rendered
-  filename        = format("%s/%s/lb.sh", path.cwd, aws_eks_cluster.eks.name)
-  file_permission = "0600"
+resource "local_file" "update-kubeconfig" {
+  content         = data.template_file.update-kubeconfig.rendered
+  filename        = format("%s/update-kubeconfig.sh", path.cwd)
+  file_permission = "0500"
 }
 
 # security/policy

@@ -1,8 +1,8 @@
 # x509 certificates for spinnaker cli and helm/tiller communication
 
 # x509 certificates authority
-data "template_file" "update-x509ca" {
-  template = file(format("%s/resources/update-x509ca.tpl", path.module))
+data "template_file" "x509" {
+  template = file(format("%s/resources/x509.tpl", path.module))
 
   vars = {
     country      = lookup(var.x509_prop, "country", "KR")
@@ -14,10 +14,10 @@ data "template_file" "update-x509ca" {
   }
 }
 
-resource "local_file" "update-x509ca" {
-  content         = data.template_file.update-x509ca.rendered
-  filename        = format("%s/update-x509ca.sh", path.cwd)
-  file_permission = "0500"
+resource "local_file" "gen-x509-ca" {
+  content         = data.template_file.x509.rendered
+  filename        = format("%s/x509.sh", path.cwd)
+  file_permission = "0600"
 }
 
 # halconfig

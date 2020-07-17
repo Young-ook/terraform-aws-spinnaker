@@ -134,13 +134,3 @@ variable "detail" {
   description = "The extra description of module instance"
   default     = ""
 }
-
-variable "slug" {
-  description = "A random string to be end of tail of module name"
-  default     = ""
-}
-
-variable "eks_linux_ami_owner" {
-  description = "The AMI owner of eks linux ami. e.g., commercial region: 602401143452, us-gov-west: 013241004608"
-  default     = "602401143452"
-}

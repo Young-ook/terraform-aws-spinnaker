@@ -32,5 +32,4 @@ module "this" {
   mysql_snapshot          = var.mysql_snapshot
   mysql_apply_immediately = var.mysql_apply_immediately
   dns_zone                = var.dns_zone
-  ssl_cert_arn            = var.ssl_cert_arn
 }

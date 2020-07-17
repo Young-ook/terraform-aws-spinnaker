@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 CURDIR=`dirname $0`
-KUBE_HOME=$CURDIR/kube
+KUBE_HOME=$CURDIR/.kube
 NAMESPACES="spinnaker prometheus"
 
 EKS_NAME=${cluster_name}

@@ -1,6 +1,5 @@
 #!/bin/bash -e
 
-# Environment variables
 CURDIR=`dirname $0`
 KUBE_HOME=$CURDIR/kube
 NAMESPACES="spinnaker prometheus"
@@ -11,8 +10,7 @@ EKS_ARN=${cluster_arn}
 export AWS_DEFAULT_REGION=${aws_region}
 export KUBECONFIG=$KUBE_HOME/config
 
-# Initialize kubernetes config file using aws cli
-function init_kube() {
+function init() {
   # Make new home directory for kubernetes configuration
   if [ -d $KUBE_HOME ]; then
     rm -r $KUBE_HOME
@@ -22,13 +20,19 @@ function init_kube() {
   # update kubeconfig
   aws eks update-kubeconfig --name $EKS_NAME
   kubectl config use-context $EKS_ARN
+
+  for namespace in $NAMESPACES; do
+    init_ns $namespace
+  done
+
+  minify $EKS_ARN
+  rm $KUBECONFIG
 }
 
-# Create namespace and service account
 function init_ns() {
   local NAMESPACE=$1
   local SERVICEACCOUNT=$NAMESPACE-sa
-  local CONTEXT=$SERVICEACCOUNT
+  local CONTEXT=$NAMESPACE
 
   # Minimal RBAC permissions for namespace
   cat  << EOF | kubectl apply -f -
@@ -80,26 +84,32 @@ EOF
           --cluster=$EKS_ARN \
           --user=$SERVICEACCOUNT \
           --namespace=$NAMESPACE
+
+  minify $NAMESPACE
 }
 
-# Mminify kubernetes config
 function minify () {
+  local MINI_KUBECONFIG
+
+  if [ $1 == $EKS_ARN ]; then
+    MINI_KUBECONFIG=$KUBECONFIG-$EKS_NAME
+  else
+    MINI_KUBECONFIG=$KUBECONFIG-$1
+  fi
+
   kubectl config view --raw > $KUBECONFIG.full.tmp
   kubectl --kubeconfig $KUBECONFIG.full.tmp config use-context $1
   kubectl --kubeconfig $KUBECONFIG.full.tmp \
-    config view --flatten --minify > $KUBECONFIG
+    config view --flatten --minify > $MINI_KUBECONFIG
 
   chmod 600 $KUBECONFIG
   rm $KUBECONFIG.full.tmp
 }
 
-### 
-init_kube
-for namespace in $NAMESPACES; do
-  init_ns $namespace
-done
-### 
+#
+# initialize the minified kubeconfig files
+#
+init
 
-# Clean up
 unset AWS_DEFAULT_REGION
 unset KUBECONFIG

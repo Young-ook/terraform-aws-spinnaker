@@ -10,6 +10,27 @@ EKS_ARN=${cluster_arn}
 export AWS_DEFAULT_REGION=${aws_region}
 export KUBECONFIG=$KUBE_HOME/config
 
+function print_usage() {
+  echo "Usage: $0"
+}
+
+function process_args() {
+  if [[ $# < 1 ]]; then
+    init
+  fi
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+    shift
+    case $key in
+      *)
+        >&2 echo "Unrecognized argument '$key'"
+        print_usage
+        exit -1
+    esac
+  done
+}
+
 function init() {
   # Make new home directory for kubernetes configuration
   if [ -d $KUBE_HOME ]; then
@@ -106,10 +127,8 @@ function minify () {
   rm $KUBECONFIG.full.tmp
 }
 
-#
-# initialize the minified kubeconfig files
-#
-init
+# main
+process_args "$@"
 
 unset AWS_DEFAULT_REGION
 unset KUBECONFIG

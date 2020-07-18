@@ -32,4 +32,7 @@ module "this" {
   mysql_snapshot          = var.mysql_snapshot
   mysql_apply_immediately = var.mysql_apply_immediately
   dns_zone                = var.dns_zone
+  helm_config = {
+    values = file("override-helm-values.yaml")
+  }
 }

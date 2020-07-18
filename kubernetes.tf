@@ -226,3 +226,51 @@ resource "aws_iam_role_policy_attachment" "spin-assume" {
   policy_arn = aws_iam_policy.spin-assume.arn
   role       = aws_iam_role.ng.name
 }
+
+data "aws_eks_cluster" "eks" {
+  name = aws_eks_cluster.eks.name
+}
+
+data "aws_eks_cluster_auth" "eks" {
+  name = aws_eks_cluster.eks.name
+}
+
+### helming!!!
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.eks.endpoint
+  token                  = data.aws_eks_cluster_auth.eks.token
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+  load_config_file       = false
+}
+
+resource "kubernetes_namespace" "spinnaker" {
+  metadata {
+    labels = {
+      app = "spinnaker"
+    }
+    name = "spinnaker"
+  }
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.eks.endpoint
+    token                  = data.aws_eks_cluster_auth.eks.token
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+    load_config_file       = false
+  }
+}
+
+resource "helm_release" "spinnaker" {
+  name       = "spinnaker"
+  chart      = "spinnaker"
+  repository = lookup(var.helm_config, "repo", local.default_helm_config["repo"])
+  namespace  = lookup(var.helm_config, "namespace", local.default_helm_config["namespace"])
+  timeout    = lookup(var.helm_config, "timeout", local.default_helm_config["timeout"])
+  version    = lookup(var.helm_config, "version", local.default_helm_config["version"])
+  values     = [lookup(var.helm_config, "values", local.default_helm_config["values"])]
+
+  depends_on = [aws_eks_cluster.eks, aws_eks_node_group.ng, kubernetes_namespace.spinnaker]
+
+}

@@ -119,6 +119,13 @@ variable "dns_zone" {
   description = "The hosted zone name for internal dns, e.g., app.internal"
 }
 
+### helm
+variable "helm_config" {
+  description = "A configuration map for helm variables to deploy a spinnaker"
+  default     = null
+  type        = map
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"

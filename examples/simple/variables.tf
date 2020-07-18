@@ -127,10 +127,28 @@ variable "dns_zone" {
 }
 
 ### helm
-variable "helm_config" {
-  description = "A configuration map for helm variables to deploy a spinnaker"
-  default     = null
-  type        = map
+variable "helm_repo" {
+  description = "A repositiry url of helm chart to deploy a spinnaker"
+  default     = "https://kubernetes-charts.storage.googleapis.com"
+  type        = string
+}
+
+variable "helm_timeout" {
+  description = "Timeout value to wailt for helm chat deployment"
+  default     = 600
+  type        = number
+}
+
+variable "helm_chart_version" {
+  description = "The version of helm chart to deploy spinnaker"
+  default     = "2.1.0-rc.1"
+  type        = string
+}
+
+variable "helm_chart_values" {
+  description = "A list of variables of helm chart to configure the spinnaker deployment"
+  default     = []
+  type        = list
 }
 
 ### description

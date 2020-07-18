@@ -59,18 +59,6 @@ variable "assume_role_arn" {
   default     = ["arn:aws:iam::12345678987:role/spinnaker-managed-dev"]
 }
 
-variable "x509_prop" {
-  description = "Properties for generating self-signed certificates"
-  default = {
-    "country"      = "KR"
-    "state"        = "SEL"
-    "location"     = "SEL"
-    "organization" = "ORG"
-    "common_name"  = "your@email.com"
-    "groups"       = "admin"
-  }
-}
-
 ### rdb cluster (aurora-mysql)
 variable "mysql_version" {
   description = "The target version of mysql cluster"

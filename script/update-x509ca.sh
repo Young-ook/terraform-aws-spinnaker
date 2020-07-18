@@ -1,28 +1,25 @@
 #!/bin/bash -e
+# create new self-signed certificate authority (CA)
 
-# Environment
 CURDIR=`dirname $0`
-SECRET_HOME=$HOME/.secret
-CERT_HOME=$SECRET_HOME/cert
+CERT_HOME=$CURDIR/cert
 
 # Variable
-CNTRY=${country}
-STAT=${state}
-LOC=${location}
-ORG=${organization}
-CN=${common_name}
-GROUP=${groups}
+CNTRY="KR"
+STAT="ICN"
+LOC="ICN"
+ORG="ORG"
+CN="your@email.com"
+GROUP="spinnaker-team1\nspinnaker-team2"
 
 # Conditions
 CLT=false
 SVR=false
 
-# print help
 function print_usage() {
-  echo "Usage: $0 client | all"
+  echo "Usage: $0 -a(all) | -c(client only)"
 }
 
-# command parsing
 function process_args() {
   if [[ $# < 1 ]]; then
     print_usage
@@ -33,11 +30,11 @@ function process_args() {
     local key="$1"
     shift
     case $key in
-      all)
+      -a)
         CLT=true
         SVR=true
         ;;
-      client)
+      -c)
         CLT=true
         SVR=false
         ;;
@@ -64,19 +61,12 @@ function clean() {
   fi
 }
 
-# create new self-signed certificate authority (CA)
-function create_ca() {
-  echo "---------------------------------------------------------------------------"
-  echo "Create self signed certificates authority"
-  echo "Automatically generated key will be stored in $CERT_HOME/server.secret file"
-  echo "---------------------------------------------------------------------------"
-
+function gen_ca() {
   openssl genrsa -out $CERT_HOME/ca.key 4096
   openssl req -new -x509 -days 365 -key $CERT_HOME/ca.key -out $CERT_HOME/ca.crt \
     -subj "/C=$CNTRY/ST=$STAT/L=$LOC/O=$ORG/OU=$ORG/CN=$CN"
 }
 
-# create new server side certificates
 function gen_server_crt() {
   openssl genrsa -out $CERT_HOME/server.key 4096
   openssl req -new -key $CERT_HOME/server.key -out $CERT_HOME/server.csr \
@@ -85,11 +75,13 @@ function gen_server_crt() {
   openssl x509 -req -days 365 -in $CERT_HOME/server.csr -CA $CERT_HOME/ca.crt -CAkey $CERT_HOME/ca.key \
     -CAcreateserial -out $CERT_HOME/server.crt
 
+  echo "---------------------------------------------------------------------------"
+  echo "Automatically generated key will be stored in $CERT_HOME/server.secret file"
+  echo "---------------------------------------------------------------------------"
   # password auto-generation
   local PASSWD=$(pwgen 20 1)
   echo $PASSWD > $CERT_HOME/server.secret | chmod 600 $CERT_HOME/server.secret
 
-  # Create server keystore
   openssl pkcs12 -export -clcerts -in $CERT_HOME/server.crt \
     -inkey $CERT_HOME/server.key -out $CERT_HOME/server.p12 \
     -name spinnaker -password pass:$PASSWD
@@ -104,7 +96,6 @@ function gen_server_crt() {
     -deststorepass $PASSWD -destkeypass $PASSWD
 }
 
-# create new client certificates
 function gen_client_crt() {
   # x509 config file
 cat << EOF > $CERT_HOME/openssl.conf
@@ -143,13 +134,12 @@ EOF
     -extfile $CERT_HOME/openssl.conf -extensions v3_req
 }
 
-
 # main
 process_args "$@"
 clean
 
 if $SVR && $CLT; then
-  create_ca
+  gen_ca
   gen_server_crt
 fi
 

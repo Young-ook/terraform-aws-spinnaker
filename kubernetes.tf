@@ -106,23 +106,6 @@ resource "aws_eks_node_group" "ng" {
   ]
 }
 
-# kubeconfig
-data "template_file" "update-kubeconfig" {
-  template = file(format("%s/resources/update-kubeconfig.tpl", path.module))
-
-  vars = {
-    cluster_name = aws_eks_cluster.eks.name
-    cluster_arn  = aws_eks_cluster.eks.arn
-    aws_region   = var.region
-  }
-}
-
-resource "local_file" "update-kubeconfig" {
-  content         = data.template_file.update-kubeconfig.rendered
-  filename        = format("%s/update-kubeconfig.sh", path.cwd)
-  file_permission = "0500"
-}
-
 # security/policy
 # bake
 resource "aws_iam_policy" "rosco-bake" {

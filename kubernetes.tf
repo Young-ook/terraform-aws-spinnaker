@@ -265,11 +265,11 @@ provider "helm" {
 resource "helm_release" "spinnaker" {
   name       = "spinnaker"
   chart      = "spinnaker"
-  repository = lookup(var.helm_config, "repo", local.default_helm_config["repo"])
-  namespace  = lookup(var.helm_config, "namespace", local.default_helm_config["namespace"])
-  timeout    = lookup(var.helm_config, "timeout", local.default_helm_config["timeout"])
-  version    = lookup(var.helm_config, "version", local.default_helm_config["version"])
-  values     = [lookup(var.helm_config, "values", local.default_helm_config["values"])]
+  repository = var.helm_repo
+  namespace  = "spinnaker"
+  timeout    = var.helm_timeout
+  version    = var.helm_chart_version
+  values     = var.helm_chart_values
 
   depends_on = [aws_eks_cluster.eks, aws_eks_node_group.ng, kubernetes_namespace.spinnaker]
 

@@ -1,3 +1,5 @@
+# Complete example
+
 terraform {
   required_version = "~> 0.12.0"
 }
@@ -8,9 +10,10 @@ provider "aws" {
   version             = ">= 1.21.0"
 }
 
-# Test code
-module "this" {
-  source = "../../"
+# spinnaker
+module "spinnaker" {
+  source  = "Young-ook/spinnaker-managed-role/aws"
+  version = "2.0.0"
 
   name                    = var.name
   stack                   = var.stack
@@ -32,5 +35,16 @@ module "this" {
   mysql_snapshot          = var.mysql_snapshot
   mysql_apply_immediately = var.mysql_apply_immediately
   dns_zone                = var.dns_zone
-  helm_chart_values       = [file("override-helm-values.yaml")]
+  helm_chart_version      = "2.0.0-rc9"
+  helm_chart_values       = [file("helm-values.yml")]
+  assume_role_arn         = [module.spinnaker-managed-role.role_arn]
+}
+
+# spinnaker managed role
+module "spinnaker-managed-role" {
+  source  = "Young-ook/spinnaker-managed-role/aws"
+  version = "1.0.2"
+
+  desc             = "preprod"
+  trusted_role_arn = []
 }

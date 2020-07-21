@@ -2,7 +2,7 @@
 
 # security/policy
 resource "aws_iam_role" "eks" {
-  name = local.name
+  name = format("%s-eks", local.name)
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
@@ -27,17 +27,13 @@ resource "aws_iam_role_policy_attachment" "eks-service" {
 
 # eks cluster
 resource "aws_eks_cluster" "eks" {
-  name     = local.name
+  name     = format("%s", local.name)
   role_arn = aws_iam_role.eks.arn
   version  = var.kube_version
   tags     = merge(local.name-tag, var.tags)
 
   vpc_config {
     subnet_ids = aws_subnet.private.*.id
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 
   depends_on = [
@@ -49,7 +45,7 @@ resource "aws_eks_cluster" "eks" {
 
 # security/policy
 resource "aws_iam_role" "ng" {
-  name = format("%s-ng", aws_eks_cluster.eks.name)
+  name = format("%s", local.name)
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
@@ -94,11 +90,6 @@ resource "aws_eks_node_group" "ng" {
     desired_size = var.kube_node_size
   }
 
-  lifecycle {
-    create_before_destroy = true
-    ignore_changes        = [scaling_config]
-  }
-
   depends_on = [
     aws_iam_role_policy_attachment.ng-eks,
     aws_iam_role_policy_attachment.ng-cni,
@@ -109,7 +100,7 @@ resource "aws_eks_node_group" "ng" {
 # security/policy
 # bake
 resource "aws_iam_policy" "rosco-bake" {
-  name = format("%s-bake", aws_eks_cluster.eks.name)
+  name = format("%s-bake", local.name)
   policy = jsonencode({
     Statement = [{
       Action = [
@@ -160,7 +151,7 @@ resource "aws_iam_policy" "rosco-bake" {
 
 # describes ec2
 resource "aws_iam_policy" "spin-ec2read" {
-  name = format("%s-ec2read", aws_eks_cluster.eks.name)
+  name = format("%s-ec2read", local.name)
   policy = jsonencode({
     Statement = [{
       Action   = "ec2:Describe*"
@@ -183,7 +174,7 @@ data "aws_iam_policy_document" "spin-assume" {
 }
 
 resource "aws_iam_policy" "spin-assume" {
-  name   = format("%s-assume", aws_eks_cluster.eks.name)
+  name   = format("%s-assume", local.name)
   policy = data.aws_iam_policy_document.spin-assume.json
 }
 
@@ -191,7 +182,7 @@ resource "aws_iam_policy" "spin-assume" {
 ### policy attachment to allow pods to access aws resources
 
 resource "aws_iam_role_policy_attachment" "spin-s3admin" {
-  policy_arn = aws_iam_policy.s3admin.arn
+  policy_arn = aws_iam_policy.spin-s3admin.arn
   role       = aws_iam_role.ng.name
 }
 
@@ -255,5 +246,4 @@ resource "helm_release" "spinnaker" {
   values     = var.helm_chart_values
 
   depends_on = [aws_eks_cluster.eks, aws_eks_node_group.ng, kubernetes_namespace.spinnaker]
-
 }

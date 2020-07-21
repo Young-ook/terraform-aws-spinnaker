@@ -2,7 +2,7 @@
 ## s3 bucket for front50 storage
 
 # security/role
-data "aws_iam_policy_document" "s3admin" {
+data "aws_iam_policy_document" "spin-s3admin" {
   statement {
     effect    = "Allow"
     resources = [format("arn:%s:s3:::%s/*", data.aws_partition.current.partition, local.name)]
@@ -33,9 +33,9 @@ data "aws_iam_policy_document" "s3admin" {
   }
 }
 
-resource "aws_iam_policy" "s3admin" {
+resource "aws_iam_policy" "spin-s3admin" {
   name   = format("%s-s3admin", local.name)
-  policy = data.aws_iam_policy_document.s3admin.json
+  policy = data.aws_iam_policy_document.spin-s3admin.json
 }
 
 resource "aws_s3_bucket" "storage" {

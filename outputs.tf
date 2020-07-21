@@ -1,13 +1,18 @@
 # output variables 
 
-output "cluster_name" {
+output "name" {
   value       = local.name
   description = "The name of eks cluster to run spinnaker pods"
 }
 
-output "eks_endpoint" {
+output "endpoint" {
   value       = aws_eks_cluster.eks.endpoint
   description = "The enpoint of eks cluster"
+}
+
+output "role_arn" {
+  value       = aws_iam_role.ng.arn
+  description = "The generated role ARN of eks node group"
 }
 
 output "bucket_name" {

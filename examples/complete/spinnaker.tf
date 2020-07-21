@@ -12,7 +12,7 @@ provider "aws" {
 
 # spinnaker
 module "spinnaker" {
-  source  = "Young-ook/spinnaker-managed-role/aws"
+  source  = "Young-ook/spinnaker/aws"
   version = "2.0.0"
 
   name                    = var.name
@@ -43,7 +43,7 @@ module "spinnaker" {
 # spinnaker managed role
 module "spinnaker-managed-role" {
   source  = "Young-ook/spinnaker-managed-role/aws"
-  version = "1.0.2"
+  version = "1.0.3"
 
   desc             = "preprod"
   trusted_role_arn = []

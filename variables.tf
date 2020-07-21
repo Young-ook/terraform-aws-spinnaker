@@ -53,12 +53,6 @@ variable "tags" {
   default     = {}
 }
 
-### security
-variable "assume_role_arn" {
-  description = "The list of arns to allow assume role from spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
-  default     = ["arn:aws:iam::12345678987:role/spinnaker-managed-dev"]
-}
-
 ### rdb cluster (aurora-mysql)
 variable "mysql_version" {
   description = "The target version of mysql cluster"
@@ -146,4 +140,11 @@ variable "stack" {
 variable "detail" {
   description = "The extra description of module instance"
   default     = ""
+}
+
+### security
+variable "assume_role_arn" {
+  description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
+  default     = []
+  type        = list(string)
 }

@@ -127,10 +127,9 @@ variable "helm_chart_version" {
   type        = string
 }
 
-variable "helm_chart_values" {
-  description = "A list of variables of helm chart to configure the spinnaker deployment"
-  default     = []
-  type        = list
+variable "helm_chart_values_file" {
+  description = "Path to file for helm chart configuration"
+  type        = string
 }
 
 ### description

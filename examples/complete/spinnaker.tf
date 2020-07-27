@@ -10,6 +10,13 @@ provider "aws" {
   version             = ">= 1.21.0"
 }
 
+provider "aws" {
+  alias               = "prod"
+  region              = var.aws_region
+  allowed_account_ids = [var.aws_account_id]
+  version             = ">= 1.21.0"
+}
+
 # spinnaker
 module "spinnaker" {
   source  = "Young-ook/spinnaker/aws"
@@ -45,6 +52,7 @@ module "spinnaker-managed-role" {
   source  = "Young-ook/spinnaker-managed-role/aws"
   version = "1.0.3"
 
+  providers        = { aws = aws.prod }
   desc             = "preprod"
   trusted_role_arn = [module.spinnaker.role_arn]
 }

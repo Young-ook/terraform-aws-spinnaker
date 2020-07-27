@@ -13,7 +13,7 @@ provider "aws" {
 # spinnaker
 module "spinnaker" {
   source  = "Young-ook/spinnaker/aws"
-  version = "2.0.1"
+  version = "~> 2.0"
 
   name                    = var.name
   stack                   = var.stack

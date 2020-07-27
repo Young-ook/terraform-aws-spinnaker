@@ -10,5 +10,10 @@ output "spinnaker_role_arn" {
 
 output "spinnaker_managed_role_arn" {
   value       = module.spinnaker-managed-role.role_arn
-  description = "The generated arn from spinnaker managed role module"
+  description = "The generated ARN from spinnaker managed role module"
+}
+
+output "artifact_write_policy_arn" {
+  value       = module.spinnaker.artifact_write_policy_arn
+  description = "Policy ARN created to allow CI tools to upload the artifacts"
 }

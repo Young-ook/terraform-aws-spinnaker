@@ -20,6 +20,11 @@ output "bucket_name" {
   description = "The name of s3 bucket to store pipelines and applications of spinnaker"
 }
 
+output "artifact_write_policy_arn" {
+  value       = aws_iam_policy.spin-artifact-writeonly.arn
+  description = "The policy ARN to allow access to artifact bucket"
+}
+
 output "vpc_id" {
   value       = aws_vpc.vpc.id
   description = "The Id. of new VPC"

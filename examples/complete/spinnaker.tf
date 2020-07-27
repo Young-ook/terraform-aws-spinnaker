@@ -13,7 +13,7 @@ provider "aws" {
 # spinnaker
 module "spinnaker" {
   source  = "Young-ook/spinnaker/aws"
-  version = "2.0.0"
+  version = "2.0.1"
 
   name                    = var.name
   stack                   = var.stack
@@ -35,8 +35,8 @@ module "spinnaker" {
   mysql_snapshot          = var.mysql_snapshot
   mysql_apply_immediately = var.mysql_apply_immediately
   dns_zone                = var.dns_zone
-  helm_chart_version      = "2.0.0-rc9"
-  helm_chart_values       = [file("helm-values.yml")]
+  helm_chart_version      = "2.1.0-rc.1"
+  helm_chart_values       = [file(var.helm_chart_values_file)]
   assume_role_arn         = [module.spinnaker-managed-role.role_arn]
 }
 
@@ -46,5 +46,5 @@ module "spinnaker-managed-role" {
   version = "1.0.3"
 
   desc             = "preprod"
-  trusted_role_arn = []
+  trusted_role_arn = [module.spinnaker.role_arn]
 }

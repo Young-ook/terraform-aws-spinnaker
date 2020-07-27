@@ -2,40 +2,38 @@
 ## s3 bucket for front50 storage
 
 # security/role
-data "aws_iam_policy_document" "spin-s3admin" {
-  statement {
-    effect    = "Allow"
-    resources = [format("arn:%s:s3:::%s/*", data.aws_partition.current.partition, local.name)]
-    actions   = ["s3:*"]
-  }
-
-  statement {
-    effect    = "Allow"
-    resources = [format("arn:%s:s3:::%s", data.aws_partition.current.partition, local.name)]
-    actions = [
-      "s3:ListBucketByTags",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListBucketVersions",
-      "s3:ListBucket",
-      "s3:GetBucketVersioning",
-      "s3:GetBucketLocation",
-    ]
-  }
-
-  statement {
-    effect    = "Allow"
-    resources = ["*"]
-
-    actions = [
-      "s3:HeadBucket",
-      "s3:ListAllMyBuckets",
-    ]
-  }
-}
-
 resource "aws_iam_policy" "spin-s3admin" {
-  name   = format("%s-s3admin", local.name)
-  policy = data.aws_iam_policy_document.spin-s3admin.json
+  name = format("%s-s3admin", local.name)
+  policy = jsonencode({
+    Statement = [
+      {
+        Action   = "s3:*"
+        Effect   = "Allow"
+        Resource = [format("arn:%s:s3:::%s/*", data.aws_partition.current.partition, local.name)]
+      },
+      {
+        Action = [
+          "s3:ListBucketByTags",
+          "s3:ListBucketMultipartUploads",
+          "s3:ListBucketVersions",
+          "s3:ListBucket",
+          "s3:GetBucketVersioning",
+          "s3:GetBucketLocation",
+        ]
+        Effect   = "Allow"
+        Resource = [format("arn:%s:s3:::%s", data.aws_partition.current.partition, local.name)]
+      },
+      {
+        Action = [
+          "s3:HeadBucket",
+          "s3:ListAllMyBuckets",
+        ]
+        Effect   = "Allow"
+        Resource = ["*"]
+      }
+    ]
+    Version = "2012-10-17"
+  })
 }
 
 resource "aws_s3_bucket" "storage" {

@@ -1,4 +1,4 @@
-## managed kubernetes master cluster
+## managed kubernetes cluster
 
 # security/policy
 resource "aws_iam_role" "eks" {
@@ -25,7 +25,6 @@ resource "aws_iam_role_policy_attachment" "eks-service" {
   role       = aws_iam_role.eks.id
 }
 
-# eks cluster
 resource "aws_eks_cluster" "eks" {
   name     = format("%s", local.name)
   role_arn = aws_iam_role.eks.arn
@@ -68,12 +67,11 @@ resource "aws_iam_role_policy_attachment" "ng-cni" {
   role       = aws_iam_role.ng.name
 }
 
-resource "aws_iam_role_policy_attachment" "ng-ecr-read" {
+resource "aws_iam_role_policy_attachment" "ng-ecrread" {
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
   role       = aws_iam_role.ng.name
 }
 
-# eks node group
 resource "aws_eks_node_group" "ng" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = aws_eks_cluster.eks.name
@@ -93,7 +91,7 @@ resource "aws_eks_node_group" "ng" {
   depends_on = [
     aws_iam_role_policy_attachment.ng-eks,
     aws_iam_role_policy_attachment.ng-cni,
-    aws_iam_role_policy_attachment.ng-ecr-read,
+    aws_iam_role_policy_attachment.ng-ecrread,
   ]
 }
 
@@ -165,17 +163,16 @@ resource "aws_iam_policy" "spin-ec2read" {
 ###
 # assume to cross account spinnaker-managed role
 ###
-data "aws_iam_policy_document" "spin-assume" {
-  statement {
-    actions   = ["sts:AssumeRole"]
-    effect    = "Allow"
-    resources = var.assume_role_arn
-  }
-}
-
 resource "aws_iam_policy" "spin-assume" {
-  name   = format("%s-assume", local.name)
-  policy = data.aws_iam_policy_document.spin-assume.json
+  name = format("%s-assume", local.name)
+  policy = jsonencode({
+    Statement = [{
+      Action   = "sts:AssumeRole"
+      Effect   = "Allow"
+      Resource = var.assume_role_arn
+    }]
+    Version = "2012-10-17"
+  })
 }
 
 

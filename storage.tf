@@ -36,6 +36,18 @@ resource "aws_iam_policy" "spin-s3admin" {
   })
 }
 
+resource "aws_iam_policy" "spin-artifact-writeonly" {
+  name = format("%s-artifact-writeonly", local.name)
+  policy = jsonencode({
+    Statement = [{
+      Action   = "s3:Put*"
+      Effect   = "Allow"
+      Resource = [format("arn:%s:s3:::%s/artifact/*", data.aws_partition.current.partition, local.name)]
+    }]
+    Version = "2012-10-17"
+  })
+}
+
 resource "aws_s3_bucket" "storage" {
   bucket = local.name
   tags   = var.tags
@@ -64,7 +76,7 @@ resource "aws_s3_bucket" "storage" {
 }
 
 locals {
-  keys = ["front50", "kayenta", "halyard"]
+  keys = ["front50", "kayenta", "halyard", "artifact"]
 }
 
 resource "aws_s3_bucket_object" "keys" {

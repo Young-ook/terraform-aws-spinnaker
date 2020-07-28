@@ -8,7 +8,7 @@ resource "aws_iam_role" "eks" {
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
-        Service = "eks.amazonaws.com"
+        Service = format("eks.%s", data.aws_partition.current.dns_suffix)
       }
     }]
     Version = "2012-10-17"
@@ -50,24 +50,24 @@ resource "aws_iam_role" "ng" {
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
-        Service = "ec2.amazonaws.com"
+        Service = format("ec2.%s", data.aws_partition.current.dns_suffix)
       }
     }]
     Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ng-eks" {
+resource "aws_iam_role_policy_attachment" "eks-ng" {
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSWorkerNodePolicy", data.aws_partition.current.partition)
   role       = aws_iam_role.ng.name
 }
 
-resource "aws_iam_role_policy_attachment" "ng-cni" {
+resource "aws_iam_role_policy_attachment" "eks-cni" {
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEKS_CNI_Policy", data.aws_partition.current.partition)
   role       = aws_iam_role.ng.name
 }
 
-resource "aws_iam_role_policy_attachment" "ng-ecrread" {
+resource "aws_iam_role_policy_attachment" "ecr-read" {
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
   role       = aws_iam_role.ng.name
 }
@@ -89,9 +89,9 @@ resource "aws_eks_node_group" "ng" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.ng-eks,
-    aws_iam_role_policy_attachment.ng-cni,
-    aws_iam_role_policy_attachment.ng-ecrread,
+    aws_iam_role_policy_attachment.eks-ng,
+    aws_iam_role_policy_attachment.eks-cni,
+    aws_iam_role_policy_attachment.ecr-read,
   ]
 }
 

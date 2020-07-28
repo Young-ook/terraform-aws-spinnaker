@@ -2,11 +2,6 @@
 data "aws_partition" "current" {}
 
 # name and description
-locals {
-  name   = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
-  suffix = random_string.suffix.result
-}
-
 resource "random_string" "suffix" {
   length  = 4
   upper   = false
@@ -15,9 +10,14 @@ resource "random_string" "suffix" {
   special = false
 }
 
+locals {
+  suffix   = random_string.suffix.result
+  name     = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
+  name-tag = { "Name" = local.name }
+}
+
 # vpc tags
 locals {
-  name-tag               = { "Name" = local.name }
   vpc-name-tag           = { "Name" = join("-", compact([local.name, "vpc"])) }
   igw-name-tag           = { "Name" = join("-", compact([local.name, "igw"])) }
   ngw-name-tag           = { "Name" = join("-", compact([local.name, "ngw"])) }

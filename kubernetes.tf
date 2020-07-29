@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "eks-service" {
 resource "aws_eks_cluster" "eks" {
   name     = format("%s", local.name)
   role_arn = aws_iam_role.eks.arn
-  version  = var.kube_version
+  version  = var.kubernetes_version
   tags     = merge(local.name-tag, var.tags)
 
   vpc_config {
@@ -73,19 +73,20 @@ resource "aws_iam_role_policy_attachment" "ecr-read" {
 }
 
 resource "aws_eks_node_group" "ng" {
+  for_each        = var.kubernetes_node_groups
   cluster_name    = aws_eks_cluster.eks.name
-  node_group_name = aws_eks_cluster.eks.name
+  node_group_name = join("-", [aws_eks_cluster.eks.name, each.key])
   node_role_arn   = aws_iam_role.ng.arn
   subnet_ids      = aws_subnet.private.*.id
-  disk_size       = var.kube_node_vol_size
-  instance_types  = [var.kube_node_type]
+  disk_size       = lookup(each.value, "disk_size", "20")
+  instance_types  = [lookup(each.value, "instance_type", "m5.xlarge")]
   version         = aws_eks_cluster.eks.version
   tags            = merge(local.name-tag, var.tags)
 
   scaling_config {
-    max_size     = var.kube_node_size
-    min_size     = var.kube_node_size
-    desired_size = var.kube_node_size
+    max_size     = lookup(each.value, "max_size", 3)
+    min_size     = lookup(each.value, "min_size", 1)
+    desired_size = lookup(each.value, "desired_size", 1)
   }
 
   depends_on = [

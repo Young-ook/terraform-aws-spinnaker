@@ -18,34 +18,24 @@ variable "cidr" {
 }
 
 ### kubernetes cluster
-variable "kube_version" {
+variable "kubernetes_version" {
   description = "The target version of kubernetes"
   type        = string
   default     = "1.14"
 }
 
-variable "kube_node_type" {
-  description = "The instance type for kubernetes worker nodes"
-  type        = string
-  default     = "m5.large"
-}
-
-variable "kube_node_size" {
-  description = "The instance count for kubernetes worker nodes"
-  type        = number
-  default     = "3"
-}
-
-variable "kube_node_vol_size" {
-  description = "The volume size of each kubernetes worker node"
-  type        = number
-  default     = "50"
-}
-
-variable "kube_node_vol_type" {
-  description = "The volume type of each kubernetes worker node"
-  type        = string
-  default     = "gp2"
+variable "kubernetes_node_groups" {
+  description = "Node group definitions"
+  type        = map
+  default = {
+    "default" = {
+      "disk_size"     = "20"
+      "instance_type" = "m5.xlarge"
+      "max_size"      = "3"
+      "min_size"      = "1"
+      "desired_size"  = "1"
+    }
+  }
 }
 
 ### rdb cluster (aurora-mysql)

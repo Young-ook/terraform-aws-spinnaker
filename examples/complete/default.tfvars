@@ -5,11 +5,16 @@ stack              = "dev"
 azs                = ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
 tags               = { "env" = "dev" }
 dns_zone           = "your.private"
-kube_version       = "1.16"
-kube_node_type     = "t3.medium"
-kube_node_size     = "1"
-kube_node_vol_size = "8"
-mysql_version      = "5.7.12"
-mysql_node_type    = "db.t3.medium"
-mysql_node_size    = "1"
-helm_values_file   = "helm-values.yml"
+kubernetes_version = "1.16"
+kubernetes_node_groups = {
+  "default" = {
+    "instance_type" = "m5.large"
+    "min_size"      = "1"
+    "max_size"      = "3"
+    "desired_size"  = "2"
+  }
+}
+mysql_version    = "5.7.12"
+mysql_node_type  = "db.t3.medium"
+mysql_node_size  = "1"
+helm_values_file = "helm-values.yml"

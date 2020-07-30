@@ -37,55 +37,13 @@ variable "kubernetes_node_groups" {
   default     = {}
 }
 
+#  [CAUTION] Changing the snapshot ID. will force a new resource.
+
 ### rdb cluster (aurora-mysql)
-variable "mysql_version" {
-  description = "The target version of mysql cluster"
-  type        = string
-  default     = "5.7.12"
-}
-
-variable "mysql_port" {
-  description = "The port number of mysql"
-  type        = number
-  default     = "3306"
-}
-
-variable "mysql_node_type" {
-  description = "The instance type for mysql cluster"
-  type        = string
-  default     = "db.r4.large"
-}
-
-variable "mysql_node_size" {
-  description = "The instance count of mysql (aurora) cluster"
-  type        = number
-  default     = "1"
-}
-
-variable "mysql_master_user" {
-  description = "The name of master user of mysql"
-  type        = string
-  default     = "yourid"
-}
-
-variable "mysql_db" {
-  description = "The name of initial database in mysql"
-  type        = string
-  default     = "yourdb"
-}
-
-#  [CAUTION] Changing the snapshot will force a new resource.
-
-variable "mysql_snapshot" {
-  description = "The name of snapshot to be source of new mysql cluster"
-  type        = string
-  default     = ""
-}
-
-variable "mysql_apply_immediately" {
-  description = "specifies whether any database modifications are applied immediately, or during the next maintenance window"
-  type        = bool
-  default     = false
+variable "aurora_cluster" {
+  description = "RDS Aurora for mysql cluster definition"
+  type        = map
+  default     = {}
 }
 
 ### security

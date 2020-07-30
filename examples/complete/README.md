@@ -40,14 +40,7 @@ module "spinnaker" {
   cidr                    = var.cidr
   kubernetes_version      = var.kubernetes_version
   kubernetes_node_groups  = var.kubernetes_node_groups
-  mysql_version           = var.mysql_version
-  mysql_port              = var.mysql_port
-  mysql_node_type         = var.mysql_node_type
-  mysql_node_size         = var.mysql_node_size
-  mysql_master_user       = var.mysql_master_user
-  mysql_db                = var.mysql_db
-  mysql_snapshot          = var.mysql_snapshot
-  mysql_apply_immediately = var.mysql_apply_immediately
+  aurora_cluster          = var.aurora_cluster
   dns_zone                = var.dns_zone
   helm_chart_version      = "2.1.0-rc.1"
   helm_chart_values       = [file(var.helm_chart_values_file)]

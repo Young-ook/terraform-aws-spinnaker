@@ -55,13 +55,6 @@ variable "kube_node_vol_type" {
   default     = "gp2"
 }
 
-### tags
-variable "tags" {
-  description = "The key-value maps for tagging"
-  type        = map(string)
-  default     = {}
-}
-
 ### rdb cluster (aurora-mysql)
 variable "mysql_version" {
   description = "The target version of mysql cluster"
@@ -111,6 +104,13 @@ variable "mysql_apply_immediately" {
   description = "specifies whether any database modifications are applied immediately, or during the next maintenance window"
   type        = bool
   default     = false
+}
+
+### security
+variable "assume_role_arn" {
+  description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
+  type        = list(string)
+  default     = []
 }
 
 ### dns
@@ -164,9 +164,9 @@ variable "detail" {
   default     = ""
 }
 
-### security
-variable "assume_role_arn" {
-  description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
-  type        = list(string)
-  default     = []
+### tags
+variable "tags" {
+  description = "The key-value maps for tagging"
+  type        = map(string)
+  default     = {}
 }

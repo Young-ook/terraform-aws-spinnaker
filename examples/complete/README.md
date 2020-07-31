@@ -38,10 +38,8 @@ module "spinnaker" {
   region                  = var.aws_region
   azs                     = var.azs
   cidr                    = var.cidr
-  kube_version            = var.kube_version
-  kube_node_type          = var.kube_node_type
-  kube_node_size          = var.kube_node_size
-  kube_node_vol_size      = var.kube_node_vol_size
+  kubernetes_version      = var.kubernetes_version
+  kubernetes_node_groups  = var.kubernetes_node_groups
   mysql_version           = var.mysql_version
   mysql_port              = var.mysql_port
   mysql_node_type         = var.mysql_node_type

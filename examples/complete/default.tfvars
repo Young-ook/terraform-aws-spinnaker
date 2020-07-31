@@ -14,7 +14,9 @@ kubernetes_node_groups = {
     "desired_size"  = "2"
   }
 }
-mysql_version    = "5.7.12"
-mysql_node_type  = "db.t3.medium"
-mysql_node_size  = "1"
+aurora_cluster = {
+  "node_size" = "1"
+  "node_type" = "db.t3.medium"
+  "version"   = "5.7.12"
+}
 helm_values_file = "helm-values.yml"

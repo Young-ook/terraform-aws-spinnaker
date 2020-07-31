@@ -89,6 +89,10 @@ resource "aws_eks_node_group" "ng" {
     desired_size = lookup(each.value, "desired_size", 1)
   }
 
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.eks-ng,
     aws_iam_role_policy_attachment.eks-cni,

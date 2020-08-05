@@ -56,7 +56,8 @@ module "spinnaker-managed-role-preprod" {
   version = "1.0.3"
 
   providers        = { aws = aws.preprod }
-  desc             = "preprod"
+  name             = "spinnaker"
+  detail           = "preprod"
   trusted_role_arn = [module.spinnaker.role_arn]
 }
 
@@ -66,7 +67,8 @@ module "spinnaker-managed-role-prod" {
   version = "1.0.3"
 
   providers        = { aws = aws.prod }
-  desc             = "prod"
+  name             = "spinnaker"
+  detail           = "prod"
   trusted_role_arn = [module.spinnaker.role_arn]
 }
 ```

@@ -40,10 +40,11 @@ module "spinnaker" {
 
 # spinnaker managed role
 module "spinnaker-managed-role" {
-  source  = "Young-ook/spinnaker-managed-role/aws"
-  version = "1.0.3"
+  source  = "Young-ook/spinnaker-managed/aws"
+  version = "~> 1.0"
 
   providers        = { aws = aws.prod }
-  desc             = "preprod"
+  name             = "test"
+  stack            = "prod"
   trusted_role_arn = [module.spinnaker.role_arn]
 }

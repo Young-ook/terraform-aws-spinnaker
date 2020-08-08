@@ -5,14 +5,14 @@
 * You have an AWS account you want to manage by Spinnaker. This module will create an IAM role on your AWS account and the role name will be similar to the following, `<name>-<stack>-<detail>-spinnaker-managed`.
 
 ## Examples
-- [Quickstart Example](https://github.com/Young-ook/terraform-aws-spinnaker/tree/master/modules/spinnaker-managed/aws/README.md#Quickstart)
+- [Quickstart Example](https://github.com/Young-ook/terraform-aws-spinnaker/tree/master/modules/spinnaker-managed-aws/README.md#Quickstart)
 - [Complete Example](https://github.com/Young-ook/terraform-aws-spinnaker/tree/master/examples/complete)
 
 ## Quickstart
 ### Setup
 ```hcl
 module "spinnaker-role" {
-  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/aws"
+  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed-aws"
   version = "~> 2.0"
 
   name             = "app"

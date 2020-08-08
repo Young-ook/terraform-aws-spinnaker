@@ -52,7 +52,7 @@ module "spinnaker" {
 
 # spinnaker managed role (preprod)
 module "spinnaker-managed-role-preprod" {
-  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/aws"
+  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed-aws"
   version = "~> 2.0"
 
   providers        = { aws = aws.preprod }
@@ -64,7 +64,7 @@ module "spinnaker-managed-role-preprod" {
 
 # spinnaker managed role (prod)
 module "spinnaker-managed-role-prod" {
-  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/aws"
+  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed-aws"
   version = "~> 2.0"
 
   providers        = { aws = aws.prod }
@@ -76,7 +76,7 @@ module "spinnaker-managed-role-prod" {
 
 # spinnaker managed role (gcp)
 module "spinnaker-managed-role-gcp" {
-  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/gcp"
+  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed-gcp"
   version = "~> 2.0"
 
   desc    = "dev"

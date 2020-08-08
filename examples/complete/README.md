@@ -51,25 +51,36 @@ module "spinnaker" {
 }
 
 # spinnaker managed role (preprod)
-module "spinnaker-managed-preprod" {
-  source  = "Young-ook/spinnaker-managed/aws"
-  version = "~> 1.0"
+module "spinnaker-managed-role-preprod" {
+  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/aws"
+  version = "~> 2.0"
 
   providers        = { aws = aws.preprod }
   name             = "spinnaker"
-  detail           = "preprod"
+  stack            = "preprod"
+  detail           = "additional-desc"
   trusted_role_arn = [module.spinnaker.role_arn]
 }
 
 # spinnaker managed role (prod)
-module "spinnaker-managed-prod" {
-  source  = "Young-ook/spinnaker-managed/aws"
-  version = "~> 1.0"
+module "spinnaker-managed-role-prod" {
+  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/aws"
+  version = "~> 2.0"
 
   providers        = { aws = aws.prod }
   name             = "spinnaker"
-  detail           = "prod"
+  stack            = "prod"
+  detail           = "additional-desc"
   trusted_role_arn = [module.spinnaker.role_arn]
+}
+
+# spinnaker managed role (gcp)
+module "spinnaker-managed-role-gcp" {
+  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/gcp"
+  version = "~> 2.0"
+
+  desc    = "dev"
+  project = "yourproj"
 }
 ```
 Run terraform:

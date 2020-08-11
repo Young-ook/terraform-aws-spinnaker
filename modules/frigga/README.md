@@ -13,7 +13,7 @@ From Norse mythology. the name Frigga refers the wife of Odin, queen of Asgard.
 ### Setup
 ```hcl
 module "frigga" {
-  source  = "Young-ook/spinnaker/aws/modules/frigga"
+  source  = "Young-ook/spinnaker/aws//modules/frigga"
   version = "~> 2.0"
 
   name             = "app"
@@ -42,7 +42,7 @@ nametag = {
 If you don't want to append a random identifier to the end of generated frigga name, please set petname variable to `false` when applyng the module.
 ```hcl
 module "frigga" {
-  source  = "Young-ook/spinnaker/aws/modules/frigga"
+  source  = "Young-ook/spinnaker/aws//modules/frigga"
   version = "~> 2.0"
 
   name             = "app"

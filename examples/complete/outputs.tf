@@ -17,3 +17,8 @@ output "artifact_write_policy_arn" {
   value       = module.spinnaker.artifact_write_policy_arn
   description = "Policy ARN created to allow CI tools to upload the artifacts"
 }
+
+output "kubeconfig" {
+  value       = module.spinnaker.kubeconfig
+  description = "Bash script to update the kubeconfig file for the EKS cluster"
+}

@@ -49,3 +49,14 @@ output "db_endpoint" {
   value       = aws_route53_record.db.*.name
   description = "The enpoint of aurora mysql cluster"
 }
+
+data "template_file" "kubeconfig" {
+  template = <<EOT
+bash -e ${path.module}/script/update-kubeconfig.sh -r ${data.aws_region.current.name} -n ${data.aws_eks_cluster.eks.name}
+EOT
+}
+
+output "kubeconfig" {
+  value       = data.template_file.kubeconfig.rendered
+  description = "Bash script to update kubeconfig file"
+}

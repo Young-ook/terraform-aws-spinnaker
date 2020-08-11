@@ -40,7 +40,7 @@ module "spinnaker" {
 
 # spinnaker managed role
 module "spinnaker-managed-role" {
-  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed/aws"
+  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-aws"
   version = "~> 2.0"
 
   providers        = { aws = aws.prod }

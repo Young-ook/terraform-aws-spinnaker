@@ -1,11 +1,18 @@
-### feature
-variable "base_role_enabled" {
-  description = "A boolean variable to indicate whether to create a BaseIAMRole for EC2 deployment"
-  type        = bool
-  default     = false
+# Variables for providing to module fixture codes
+
+### aws credential
+variable "aws_account_id" {
+  description = "The aws account id for the tf backend creation (e.g. 857026751867)"
 }
 
-### security/trusted-roles
+### network
+variable "aws_region" {
+  description = "The aws region to deploy the service into"
+  type        = string
+  default     = "us-east-1"
+}
+
+### security
 variable "trusted_role_arn" {
   description = "A list of full arn of iam roles of spinnaker cluster"
   type        = list(string)
@@ -26,7 +33,7 @@ variable "stack" {
 }
 
 variable "detail" {
-  description = "The purpose of your aws account"
+  description = "The extra description of module instance"
   type        = string
   default     = ""
 }

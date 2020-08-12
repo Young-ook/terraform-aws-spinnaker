@@ -12,7 +12,7 @@
 ### Setup
 ```hcl
 module "spinnaker-role" {
-  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed-aws"
+  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-aws"
   version = "~> 2.0"
 
   name             = "app"

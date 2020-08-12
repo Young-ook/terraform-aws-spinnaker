@@ -2,7 +2,7 @@
 variable "trusted_role_arn" {
   description = "A list of full arn of iam roles of spinnaker cluster"
   type        = list(string)
-  default     = ["place-here-your-spinnaker-role-arn"]
+  default     = []
 }
 
 ### description

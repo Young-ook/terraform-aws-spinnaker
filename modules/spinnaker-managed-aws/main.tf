@@ -12,55 +12,50 @@ resource "aws_iam_role" "spinnaker-managed" {
           format("ecs-tasks.%s", data.aws_partition.current.dns_suffix),
           format("application-autoscaling.%s", data.aws_partition.current.dns_suffix)
         ],
-        AWS = var.trusted_role_arn
+        AWS = flatten([
+          data.aws_caller_identity.current.account_id,
+          var.trusted_role_arn,
+        ])
       }
     }]
     Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "vpc-full-accs" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonVPCFullAccess", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
+resource "aws_iam_policy" "poweruser-access" {
+  name        = format("%s-poweruser", local.name)
+  description = "Poweruser Access permission for Spinnaker-Managed-Role"
+  path        = "/"
+  policy = jsonencode({
+    Statement = [
+      {
+        "Effect" : "Allow",
+        "NotAction" : [
+          "iam:*",
+          "organizations:*",
+          "account:*"
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "iam:CreateServiceLinkedRole",
+          "iam:DeleteServiceLinkedRole",
+          "iam:ListRoles",
+          "iam:PassRole",
+          "organizations:DescribeOrganization",
+          "account:ListRegions"
+        ],
+        "Resource" : "*"
+      }
+    ]
+    Version = "2012-10-17"
+  })
 }
 
-resource "aws_iam_role_policy_attachment" "ec2-full-accs" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2FullAccess", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
-}
-
-resource "aws_iam_role_policy_attachment" "ecs-full-accs" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonECS_FullAccess", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
-}
-
-resource "aws_iam_role_policy_attachment" "ecs-task-exec" {
-  policy_arn = format("arn:%s:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
-}
-
-resource "aws_iam_role_policy_attachment" "secret-manager" {
-  policy_arn = format("arn:%s:iam::aws:policy/SecretsManagerReadWrite", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
-}
-
-resource "aws_iam_role_policy_attachment" "lambda-full-accs" {
-  policy_arn = format("arn:%s:iam::aws:policy/AWSLambdaFullAccess", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
-}
-
-resource "aws_iam_role_policy_attachment" "ecr-read" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
-}
-
-resource "aws_iam_role_policy_attachment" "cfn-full-accs" {
-  policy_arn = format("arn:%s:iam::aws:policy/AWSCloudFormationFullAccess", data.aws_partition.current.partition)
-  role       = aws_iam_role.spinnaker-managed.id
-}
-
-resource "aws_iam_role_policy_attachment" "iam-read" {
-  policy_arn = format("arn:%s:iam::aws:policy/IAMReadOnlyAccess", data.aws_partition.current.partition)
+resource "aws_iam_role_policy_attachment" "poweruser-accs" {
+  policy_arn = aws_iam_policy.poweruser-access.arn
   role       = aws_iam_role.spinnaker-managed.id
 }
 

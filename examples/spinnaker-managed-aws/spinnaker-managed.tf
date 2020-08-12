@@ -14,8 +14,9 @@ provider "aws" {
 module "spinnaker-managed-role" {
   source = "../../modules/spinnaker-managed-aws"
 
-  name             = var.name
-  stack            = var.stack
-  detail           = var.detail
-  trusted_role_arn = var.trusted_role_arn
+  name              = var.name
+  stack             = var.stack
+  detail            = var.detail
+  trusted_role_arn  = var.trusted_role_arn
+  base_role_enabled = true
 }

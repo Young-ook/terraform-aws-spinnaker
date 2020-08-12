@@ -59,10 +59,11 @@ resource "aws_iam_role_policy_attachment" "poweruser-accs" {
   role       = aws_iam_role.spinnaker-managed.id
 }
 
-# base iam intance-profile
+# BaseIAMRole
 resource "aws_iam_role" "base-iam" {
-  name = "BaseIAMRole"
-  path = "/"
+  count = var.base_role_enabled ? 1 : 0
+  name  = "BaseIAMRole"
+  path  = "/"
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
@@ -79,6 +80,7 @@ resource "aws_iam_role" "base-iam" {
 }
 
 resource "aws_iam_instance_profile" "base-iam" {
-  name = "BaseIAMRole"
-  role = aws_iam_role.base-iam.name
+  count = var.base_role_enabled ? 1 : 0
+  name  = "BaseIAMRole"
+  role  = aws_iam_role.base-iam[0].name
 }

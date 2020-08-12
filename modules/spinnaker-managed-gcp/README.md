@@ -9,7 +9,7 @@
 ### Setup
 ```hcl
 module "spinnaker-managed-role" {
-  source  = "Young-ook/spinnaker/aws/modules/spinnaker-managed-gcp"
+  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-gcp"
   version = "~> 2.0"
 
   desc    = "dev"

@@ -16,8 +16,13 @@ output "role_arn" {
 }
 
 output "bucket_name" {
-  value       = local.name
+  value       = aws_s3_bucket.storage.id
   description = "The name of s3 bucket to store pipelines and applications of spinnaker"
+}
+
+output "artifact_location" {
+  value       = format("%s/%s/", aws_s3_bucket.storage.id, "artifact")
+  description = "The S3 path for artifact storage"
 }
 
 output "artifact_write_policy_arn" {

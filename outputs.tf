@@ -20,9 +20,9 @@ output "bucket_name" {
   description = "The name of s3 bucket to store pipelines and applications of spinnaker"
 }
 
-output "artifact_location" {
+output "artifact_repository" {
   value       = format("%s/%s/", aws_s3_bucket.storage.id, "artifact")
-  description = "The S3 path for artifact storage"
+  description = "The S3 path for artifact repository/storage"
 }
 
 output "artifact_write_policy_arn" {

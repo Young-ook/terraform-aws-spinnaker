@@ -13,13 +13,14 @@ resource "random_string" "suffix" {
 }
 
 locals {
-  suffix   = random_string.suffix.result
-  name     = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
-  name-tag = { "Name" = local.name }
+  suffix             = random_string.suffix.result
+  name               = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
+  artifact-repo-name = join("-", compact(["artifact", var.stack, var.detail, local.suffix]))
 }
 
-# vpc tags
+# tags
 locals {
+  name-tag               = { "Name" = local.name }
   vpc-name-tag           = { "Name" = join("-", compact([local.name, "vpc"])) }
   igw-name-tag           = { "Name" = join("-", compact([local.name, "igw"])) }
   ngw-name-tag           = { "Name" = join("-", compact([local.name, "ngw"])) }

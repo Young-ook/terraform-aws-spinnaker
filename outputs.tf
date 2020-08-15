@@ -21,12 +21,12 @@ output "bucket_name" {
 }
 
 output "artifact_repository" {
-  value       = format("%s/%s/", aws_s3_bucket.storage.id, "artifact")
+  value       = aws_s3_bucket.artifact.id
   description = "The S3 path for artifact repository/storage"
 }
 
 output "artifact_write_policy_arn" {
-  value       = aws_iam_policy.spin-artifact-writeonly.arn
+  value       = aws_iam_policy.artifact-write.arn
   description = "The policy ARN to allow access to artifact bucket"
 }
 

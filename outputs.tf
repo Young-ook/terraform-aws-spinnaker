@@ -57,7 +57,7 @@ output "db_endpoint" {
 
 data "template_file" "kubeconfig" {
   template = <<EOT
-bash -e ${path.module}/script/update-kubeconfig.sh -r ${data.aws_region.current.name} -n ${data.aws_eks_cluster.eks.name}
+bash -e ${path.module}/script/update-kubeconfig.sh -r ${data.aws_region.current.name} -n ${aws_eks_cluster.eks.name}
 EOT
 }
 

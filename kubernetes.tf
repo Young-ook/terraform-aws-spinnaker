@@ -203,10 +203,6 @@ resource "aws_iam_role_policy_attachment" "spin-assume" {
   role       = aws_iam_role.ng.name
 }
 
-data "aws_eks_cluster" "eks" {
-  name = aws_eks_cluster.eks.name
-}
-
 data "aws_eks_cluster_auth" "eks" {
   name = aws_eks_cluster.eks.name
 }

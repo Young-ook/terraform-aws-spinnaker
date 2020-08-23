@@ -48,6 +48,18 @@ module "spinnaker-managed-eks" {
     }
   }
 }
+
+module "irsa" {
+  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-eks//modules/iam-role-for-serviceaccount"
+  version = "~> 2.0"
+
+  namespace      = "default"
+  serviceaccount = "irsa-test"
+  oidc_url       = module.spinnaker-managed-eks.oidc_url
+  oidc_arn       = module.spinnaker-managed-eks.oidc_arn
+  policy_arns    = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"]
+  tags           = { env = "dev" }
+}
 ```
 Run terraform:
 ```
@@ -60,4 +72,4 @@ terraform plan -var-file=default.tfvars
 terraform apply -var-file=default.tfvars
 ```
 
-After then you will see the created EKS cluster and node groups.
+After then you will see the created EKS cluster and node groups and IAM role. For more information about configuration of service account mapping for IAM role in Kubernetes, please check out the [Quickstart Example](https://github.com/Young-ook/terraform-aws-spinnaker/tree/master/modules/spinnaker-managed-eks/README.md#Quickstart)

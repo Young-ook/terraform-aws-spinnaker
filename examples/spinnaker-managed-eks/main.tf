@@ -48,3 +48,15 @@ module "spinnaker-managed-eks" {
     }
   }
 }
+
+module "irsa" {
+  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-eks//modules/iam-role-for-serviceaccount"
+  version = "~> 2.0"
+
+  namespace      = "default"
+  serviceaccount = "irsa-test"
+  oidc_url       = module.spinnaker-managed-eks.oidc_url
+  oidc_arn       = module.spinnaker-managed-eks.oidc_arn
+  policy_arns    = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"]
+  tags           = { env = "dev" }
+}

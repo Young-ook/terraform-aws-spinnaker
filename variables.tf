@@ -21,7 +21,7 @@ variable "cidr" {
 variable "kubernetes_version" {
   description = "The target version of kubernetes"
   type        = string
-  default     = "1.14"
+  default     = "1.17"
 }
 
 variable "kubernetes_node_groups" {
@@ -100,13 +100,13 @@ variable "helm_chart_values" {
 variable "name" {
   description = "The logical name of the module instance"
   type        = string
-  default     = "spin"
+  default     = "spinnaker"
 }
 
 variable "stack" {
   description = "Text used to identify stack of infrastructure components"
   type        = string
-  default     = "default"
+  default     = ""
 }
 
 variable "detail" {

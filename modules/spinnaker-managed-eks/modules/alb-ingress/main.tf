@@ -1,52 +1,29 @@
+## kubernetes alb-ingress
+
 locals {
   albingress_namespace       = "kube-system"
-  albingress_service_account = format("%s-aws-alb-ingress-controller", local.name)
+  albingress_service_account = "aws-alb-ingress-controller"
   albingress_oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
     local.albingress_namespace,
     local.albingress_service_account
   )
 }
 
-resource "helm_release" "albingress" {
-  count        = (length(var.node_groups) >= 1 ? 1 : 0)
-  name         = local.name
-  chart        = "aws-alb-ingress-controller"
-  repository   = "http://storage.googleapis.com/kubernetes-charts-incubator"
-  namespace    = local.albingress_namespace
-  reset_values = true
-
-  dynamic "set" {
-    for_each = {
-      autoDiscoverAwsRegion                                            = true
-      autoDiscoverAwsVpcID                                             = true
-      clusterName                                                      = aws_eks_cluster.cp.name
-      "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = aws_iam_role.albingress.arn
-    }
-    content {
-      name  = set.key
-      value = set.value
-    }
-  }
-
-  depends_on = [
-    aws_eks_cluster.cp,
-  ]
-}
-
 # security/policy
 resource "aws_iam_role" "albingress" {
-  name = format("%s-albingress", local.name)
-  path = "/"
-  tags = merge(local.default-tags, var.tags)
+  count = var.enabled ? 1 : 0
+  name  = format("%s-albingress", var.cluster_name)
+  path  = "/"
+  tags  = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRoleWithWebIdentity"
       Effect = "Allow"
       Principal = {
-        Federated = aws_iam_openid_connect_provider.oidc.arn
+        Federated = var.oidc["arn"]
       }
       Condition = {
-        StringEquals = { join(":", [local.oidc_provider_url, "sub"]) = [local.albingress_oidc_fully_qualified_subjects] }
+        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.albingress_oidc_fully_qualified_subjects] }
       }
     }]
     Version = "2012-10-17"
@@ -54,12 +31,14 @@ resource "aws_iam_role" "albingress" {
 }
 
 resource "aws_iam_role_policy_attachment" "albingress" {
-  policy_arn = aws_iam_policy.albingress.arn
-  role       = aws_iam_role.albingress.name
+  count      = var.enabled ? 1 : 0
+  policy_arn = aws_iam_policy.albingress[0].arn
+  role       = aws_iam_role.albingress[0].name
 }
 
 resource "aws_iam_policy" "albingress" {
-  name        = format("%s-albingress", local.name)
+  count       = var.enabled ? 1 : 0
+  name        = format("%s-albingress", var.cluster_name)
   description = format("Allow alb-ingress-controller to manage AWS resources")
   path        = "/"
   policy = jsonencode({
@@ -146,4 +125,28 @@ resource "aws_iam_policy" "albingress" {
     }]
     Version = "2012-10-17"
   })
+}
+
+resource "helm_release" "albingress" {
+  count             = var.enabled ? 1 : 0
+  name              = "aws-alb-ingress-controller"
+  chart             = lookup(var.helm, "chart")
+  repository        = lookup(var.helm, "repository")
+  namespace         = local.albingress_namespace
+  reset_values      = true
+  cleanup_on_fail   = true
+  dependency_update = true
+
+  dynamic "set" {
+    for_each = {
+      "autoDiscoverAwsRegion"                                          = true
+      "autoDiscoverAwsVpcID"                                           = true
+      "clusterName"                                                    = var.cluster_name
+      "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = aws_iam_role.albingress[0].arn
+    }
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
 }

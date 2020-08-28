@@ -26,12 +26,12 @@ output "tags" {
 }
 
 output "oidc_url" {
-  value       = local.oidc_provider_url
+  value       = local.oidc["url"]
   description = "The URL on the EKS cluster OIDC issuer"
 }
 
 output "oidc_arn" {
-  value       = aws_iam_openid_connect_provider.oidc.arn
+  value       = local.oidc["arn"]
   description = "The ARN of OIDC provider"
 }
 

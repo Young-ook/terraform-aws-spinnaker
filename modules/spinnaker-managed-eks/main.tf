@@ -219,9 +219,19 @@ resource "aws_autoscaling_group" "ng" {
 
   tags = [
     {
-      "key"                 = format("kubernetes.io/cluster/%s", aws_eks_cluster.cp.name)
-      "value"               = "owned"
-      "propagate_at_launch" = "true"
+      key                 = format("kubernetes.io/cluster/%s", aws_eks_cluster.cp.name)
+      value               = "owned"
+      propagate_at_launch = true
+    },
+    {
+      key                 = format("k8s.io/cluster-autoscaler/%s", aws_eks_cluster.cp.name)
+      value               = "owned"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "k8s.io/cluster-autoscaler/enabled"
+      value               = "true"
+      propagate_at_launch = true
     }
   ]
 
@@ -247,7 +257,10 @@ resource "aws_iam_openid_connect_provider" "oidc" {
 }
 
 locals {
-  oidc_provider_url = replace(aws_iam_openid_connect_provider.oidc.url, "https://", "")
+  oidc = {
+    arn = aws_iam_openid_connect_provider.oidc.arn
+    url = replace(aws_iam_openid_connect_provider.oidc.url, "https://", "")
+  }
 }
 
 provider "kubernetes" {
@@ -257,17 +270,8 @@ provider "kubernetes" {
   load_config_file       = false
 }
 
-provider "helm" {
-  kubernetes {
-    host                   = aws_eks_cluster.cp.endpoint
-    token                  = data.aws_eks_cluster_auth.cp.token
-    cluster_ca_certificate = base64decode(aws_eks_cluster.cp.certificate_authority.0.data)
-    load_config_file       = false
-  }
-}
-
 resource "kubernetes_config_map" "aws-auth" {
-  count = ((length(var.node_groups) > 0) ? 1 : 0)
+  count = (var.node_groups != null ? ((length(var.node_groups) > 0) ? 1 : 0) : 0)
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"

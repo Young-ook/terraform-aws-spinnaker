@@ -26,3 +26,13 @@ module "cluster-autoscaler" {
   oidc         = local.oidc
   tags         = var.tags
 }
+
+module "alb-ingress" {
+  source = "./modules/alb-ingress"
+
+  providers    = { helm = helm.aws-controller }
+  enabled      = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
+  cluster_name = aws_eks_cluster.cp.name
+  oidc         = local.oidc
+  tags         = var.tags
+}

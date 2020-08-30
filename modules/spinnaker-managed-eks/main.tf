@@ -86,31 +86,6 @@ resource "aws_iam_role_policy_attachment" "ecr-read" {
   role       = aws_iam_role.ng.name
 }
 
-resource "aws_iam_policy" "logs" {
-  name        = format("%s-logs-readwrite", local.name)
-  description = format("Allow access to CloudWatch logs for ContainerInsights")
-  path        = "/"
-  policy = jsonencode({
-    Statement = [{
-      Action = [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogGroups",
-        "logs:DescribeLogStreams"
-      ]
-      Effect   = "Allow"
-      Resource = [format("arn:${data.aws_partition.current.partition}:logs:*:*:*")]
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "logs" {
-  policy_arn = aws_iam_policy.logs.arn
-  role       = aws_iam_role.ng.name
-}
-
 # eks-optimized linux
 data "aws_ami" "eks" {
   owners      = ["amazon"]

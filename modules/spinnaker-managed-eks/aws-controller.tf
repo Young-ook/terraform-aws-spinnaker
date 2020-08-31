@@ -8,8 +8,8 @@ provider "helm" {
   }
 }
 
-module "cluster-autoscaler" {
-  source = "./modules/cluster-autoscaler"
+module "autoscaler" {
+  source = "./modules/autoscaler"
 
   providers    = { helm = helm.aws-controller }
   enabled      = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
@@ -18,8 +18,8 @@ module "cluster-autoscaler" {
   tags         = var.tags
 }
 
-module "alb-ingress" {
-  source = "./modules/alb-ingress"
+module "albingress" {
+  source = "./modules/albingress"
 
   providers    = { helm = helm.aws-controller }
   enabled      = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
@@ -28,8 +28,8 @@ module "alb-ingress" {
   tags         = var.tags
 }
 
-module "container-insights" {
-  source = "./modules/container-insights"
+module "containerinsights" {
+  source = "./modules/containerinsights"
 
   providers    = { helm = helm.aws-controller }
   enabled      = (var.node_groups != null ? ((length(var.node_groups) > 0 && var.container_insights_enabled) ? true : false) : false)

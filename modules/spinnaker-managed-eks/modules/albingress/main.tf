@@ -129,13 +129,11 @@ resource "aws_iam_policy" "albingress" {
 
 resource "helm_release" "albingress" {
   count             = var.enabled ? 1 : 0
-  name              = "aws-alb-ingress-controller"
+  name              = "eks-alb"
   chart             = lookup(var.helm, "chart")
   repository        = lookup(var.helm, "repository")
   namespace         = local.albingress_namespace
-  reset_values      = true
   cleanup_on_fail   = true
-  dependency_update = true
 
   dynamic "set" {
     for_each = {

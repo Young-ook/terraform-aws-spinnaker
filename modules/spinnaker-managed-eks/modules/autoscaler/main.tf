@@ -62,13 +62,11 @@ resource "aws_iam_policy" "autoscaler" {
 
 resource "helm_release" "autoscaler" {
   count             = var.enabled ? 1 : 0
-  name              = "aws-cluster-autoscaler"
+  name              = "eks-as"
   chart             = lookup(var.helm, "chart")
   repository        = lookup(var.helm, "repository")
   namespace         = local.autoscaler_namespace
-  reset_values      = true
   cleanup_on_fail   = true
-  dependency_update = true
 
   dynamic "set" {
     for_each = {

@@ -70,14 +70,12 @@ resource "aws_iam_role_policy_attachment" "logs" {
 
 resource "helm_release" "containerinsights" {
   count             = var.enabled ? 1 : 0
-  name              = "eks"
+  name              = "eks-cw"
   chart             = lookup(var.helm, "chart")
   repository        = lookup(var.helm, "repository", join("/", [path.module, "charts"]))
   namespace         = local.containerinsights_namespace
   create_namespace  = true
-  reset_values      = true
   cleanup_on_fail   = true
-  dependency_update = true
 
   dynamic "set" {
     for_each = {

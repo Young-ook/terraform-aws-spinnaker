@@ -1,11 +1,11 @@
 ## kubernetes alb-ingress
 
 locals {
-  albingress_namespace       = "kube-system"
-  albingress_service_account = "aws-alb-ingress-controller"
-  albingress_oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
-    local.albingress_namespace,
-    local.albingress_service_account
+  namespace      = lookup(var.helm, "namespace", "kube-system")
+  serviceaccount = lookup(var.helm, "serviceaccount", "aws-alb-ingress-controller")
+  oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
+    local.namespace,
+    local.serviceaccount
   )
 }
 
@@ -23,7 +23,7 @@ resource "aws_iam_role" "albingress" {
         Federated = var.oidc["arn"]
       }
       Condition = {
-        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.albingress_oidc_fully_qualified_subjects] }
+        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.oidc_fully_qualified_subjects] }
       }
     }]
     Version = "2012-10-17"
@@ -128,18 +128,19 @@ resource "aws_iam_policy" "albingress" {
 }
 
 resource "helm_release" "albingress" {
-  count             = var.enabled ? 1 : 0
-  name              = "eks-alb"
-  chart             = lookup(var.helm, "chart")
-  repository        = lookup(var.helm, "repository")
-  namespace         = local.albingress_namespace
-  cleanup_on_fail   = true
+  count           = var.enabled ? 1 : 0
+  name            = "eks-alb"
+  chart           = lookup(var.helm, "chart")
+  repository      = lookup(var.helm, "repository")
+  namespace       = local.namespace
+  cleanup_on_fail = lookup(var.helm, "cleanup_on_fail", true)
 
   dynamic "set" {
     for_each = {
       "autoDiscoverAwsRegion"                                          = true
       "autoDiscoverAwsVpcID"                                           = true
       "clusterName"                                                    = var.cluster_name
+      "rbac.serviceAccount.name"                                       = local.serviceaccount
       "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = aws_iam_role.albingress[0].arn
     }
     content {

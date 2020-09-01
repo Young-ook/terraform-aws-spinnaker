@@ -1,11 +1,11 @@
 ## kubernetes container-insights
 
 locals {
-  containerinsights_namespace       = "amazon-cloudwatch"
-  containerinsights_service_account = "aws-container-insights"
-  containerinsights_oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
-    local.containerinsights_namespace,
-    local.containerinsights_service_account
+  namespace      = lookup(var.helm, "namespace", "amazon-cloudwatch")
+  serviceaccount = lookup(var.helm, "serviceaccount", "aws-container-insights")
+  oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
+    local.namespace,
+    local.serviceaccount
   )
 }
 
@@ -23,7 +23,7 @@ resource "aws_iam_role" "containerinsights" {
         Federated = var.oidc["arn"]
       }
       Condition = {
-        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.containerinsights_oidc_fully_qualified_subjects] }
+        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.oidc_fully_qualified_subjects] }
       }
     }]
     Version = "2012-10-17"
@@ -69,20 +69,20 @@ resource "aws_iam_role_policy_attachment" "containerinsights" {
 }
 
 resource "helm_release" "containerinsights" {
-  count             = var.enabled ? 1 : 0
-  name              = "eks-cw"
-  chart             = lookup(var.helm, "chart")
-  repository        = lookup(var.helm, "repository", join("/", [path.module, "charts"]))
-  namespace         = local.containerinsights_namespace
-  create_namespace  = true
-  cleanup_on_fail   = true
+  count            = var.enabled ? 1 : 0
+  name             = "eks-cw"
+  chart            = lookup(var.helm, "chart")
+  repository       = lookup(var.helm, "repository", join("/", [path.module, "charts"]))
+  namespace        = local.namespace
+  create_namespace = true
+  cleanup_on_fail  = lookup(var.helm, "cleanup_on_fail", true)
 
   dynamic "set" {
     for_each = {
       "cluster.name"                                              = var.cluster_name
       "cluster.region"                                            = data.aws_region.current.name
+      "serviceAccount.name"                                       = local.serviceaccount
       "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = aws_iam_role.containerinsights[0].arn
-      "serviceAccount.name"                                       = local.containerinsights_service_account
     }
     content {
       name  = set.key

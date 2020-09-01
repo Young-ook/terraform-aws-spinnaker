@@ -30,7 +30,7 @@ resource "aws_iam_role" "containerinsights" {
   })
 }
 
-resource "aws_iam_policy" "logs" {
+resource "aws_iam_policy" "containerinsights" {
   count       = var.enabled ? 1 : 0
   name        = format("%s-logs", var.cluster_name)
   description = format("Allow cloudwatch-agent to manage AWS CloudWatch logs for ContainerInsights")
@@ -62,9 +62,9 @@ resource "aws_iam_policy" "logs" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "logs" {
+resource "aws_iam_role_policy_attachment" "containerinsights" {
   count      = var.enabled ? 1 : 0
-  policy_arn = aws_iam_policy.logs[0].arn
+  policy_arn = aws_iam_policy.containerinsights[0].arn
   role       = aws_iam_role.containerinsights[0].name
 }
 

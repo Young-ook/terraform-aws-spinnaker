@@ -36,8 +36,15 @@ locals {
   eks-internal-elb-tag = {
     "kubernetes.io/role/internal-elb" = "1"
   }
-  eks-tag = {
-    "eks:cluster-name"   = local.name
-    "eks:nodegroup-name" = local.name
+  eks-autoscaler-tag = {
+    format("k8s.io/cluster-autoscaler/%s", local.name) = "owned"
   }
+  eks-tag = merge(
+    {
+      "eks:cluster-name"   = local.name
+      "eks:nodegroup-name" = local.name
+    },
+    local.eks-owned-tag,
+    local.eks-autoscaler-tag,
+  )
 }

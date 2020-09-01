@@ -192,23 +192,14 @@ resource "aws_autoscaling_group" "ng" {
     }
   }
 
-  tags = [
-    {
-      key                 = format("kubernetes.io/cluster/%s", aws_eks_cluster.cp.name)
-      value               = "owned"
-      propagate_at_launch = true
-    },
-    {
-      key                 = format("k8s.io/cluster-autoscaler/%s", aws_eks_cluster.cp.name)
-      value               = "owned"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "k8s.io/cluster-autoscaler/enabled"
-      value               = "true"
+  dynamic "tag" {
+    for_each = local.eks-tag
+    content {
+      key                 = tag.key
+      value               = tag.value
       propagate_at_launch = true
     }
-  ]
+  }
 
   lifecycle {
     create_before_destroy = true

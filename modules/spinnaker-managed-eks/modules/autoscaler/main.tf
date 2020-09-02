@@ -1,11 +1,11 @@
 ## kubernetes cluster autoscaler
 
 locals {
-  autoscaler_namespace       = "kube-system"
-  autoscaler_service_account = "aws-cluster-autoscaler"
-  autoscaler_oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
-    local.autoscaler_namespace,
-    local.autoscaler_service_account
+  namespace      = lookup(var.helm, "namespace", "kube-system")
+  serviceaccount = lookup(var.helm, "serviceaccount", "cluster-autoscaler")
+  oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
+    local.namespace,
+    local.serviceaccount
   )
 }
 
@@ -23,7 +23,7 @@ resource "aws_iam_role" "autoscaler" {
         Federated = var.oidc["arn"]
       }
       Condition = {
-        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.autoscaler_oidc_fully_qualified_subjects] }
+        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.oidc_fully_qualified_subjects] }
       }
     }]
     Version = "2012-10-17"
@@ -61,18 +61,17 @@ resource "aws_iam_policy" "autoscaler" {
 
 
 resource "helm_release" "autoscaler" {
-  count             = var.enabled ? 1 : 0
-  name              = "aws-cluster-autoscaler"
-  chart             = lookup(var.helm, "chart")
-  repository        = lookup(var.helm, "repository")
-  namespace         = local.autoscaler_namespace
-  reset_values      = true
-  cleanup_on_fail   = true
-  dependency_update = true
+  count           = var.enabled ? 1 : 0
+  name            = lookup(var.helm, "name", "eks-as")
+  chart           = lookup(var.helm, "chart")
+  repository      = lookup(var.helm, "repository")
+  namespace       = local.namespace
+  cleanup_on_fail = lookup(var.helm, "cleanup_on_fail", true)
 
   dynamic "set" {
     for_each = {
       "autoDiscovery.clusterName"                                      = var.cluster_name
+      "rbac.serviceAccount.name"                                       = local.serviceaccount
       "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = aws_iam_role.autoscaler[0].arn
     }
     content {

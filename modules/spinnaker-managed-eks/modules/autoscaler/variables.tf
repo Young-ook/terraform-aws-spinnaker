@@ -9,8 +9,12 @@ variable "helm" {
   description = "The helm release configuration"
   type        = map
   default = {
-    repository = "https://kubernetes.github.io/autoscaler"
-    chart      = "cluster-autoscaler-chart"
+    name            = "eks-as"
+    repository      = "https://kubernetes.github.io/autoscaler"
+    chart           = "cluster-autoscaler-chart"
+    namespace       = "kube-system"
+    serviceaccount  = "cluster-autoscaler"
+    cleanup_on_fail = true
   }
 }
 

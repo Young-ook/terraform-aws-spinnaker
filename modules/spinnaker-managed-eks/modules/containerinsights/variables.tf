@@ -9,7 +9,11 @@ variable "helm" {
   description = "The helm release configuration"
   type        = map
   default = {
-    chart = "containerinsights"
+    name            = "eks-cw"
+    chart           = "containerinsights"
+    namespace       = "amazon-cloudwatch"
+    serviceaccount  = "aws-container-insights"
+    cleanup_on_fail = true
   }
 }
 

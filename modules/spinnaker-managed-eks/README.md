@@ -33,7 +33,7 @@ This is AWS documentation for [IRSA]( https://docs.aws.amazon.com/eks/latest/use
 ### Setup
 ```hcl
 module "irsa" {
-  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-eks//modules/iam-role-for-serviceaccount"
+  source  = "Young-ook/spinnaker/aws//modules/iam-role-for-serviceaccount"
   version = "~> 2.0"
 
   namespace      = "default"

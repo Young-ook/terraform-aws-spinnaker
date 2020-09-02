@@ -9,6 +9,7 @@ variable "helm" {
   description = "The helm release configuration"
   type        = map
   default = {
+    name            = "eks-cw"
     chart           = "containerinsights"
     namespace       = "amazon-cloudwatch"
     serviceaccount  = "aws-container-insights"

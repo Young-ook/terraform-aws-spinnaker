@@ -9,6 +9,7 @@ variable "helm" {
   description = "The helm release configuration"
   type        = map
   default = {
+    name            = "eks-alb"
     repository      = "https://kubernetes-charts-incubator.storage.googleapis.com"
     chart           = "aws-alb-ingress-controller"
     namespace       = "kube-system"

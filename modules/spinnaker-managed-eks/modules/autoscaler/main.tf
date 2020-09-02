@@ -62,7 +62,7 @@ resource "aws_iam_policy" "autoscaler" {
 
 resource "helm_release" "autoscaler" {
   count           = var.enabled ? 1 : 0
-  name            = "eks-as"
+  name            = lookup(var.helm, "name", "eks-as")
   chart           = lookup(var.helm, "chart")
   repository      = lookup(var.helm, "repository")
   namespace       = local.namespace

@@ -70,7 +70,7 @@ resource "aws_iam_role_policy_attachment" "containerinsights" {
 
 resource "helm_release" "containerinsights" {
   count            = var.enabled ? 1 : 0
-  name             = "eks-cw"
+  name             = lookup(var.helm, "name", "eks-cw")
   chart            = lookup(var.helm, "chart")
   repository       = lookup(var.helm, "repository", join("/", [path.module, "charts"]))
   namespace        = local.namespace

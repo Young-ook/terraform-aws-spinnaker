@@ -129,7 +129,7 @@ resource "aws_iam_policy" "albingress" {
 
 resource "helm_release" "albingress" {
   count           = var.enabled ? 1 : 0
-  name            = "eks-alb"
+  name            = lookup(var.helm, "name", "eks-alb")
   chart           = lookup(var.helm, "chart")
   repository      = lookup(var.helm, "repository")
   namespace       = local.namespace

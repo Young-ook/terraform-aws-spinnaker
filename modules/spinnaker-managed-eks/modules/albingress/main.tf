@@ -2,7 +2,7 @@
 
 locals {
   namespace      = lookup(var.helm, "namespace", "kube-system")
-  serviceaccount = lookup(var.helm, "serviceaccount", "aws-alb-ingress-controller")
+  serviceaccount = join("-", ["eks-alb", lookup(var.helm, "chart")])
   oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
     local.namespace,
     local.serviceaccount

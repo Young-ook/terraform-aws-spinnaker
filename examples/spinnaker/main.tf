@@ -44,9 +44,11 @@ module "spinnaker" {
     node_type = "db.t3.medium"
     version   = "5.7.12"
   }
-  helm_chart_version = "2.1.0-rc.1"
-  helm_chart_values  = [file("values.yaml")]
-  assume_role_arn    = [module.spinnaker-managed-role.role_arn]
+  helm = {
+    version = "2.2.2"
+    values  = join("/", [path.cwd, "values.yaml"])
+  }
+  assume_role_arn = [module.spinnaker-managed-role.role_arn]
 }
 
 # spinnaker managed role

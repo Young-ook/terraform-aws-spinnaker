@@ -31,20 +31,43 @@ module "spinnaker" {
   source  = "Young-ook/spinnaker/aws"
   version = "~> 2.0"
 
-  name                    = var.name
-  stack                   = var.stack
-  detail                  = var.detail
-  tags                    = var.tags
-  region                  = var.aws_region
-  azs                     = var.azs
-  cidr                    = var.cidr
-  kubernetes_version      = var.kubernetes_version
-  kubernetes_node_groups  = var.kubernetes_node_groups
-  aurora_cluster          = var.aurora_cluster
-  dns_zone                = var.dns_zone
-  helm_chart_version      = "2.1.0-rc.1"
-  helm_chart_values       = [file(var.helm_chart_values_file)]
-  assume_role_arn         = [
+  name               = "example"
+  stack              = "dev"
+  detail             = "module-test"
+  tags               = { "env" = "dev" }
+  region             = "us-east-1"
+  azs                = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  cidr               = "10.0.0.0/16"
+  dns_zone           = "your.private"
+
+  kubernetes_version = "1.16"
+  kubernetes_node_groups = {
+    default = {
+      instance_type = "m5.large"
+      min_size      = "1"
+      max_size      = "3"
+      desired_size  = "2"
+    }
+  }
+
+  aurora_cluster = {
+    node_size = "1"
+    node_type = "db.t3.medium"
+    version   = "5.7.12"
+  }
+
+  helm = {
+    name            = "cd"
+    repository      = "https://kubernetes-charts.storage.googleapis.com"
+    chart           = "spinnaker"
+    version         = "2.2.2"
+    namespace       = "spinnaker"
+    timeout         = "500"
+    cleanup_on_fail = "true"
+    values          = join("/", [path.cwd, "values.yaml"])
+  }
+
+  assume_role_arn = [
     module.spinnaker-managed-role-preprod.role_arn,
     module.spinnaker-managed-role-prod.role_arn,
   ]

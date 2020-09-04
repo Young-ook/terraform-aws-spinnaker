@@ -10,15 +10,15 @@ provider "helm" {
 }
 
 resource "helm_release" "spinnaker" {
-  name             = "spinnaker"
-  chart            = "spinnaker"
-  namespace        = "spinnaker"
-  repository       = var.helm_repo
-  timeout          = var.helm_timeout
-  version          = var.helm_chart_version
-  values           = var.helm_chart_values
+  name             = lookup(var.helm, "name", local.default_helm_config["name"])
+  chart            = lookup(var.helm, "chart", local.default_helm_config["chart"])
+  repository       = lookup(var.helm, "repository", local.default_helm_config["repository"])
+  namespace        = lookup(var.helm, "namespace", local.default_helm_config["namespace"])
+  timeout          = lookup(var.helm, "timeout", local.default_helm_config["timeout"])
+  version          = lookup(var.helm, "version", local.default_helm_config["version"])
+  values           = [file(lookup(var.helm, "values", local.default_helm_config["values"]))]
+  cleanup_on_fail  = lookup(var.helm, "cleanup_on_fail", local.default_helm_config["cleanup_on_fail"])
   create_namespace = true
-  reset_values     = false
 
   depends_on = [
     aws_eks_cluster.eks,

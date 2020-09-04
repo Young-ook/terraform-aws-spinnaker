@@ -5,13 +5,12 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-# frigga naming 
+# frigga naming
 module "frigga" {
-  source  = "Young-ook/spinnaker/aws//modules/frigga"
-  version = "~> 2.0"
-  name    = var.name
-  stack   = var.stack
-  detail  = var.detail
+  source = "Young-ook/spinnaker/aws//modules/frigga"
+  name   = var.name
+  stack  = var.stack
+  detail = var.detail
 }
 
 locals {

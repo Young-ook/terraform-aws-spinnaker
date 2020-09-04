@@ -3,24 +3,25 @@ data "aws_partition" "current" {}
 
 data "aws_region" "current" {}
 
-# name and description
-resource "random_string" "suffix" {
-  length  = 4
-  upper   = false
-  lower   = true
-  number  = false
-  special = false
+# frigga naming
+module "frigga" {
+  source = "Young-ook/spinnaker/aws//modules/frigga"
+  name   = var.name
+  stack  = var.stack
+  detail = var.detail
 }
 
 locals {
-  suffix             = random_string.suffix.result
-  name               = join("-", compact([var.name, var.stack, var.detail, local.suffix]))
-  artifact-repo-name = join("-", compact(["artifact", var.stack, var.detail, local.suffix]))
+  name               = module.frigga.name
+  artifact-repo-name = join("-", [module.frigga.name, "artifact"])
+  default-tags = merge(
+    { "terraform.io" = "managed" },
+    { "Name" = local.name },
+  )
 }
 
 # tags
 locals {
-  name-tag               = { "Name" = local.name }
   vpc-name-tag           = { "Name" = join("-", compact([local.name, "vpc"])) }
   igw-name-tag           = { "Name" = join("-", compact([local.name, "igw"])) }
   ngw-name-tag           = { "Name" = join("-", compact([local.name, "ngw"])) }

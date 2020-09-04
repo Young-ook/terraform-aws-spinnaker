@@ -29,7 +29,7 @@ resource "aws_eks_cluster" "eks" {
   name     = format("%s", local.name)
   role_arn = aws_iam_role.eks.arn
   version  = var.kubernetes_version
-  tags     = merge(local.name-tag, var.tags)
+  tags     = merge(local.default-tags, var.tags)
 
   vpc_config {
     subnet_ids = aws_subnet.private.*.id
@@ -81,7 +81,7 @@ resource "aws_eks_node_group" "ng" {
   disk_size       = lookup(each.value, "disk_size", "20")
   instance_types  = [lookup(each.value, "instance_type", "m5.xlarge")]
   version         = aws_eks_cluster.eks.version
-  tags            = merge(local.name-tag, var.tags)
+  tags            = merge(local.default-tags, var.tags)
 
   scaling_config {
     max_size     = lookup(each.value, "max_size", 3)

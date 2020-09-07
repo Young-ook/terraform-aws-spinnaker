@@ -3,18 +3,18 @@ data "aws_partition" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-# name and description
-# frigga naming rule
-resource "random_string" "suffix" {
-  length  = 5
-  upper   = false
-  lower   = true
-  number  = false
-  special = false
+# frigga naming
+module "frigga" {
+  source = "Young-ook/spinnaker/aws//modules/frigga"
+  name   = var.name
+  stack  = var.stack
+  detail = var.detail
 }
 
 locals {
-  suffix   = random_string.suffix.result
-  name     = join("-", compact([var.name, var.stack, var.detail, local.suffix, "spinnaker-managed"]))
-  name-tag = { "Name" = local.name }
+  name = join("-", [module.frigga.name, "spinnaker-managed"])
+  default-tags = merge(
+    { "terraform.io" = "managed" },
+    { "Name" = local.name },
+  )
 }

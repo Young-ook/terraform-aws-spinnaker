@@ -2,6 +2,7 @@
 resource "aws_iam_role" "spinnaker-managed" {
   name = local.name
   path = "/"
+  tags = local.default-tags
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
@@ -64,6 +65,7 @@ resource "aws_iam_role" "base-iam" {
   count = var.base_role_enabled ? 1 : 0
   name  = "BaseIAMRole"
   path  = "/"
+  tags  = local.default-tags
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"

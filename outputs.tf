@@ -45,13 +45,8 @@ output "private_subnets" {
   description = "The Id. list of generated private subnets"
 }
 
-output "hosted_zone_id" {
-  value       = aws_route53_zone.vpc.zone_id
-  description = "The hosted zone Id. of internal domain in Route 53"
-}
-
 output "db_endpoint" {
-  value       = aws_route53_record.db.*.name
+  value       = module.db.endpoint
   description = "The enpoint of aurora mysql cluster"
 }
 

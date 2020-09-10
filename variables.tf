@@ -45,23 +45,17 @@ variable "kubernetes_node_groups" {
   }
 }
 
-#  [CAUTION] Changing the snapshot ID. will force a new resource.
-
 ### rdb cluster (aurora-mysql)
 variable "aurora_cluster" {
   description = "RDS Aurora for mysql cluster definition"
   type        = map
-  default = {
-    "node_size"         = "1"
-    "node_type"         = "db.t3.medium"
-    "version"           = "5.7.12"
-    "port"              = "3306"
-    "master_user"       = "yourid"
-    "database"          = "yourdb"
-    "snapshot_id"       = ""
-    "backup_retention"  = "5"
-    "apply_immediately" = "false"
-  }
+  default     = null
+}
+
+variable "aurora_instances" {
+  description = "RDS Aurora for mysql instances definition"
+  type        = map
+  default     = {}
 }
 
 ### security
@@ -69,13 +63,6 @@ variable "assume_role_arn" {
   description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
   type        = list(string)
   default     = []
-}
-
-### dns
-variable "dns_zone" {
-  description = "The hosted zone name for internal dns, e.g., app.internal"
-  type        = string
-  default     = "spinnaker.internal"
 }
 
 ### description

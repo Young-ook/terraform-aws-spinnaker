@@ -22,14 +22,14 @@ module "spinnaker" {
   source  = "Young-ook/spinnaker/aws"
   version = "~> 2.0"
 
-  name               = "example"
-  stack              = "dev"
-  detail             = "module-test"
-  tags               = { "env" = "dev" }
-  region             = "us-east-1"
-  azs                = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  cidr               = "10.0.0.0/16"
-  dns_zone           = "your.private"
+  name   = "example"
+  stack  = "dev"
+  detail = "module-test"
+  tags   = { "env" = "dev" }
+  region = "us-east-1"
+  azs    = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  cidr   = "10.0.0.0/16"
+
   kubernetes_version = "1.16"
   kubernetes_node_groups = {
     default = {
@@ -39,11 +39,20 @@ module "spinnaker" {
       desired_size  = "2"
     }
   }
+
   aurora_cluster = {
-    node_size = "1"
-    node_type = "db.t3.medium"
-    version   = "5.7.12"
+    version = "5.7.12"
+    port    = "3306"
   }
+  aurora_instances = {
+    main = {
+      node_type = "db.t3.medium"
+    }
+    secondary = {
+      node_type = "db.t3.medium"
+    }
+  }
+
   helm = {
     version = "2.2.2"
     values  = join("/", [path.cwd, "values.yaml"])

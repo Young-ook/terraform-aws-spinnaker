@@ -9,7 +9,6 @@ resource "aws_vpc" "vpc" {
 
   tags = merge(
     local.vpc-name-tag,
-    local.vpc-k8s-shared-tag,
     var.tags,
   )
 }
@@ -54,7 +53,6 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     { "Name" = join(".", [local.name, "public", element(var.azs, count.index)]) },
-    local.vpc-k8s-shared-tag,
     var.tags,
   )
 
@@ -72,7 +70,6 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     { "Name" = join(".", [local.name, "private", element(var.azs, count.index)]) },
-    local.vpc-k8s-shared-tag,
     var.tags,
   )
 

@@ -48,9 +48,6 @@ module "spinnaker" {
     main = {
       node_type = "db.t3.medium"
     }
-    secondary = {
-      node_type = "db.t3.medium"
-    }
   }
 
   helm = {

@@ -6,7 +6,7 @@ output "cluster" {
 }
 
 output "role_arn" {
-  value       = module.eks.role_arn
+  value       = module.eks.role.arn
   description = "The generated role ARN of the EKS node group"
 }
 

@@ -6,12 +6,12 @@ output "name" {
 }
 
 output "endpoint" {
-  value       = aws_eks_cluster.eks.endpoint
+  value       = module.eks.cluster.endpoint
   description = "The enpoint of eks cluster"
 }
 
 output "role_arn" {
-  value       = aws_iam_role.ng.arn
+  value       = module.eks.role.arn
   description = "The generated role ARN of eks node group"
 }
 
@@ -46,17 +46,13 @@ output "private_subnets" {
 }
 
 output "db_endpoint" {
-  value       = module.db.endpoint
+  value       = module.rds.endpoint
   description = "The enpoint of aurora mysql cluster"
 }
 
-data "template_file" "kubeconfig" {
-  template = <<EOT
-bash -e ${path.module}/script/update-kubeconfig.sh -r ${data.aws_region.current.name} -n ${aws_eks_cluster.eks.name}
-EOT
-}
-
 output "kubeconfig" {
-  value       = data.template_file.kubeconfig.rendered
+  value = join(" ", [
+    module.eks.kubeconfig,
+  ])
   description = "Bash script to update kubeconfig file"
 }

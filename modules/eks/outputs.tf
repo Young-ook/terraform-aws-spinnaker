@@ -10,9 +10,12 @@ output "cluster" {
   description = "The EKS cluster attributes"
 }
 
-output "role_arn" {
-  value       = aws_iam_role.ng.arn
-  description = "The generated role ARN of the EKS node group"
+output "role" {
+  value = zipmap(
+    ["name", "arn"],
+    [aws_iam_role.ng.name, aws_iam_role.ng.arn]
+  )
+  description = "The generated role of the EKS node group"
 }
 
 output "tags" {
@@ -42,7 +45,6 @@ output "kubeconfig" {
     format("-r %s", data.aws_region.current.name),
     format("-n %s", aws_eks_cluster.cp.name),
     "-k kubeconfig",
-    "-s true",
   ])
   description = "Bash script to update kubeconfig file"
 }

@@ -5,24 +5,19 @@ output "cluster" {
   description = "The EKS cluster attributes"
 }
 
-output "role_arn" {
-  value       = module.eks.role.arn
-  description = "The generated role ARN of the EKS node group"
+output "role" {
+  value       = module.eks.role
+  description = "The generated role of the EKS node group"
+}
+
+output "oidc" {
+  value       = module.eks.oidc
+  description = "The OIDC provider attributes for IAM Role for ServiceAccount"
 }
 
 output "tags" {
   value       = module.eks.tags
   description = "The generated tags for EKS integration"
-}
-
-output "oidc_url" {
-  value       = module.eks.oidc_url
-  description = "The URL on the EKS cluster OIDC issuer"
-}
-
-output "oidc_arn" {
-  value       = module.eks.oidc_arn
-  description = "The ARN of OIDC provider"
 }
 
 output "kubeconfig" {

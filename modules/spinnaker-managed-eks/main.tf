@@ -1,9 +1,7 @@
 module "eks" {
   source = "Young-ook/spinnaker/aws//modules/eks"
 
-  name                       = var.name
-  stack                      = var.stack
-  detail                     = var.detail
+  name                       = local.name
   tags                       = var.tags
   subnets                    = var.subnets
   kubernetes_version         = var.kubernetes_version

@@ -1,3 +1,9 @@
+variable "enabled" {
+  description = "A conditional indicator to enable"
+  type        = bool
+  default     = true
+}
+
 variable "namespace" {
   description = "The namespace where kubernetes service account is"
   type        = string

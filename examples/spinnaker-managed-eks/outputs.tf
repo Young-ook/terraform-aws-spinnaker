@@ -8,7 +8,7 @@ output "kubeconfig" {
   description = "Bash script to update the kubeconfig file for the EKS cluster"
 }
 
-output "irsa_cli" {
-  value       = module.irsa.cli
-  description = "The annotation of IAM role for service account"
+output "kubecli" {
+  value       = module.irsa.kubecli
+  description = "The kubectl command to attach annotations of IAM role for service account"
 }

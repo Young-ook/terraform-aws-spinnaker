@@ -52,6 +52,7 @@ module "irsa" {
   source  = "Young-ook/spinnaker/aws//modules/iam-role-for-serviceaccount"
   version = "~> 2.0"
 
+  enabled        = false
   namespace      = "default"
   serviceaccount = "irsa-test"
   oidc_url       = module.spinnaker-managed-eks.oidc.url

@@ -4,9 +4,10 @@ locals {
 
 # security/policy
 resource "aws_iam_role" "irsa" {
-  name = format("%s", local.name)
-  path = "/"
-  tags = merge(local.default-tags, var.tags)
+  count = var.enabled ? 1 : 0
+  name  = format("%s", local.name)
+  path  = "/"
+  tags  = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRoleWithWebIdentity"
@@ -25,7 +26,7 @@ resource "aws_iam_role" "irsa" {
 }
 
 resource "aws_iam_role_policy_attachment" "irsa" {
-  for_each   = toset(var.policy_arns)
+  for_each   = toset(var.enabled ? var.policy_arns : [])
   policy_arn = each.value
-  role       = aws_iam_role.irsa.name
+  role       = aws_iam_role.irsa[0].name
 }

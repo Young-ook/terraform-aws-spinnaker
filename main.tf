@@ -3,9 +3,7 @@
 module "eks" {
   source = "./modules/eks"
 
-  name                       = var.name
-  stack                      = var.stack
-  detail                     = var.detail
+  name                       = local.name
   tags                       = var.tags
   subnets                    = aws_subnet.private.*.id
   kubernetes_version         = var.kubernetes_version
@@ -34,6 +32,7 @@ module "rds" {
 ### helming!!!
 
 provider "helm" {
+  alias = "spinnaker"
   kubernetes {
     host                   = module.eks.cluster.endpoint
     token                  = data.aws_eks_cluster_auth.eks.token
@@ -44,6 +43,7 @@ provider "helm" {
 
 resource "helm_release" "spinnaker" {
   depends_on       = [module.eks]
+  provider         = helm.spinnaker
   name             = lookup(var.helm, "name", local.default_helm_config["name"])
   chart            = lookup(var.helm, "chart", local.default_helm_config["chart"])
   repository       = lookup(var.helm, "repository", local.default_helm_config["repository"])

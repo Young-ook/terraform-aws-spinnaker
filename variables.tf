@@ -41,7 +41,6 @@ variable "kubernetes_node_groups" {
       desired_size  = 1
       disk_size     = "20"
       instance_type = "m5.xlarge"
-      instance_type = "t3.medium"
       instances_distribution = {
         on_demand_allocation_strategy            = "prioritized"
         on_demand_base_capacity                  = 0

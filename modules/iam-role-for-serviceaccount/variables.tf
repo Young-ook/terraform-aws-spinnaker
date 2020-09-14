@@ -25,6 +25,13 @@ variable "oidc_arn" {
   type        = string
 }
 
+### description
+variable "name" {
+  description = "The logical name of the module instance"
+  type        = string
+  default     = "irsa"
+}
+
 ### tags
 variable "tags" {
   description = "The key-value maps for tagging"

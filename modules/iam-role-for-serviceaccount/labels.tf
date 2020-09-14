@@ -9,8 +9,9 @@ data "aws_caller_identity" "current" {}
 module "frigga" {
   source  = "Young-ook/spinnaker/aws//modules/frigga"
   version = "~> 2.0"
-  name    = var.namespace
-  stack   = var.serviceaccount
+  name    = var.name
+  stack   = var.namespace
+  detail  = var.serviceaccount
 }
 
 locals {

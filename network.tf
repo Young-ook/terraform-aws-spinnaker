@@ -1,5 +1,3 @@
-## virtual private cloud
-
 # vpc
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr
@@ -9,6 +7,7 @@ resource "aws_vpc" "vpc" {
 
   tags = merge(
     local.vpc-name-tag,
+    local.vpc-k8s-shared-tag,
     var.tags,
   )
 }
@@ -29,6 +28,7 @@ resource "aws_eip" "ngw" {
 }
 
 resource "aws_nat_gateway" "ngw" {
+  depends_on    = [aws_eip.ngw, aws_subnet.public]
   allocation_id = aws_eip.ngw.id
   subnet_id     = element(compact(aws_subnet.public.*.id), 0)
 
@@ -36,11 +36,6 @@ resource "aws_nat_gateway" "ngw" {
     local.ngw-name-tag,
     var.tags,
   )
-
-  depends_on = [
-    aws_eip.ngw,
-    aws_subnet.public,
-  ]
 }
 
 # public subnets
@@ -53,6 +48,7 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     { "Name" = join(".", [local.name, "public", element(var.azs, count.index)]) },
+    local.vpc-k8s-shared-tag,
     var.tags,
   )
 
@@ -70,6 +66,7 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     { "Name" = join(".", [local.name, "private", element(var.azs, count.index)]) },
+    local.vpc-k8s-shared-tag,
     var.tags,
   )
 

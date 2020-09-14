@@ -18,6 +18,14 @@ output "role" {
   description = "The generated role of the EKS node group"
 }
 
+output "oidc" {
+  value = zipmap(
+    ["url", "arn"],
+    [local.oidc["url"], local.oidc["arn"]]
+  )
+  description = "The OIDC provider attributes for IAM Role for ServiceAccount"
+}
+
 output "tags" {
   value = {
     "shared"       = local.eks-shared-tag
@@ -28,15 +36,7 @@ output "tags" {
   description = "The generated tags for EKS integration"
 }
 
-output "oidc_url" {
-  value       = local.oidc["url"]
-  description = "The URL on the EKS cluster OIDC issuer"
-}
-
-output "oidc_arn" {
-  value       = local.oidc["arn"]
-  description = "The ARN of OIDC provider"
-}
+data "aws_region" "current" {}
 
 output "kubeconfig" {
   value = join(" ", [

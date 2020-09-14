@@ -17,7 +17,6 @@ module "spinnaker-managed-eks" {
   stack                      = "dev"
   detail                     = "module-test"
   tags                       = { env = "dev" }
-  subnets                    = ["replace with your subnet ids"]
   kubernetes_version         = "1.17"
   enabled_cluster_log_types  = ["api", "audit"]
   container_insights_enabled = true
@@ -55,8 +54,8 @@ module "irsa" {
 
   namespace      = "default"
   serviceaccount = "irsa-test"
-  oidc_url       = module.spinnaker-managed-eks.oidc_url
-  oidc_arn       = module.spinnaker-managed-eks.oidc_arn
+  oidc_url       = module.spinnaker-managed-eks.oidc.url
+  oidc_arn       = module.spinnaker-managed-eks.oidc.arn
   policy_arns    = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"]
   tags           = { env = "dev" }
 }

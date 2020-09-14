@@ -35,6 +35,11 @@ resource "aws_iam_policy" "spin-s3admin" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "spin-s3admin" {
+  policy_arn = aws_iam_policy.spin-s3admin.arn
+  role       = module.eks.role.name
+}
+
 resource "aws_s3_bucket" "storage" {
   bucket = local.name
   tags   = var.tags

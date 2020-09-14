@@ -1,7 +1,12 @@
 # Complete example
 
 terraform {
-  required_version = "~> 0.13.0"
+  required_version = "~> 0.13"
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
 }
 
 provider "aws" {
@@ -26,11 +31,12 @@ module "spinnaker" {
   stack  = "dev"
   detail = "module-test"
   tags   = { "env" = "dev" }
-  region = "us-east-1"
-  azs    = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  region = "ap-northeast-2"
+  azs    = ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
   cidr   = "10.0.0.0/16"
 
-  kubernetes_version = "1.16"
+  container_insights_enabled = true
+  kubernetes_version         = "1.17"
   kubernetes_node_groups = {
     default = {
       instance_type = "m5.large"

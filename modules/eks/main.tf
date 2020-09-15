@@ -49,11 +49,16 @@ data "aws_eks_cluster_auth" "cp" {
   name = aws_eks_cluster.cp.name
 }
 
+locals {
+  node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
+}
+
 ## node groups (ng)
 # security/policy
 resource "aws_iam_role" "ng" {
-  name = format("%s-ng", local.name)
-  tags = merge(local.default-tags, var.tags)
+  count = local.node_groups_enabled ? 1 : 0
+  name  = format("%s-ng", local.name)
+  tags  = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
@@ -67,27 +72,32 @@ resource "aws_iam_role" "ng" {
 }
 
 resource "aws_iam_instance_profile" "ng" {
-  name = format("%s-ng", local.name)
-  role = aws_iam_role.ng.name
+  count = local.node_groups_enabled ? 1 : 0
+  name  = format("%s-ng", local.name)
+  role  = aws_iam_role.ng.0.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks-ng" {
+  count      = local.node_groups_enabled ? 1 : 0
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEKSWorkerNodePolicy", data.aws_partition.current.partition)
-  role       = aws_iam_role.ng.name
+  role       = aws_iam_role.ng.0.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks-cni" {
+  count      = local.node_groups_enabled ? 1 : 0
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEKS_CNI_Policy", data.aws_partition.current.partition)
-  role       = aws_iam_role.ng.name
+  role       = aws_iam_role.ng.0.name
 }
 
 resource "aws_iam_role_policy_attachment" "ecr-read" {
+  count      = local.node_groups_enabled ? 1 : 0
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
-  role       = aws_iam_role.ng.name
+  role       = aws_iam_role.ng.0.name
 }
 
 # eks-optimized linux
 data "aws_ami" "eks" {
+  count       = local.node_groups_enabled ? 1 : 0
   owners      = ["amazon"]
   most_recent = true
 
@@ -98,10 +108,11 @@ data "aws_ami" "eks" {
 }
 
 data "template_file" "boot" {
+  count    = local.node_groups_enabled ? 1 : 0
   template = <<EOT
 #!/bin/bash
 set -ex
-/etc/eks/bootstrap.sh ${aws_eks_cluster.cp.name} --kubelet-extra-args '--node-labels=eks.amazonaws.com/nodegroup-image=${data.aws_ami.eks.id},eks.amazonaws.com/nodegroup=${aws_eks_cluster.cp.name}' --b64-cluster-ca ${aws_eks_cluster.cp.certificate_authority.0.data} --apiserver-endpoint ${aws_eks_cluster.cp.endpoint}
+/etc/eks/bootstrap.sh ${aws_eks_cluster.cp.name} --kubelet-extra-args '--node-labels=eks.amazonaws.com/nodegroup-image=${data.aws_ami.eks.0.id},eks.amazonaws.com/nodegroup=${aws_eks_cluster.cp.name}' --b64-cluster-ca ${aws_eks_cluster.cp.certificate_authority.0.data} --apiserver-endpoint ${aws_eks_cluster.cp.endpoint}
 EOT
 }
 
@@ -109,12 +120,12 @@ resource "aws_launch_template" "ng" {
   for_each      = (var.node_groups != null ? var.node_groups : {})
   name          = format("eks-%s", uuid())
   tags          = merge(local.default-tags, local.eks-tag, var.tags)
-  image_id      = data.aws_ami.eks.id
-  user_data     = base64encode(data.template_file.boot.rendered)
+  image_id      = data.aws_ami.eks.0.id
+  user_data     = base64encode(data.template_file.boot.0.rendered)
   instance_type = lookup(each.value, "instance_type", "t3.medium")
 
   iam_instance_profile {
-    arn = aws_iam_instance_profile.ng.arn
+    arn = aws_iam_instance_profile.ng.0.arn
   }
 
   block_device_mappings {
@@ -236,7 +247,7 @@ provider "kubernetes" {
 }
 
 resource "kubernetes_config_map" "aws-auth" {
-  count      = (var.node_groups != null ? ((length(var.node_groups) > 0) ? 1 : 0) : 0)
+  count      = local.node_groups_enabled ? 1 : 0
   depends_on = [aws_eks_cluster.cp, aws_autoscaling_group.ng]
   metadata {
     name      = "aws-auth"

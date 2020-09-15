@@ -24,14 +24,14 @@ module "spinnaker-managed-eks" {
     default = {
       min_size      = 1
       max_size      = 3
-      desired_size  = 2
-      instance_type = "t3.large"
+      desired_size  = 1
+      instance_type = "t3.medium"
       instances_distribution = {
-        on_demand_allocation_strategy            = null
-        on_demand_base_capacity                  = null
-        on_demand_percentage_above_base_capacity = null
-        spot_allocation_strategy                 = "capacity-optimized"
-        spot_instance_pools                      = null
+        on_demand_allocation_strategy            = "prioritized"
+        on_demand_base_capacity                  = 0
+        on_demand_percentage_above_base_capacity = 100
+        spot_allocation_strategy                 = "lowest-price"
+        spot_instance_pools                      = 2
         spot_max_price                           = "0.03"
       }
       launch_override = [

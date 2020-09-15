@@ -11,10 +11,10 @@ output "cluster" {
 }
 
 output "role" {
-  value = zipmap(
+  value = (local.node_groups_enabled ? zipmap(
     ["name", "arn"],
-    [aws_iam_role.ng.name, aws_iam_role.ng.arn]
-  )
+    [aws_iam_role.ng.0.name, aws_iam_role.ng.0.arn]
+  ) : null)
   description = "The generated role of the EKS node group"
 }
 

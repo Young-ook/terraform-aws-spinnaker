@@ -1,6 +1,5 @@
 module "eks" {
-  source = "Young-ook/spinnaker/aws//modules/eks"
-
+  source                     = "../eks"
   name                       = local.name
   tags                       = var.tags
   subnets                    = var.subnets

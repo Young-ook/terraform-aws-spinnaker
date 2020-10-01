@@ -3,7 +3,7 @@
 ## control plane (cp)
 # security/policy
 resource "aws_iam_role" "cp" {
-  name = format("%s-eks", local.name)
+  name = format("%s-cp", local.name)
   tags = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
     Statement = [{

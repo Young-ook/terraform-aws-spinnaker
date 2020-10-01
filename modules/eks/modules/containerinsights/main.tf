@@ -3,31 +3,17 @@
 locals {
   namespace      = lookup(var.helm, "namespace", "amazon-cloudwatch")
   serviceaccount = lookup(var.helm, "serviceaccount", "aws-container-insights")
-  oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
-    local.namespace,
-    local.serviceaccount
-  )
 }
 
-# security/policy
-resource "aws_iam_role" "containerinsights" {
-  count = var.enabled ? 1 : 0
-  name  = format("%s-containerinsights", var.cluster_name)
-  path  = "/"
-  tags  = merge(local.default-tags, var.tags)
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Effect = "Allow"
-      Principal = {
-        Federated = var.oidc["arn"]
-      }
-      Condition = {
-        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.oidc_fully_qualified_subjects] }
-      }
-    }]
-    Version = "2012-10-17"
-  })
+module "irsa" {
+  source         = "../../../iam-role-for-serviceaccount"
+  count          = var.enabled ? 1 : 0
+  namespace      = local.namespace
+  serviceaccount = local.serviceaccount
+  oidc_url       = var.oidc.url
+  oidc_arn       = var.oidc.arn
+  policy_arns    = [aws_iam_policy.containerinsights.0.arn]
+  tags           = var.tags
 }
 
 resource "aws_iam_policy" "containerinsights" {
@@ -62,12 +48,6 @@ resource "aws_iam_policy" "containerinsights" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "containerinsights" {
-  count      = var.enabled ? 1 : 0
-  policy_arn = aws_iam_policy.containerinsights[0].arn
-  role       = aws_iam_role.containerinsights[0].name
-}
-
 resource "helm_release" "containerinsights" {
   count            = var.enabled ? 1 : 0
   name             = lookup(var.helm, "name", "eks-cw")
@@ -82,7 +62,7 @@ resource "helm_release" "containerinsights" {
       "cluster.name"                                              = var.cluster_name
       "cluster.region"                                            = data.aws_region.current.name
       "serviceAccount.name"                                       = local.serviceaccount
-      "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = aws_iam_role.containerinsights[0].arn
+      "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = module.irsa[0].arn[0]
     }
     content {
       name  = set.key

@@ -3,37 +3,17 @@
 locals {
   namespace      = lookup(var.helm, "namespace", "kube-system")
   serviceaccount = lookup(var.helm, "serviceaccount", "cluster-autoscaler")
-  oidc_fully_qualified_subjects = format("system:serviceaccount:%s:%s",
-    local.namespace,
-    local.serviceaccount
-  )
 }
 
-# security/policy
-resource "aws_iam_role" "autoscaler" {
-  count = var.enabled ? 1 : 0
-  name  = format("%s-autoscaler", var.cluster_name)
-  path  = "/"
-  tags  = merge(local.default-tags, var.tags)
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Effect = "Allow"
-      Principal = {
-        Federated = var.oidc["arn"]
-      }
-      Condition = {
-        StringEquals = { join(":", [var.oidc["url"], "sub"]) = [local.oidc_fully_qualified_subjects] }
-      }
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "autoscaler" {
-  count      = var.enabled ? 1 : 0
-  policy_arn = aws_iam_policy.autoscaler[0].arn
-  role       = aws_iam_role.autoscaler[0].name
+module "irsa" {
+  source         = "../../../iam-role-for-serviceaccount"
+  count          = var.enabled ? 1 : 0
+  namespace      = local.namespace
+  serviceaccount = local.serviceaccount
+  oidc_url       = var.oidc.url
+  oidc_arn       = var.oidc.arn
+  policy_arns    = [aws_iam_policy.autoscaler.0.arn]
+  tags           = var.tags
 }
 
 resource "aws_iam_policy" "autoscaler" {
@@ -72,7 +52,7 @@ resource "helm_release" "autoscaler" {
     for_each = {
       "autoDiscovery.clusterName"                                      = var.cluster_name
       "rbac.serviceAccount.name"                                       = local.serviceaccount
-      "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = aws_iam_role.autoscaler[0].arn
+      "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = module.irsa[0].arn[0]
     }
     content {
       name  = set.key

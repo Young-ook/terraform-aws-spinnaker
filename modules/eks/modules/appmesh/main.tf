@@ -13,8 +13,8 @@ module "irsa" {
   oidc_url       = var.oidc.url
   oidc_arn       = var.oidc.arn
   policy_arns = [
-    "arn:aws:iam::aws:policy/AWSCloudMapFullAccess",
-    "arn:aws:iam::aws:policy/AWSAppMeshFullAccess",
+    format("arn:%s:iam::aws:policy/AWSCloudMapFullAccess", data.aws_partition.current.partition),
+    format("arn:%s:iam::aws:policy/AWSAppMeshFullAccess", data.aws_partition.current.partition),
   ]
   tags = var.tags
 }
@@ -33,6 +33,8 @@ resource "helm_release" "appmesh" {
       "region"                                                    = data.aws_region.current.name
       "serviceAccount.name"                                       = local.serviceaccount
       "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" = module.irsa[0].arn[0]
+      "tracing.enabled"                                           = true
+      "tracing.provider"                                          = "x-ray"
     }
     content {
       name  = set.key

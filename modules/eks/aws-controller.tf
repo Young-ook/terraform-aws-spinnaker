@@ -28,6 +28,16 @@ module "albingress" {
   tags         = var.tags
 }
 
+module "appmesh" {
+  source       = "./modules/appmesh"
+  depends_on   = [aws_autoscaling_group.ng]
+  providers    = { helm = helm.aws-controller }
+  enabled      = (var.node_groups != null ? ((length(var.node_groups) > 0 && var.app_mesh_enabled) ? true : false) : false)
+  cluster_name = aws_eks_cluster.cp.name
+  oidc         = local.oidc
+  tags         = var.tags
+}
+
 module "containerinsights" {
   source       = "./modules/containerinsights"
   depends_on   = [aws_autoscaling_group.ng]

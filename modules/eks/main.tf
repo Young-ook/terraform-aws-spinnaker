@@ -95,6 +95,12 @@ resource "aws_iam_role_policy_attachment" "ecr-read" {
   role       = aws_iam_role.ng.0.name
 }
 
+resource "aws_iam_role_policy_attachment" "xray-write" {
+  count      = var.app_mesh_enabled ? 1 : 0
+  policy_arn = format("arn:%s:iam::aws:policy/AWSXRayDaemonWriteAccess", data.aws_partition.current.partition)
+  role       = aws_iam_role.ng.0.name
+}
+
 # eks-optimized linux
 data "aws_ami" "eks" {
   count       = local.node_groups_enabled ? 1 : 0

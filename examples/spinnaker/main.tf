@@ -10,14 +10,14 @@ terraform {
 }
 
 provider "aws" {
-  region              = var.aws_region
+  region              = "ap-northeast-2"
   allowed_account_ids = [var.aws_account_id]
   version             = ">= 3.0"
 }
 
 provider "aws" {
   alias               = "prod"
-  region              = var.aws_region
+  region              = "ap-northeast-2"
   allowed_account_ids = [var.aws_account_id]
   version             = ">= 3.0"
 }

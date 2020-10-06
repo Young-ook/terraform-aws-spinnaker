@@ -3,7 +3,8 @@
 
 ## Assumptions
 * You want to create a Spinnaker on AWS. This module will create a Spinnaker running on EKS (Elastic Kubernetes Service) cluster.
-* You don't have a VPC (Virtual Private Cloud) where you intend to pu the EKS cluster for Spinnaker deployment. This module will create a VPC and subnets satisfies EKS requirements.
+* You don't have a VPC (Virtual Private Cloud) where you intend to pu the EKS cluster for Spinnaker deployment. This module will create a VPC and subnets to meet the EKS requirements.
+* This module will create an Amazon Aurora cluster, S3 bucket and accociated permission policy for spinnaker storage.
 
 ## Examples
 - [Quickstart Example](README.md#Quickstart)
@@ -65,3 +66,26 @@ module "spinnaker" {
   assume_role_arn = [module.spinnaker-managed.role_arn]
 }
 ```
+
+## Enable AWS account in spinnaker
+To enable AWS account in the spinnaker, you have to access the halyard pod using `kubectl` command.
+```
+kubectl -n spinnaker exec -it cd-spinnaker-halyard-0 -- bash
+bash $ hal config provider aws account add aws-test \
+    --account-id '0123456879031' \
+    --assume-role role/spinnaker-test-xgsj \
+    --regions us-east-1, us-west-2
+bash $ hal config provider aws enable
+bash $ hal deploy apply
+```
+After you configure the Spinnaker AWS provider you can manage AWS resources depending on what you included in the AWS policy. You would be able to deploy EC2 resources with Spinnaker.
+
+## Enable AWS ECS account in spinnaker
+This is an example code to enable AWS ECS account in spinnaker. In this example `ecs-test` is the name of the Amazon ECS account in spinnaker, and `aws-test` is the name of previously added, valid AWS account. Please note that the ECS account uses the same credential from correspoding AWS account. You don't need to configure an additional assumeable role for ECS account.
+```
+kubectl -n spinnaker exec -it cd-spinnaker-halyard-0 -- bash
+bash $ hal config provider ecs account add ecs-test --aws-account aws-test
+bash $ hal config provider ecs enable
+bash $ hal deploy apply
+```
+For more information, please refer to [this](https://spinnaker.io/setup/install/providers/aws/aws-ecs/) provider configuration document.

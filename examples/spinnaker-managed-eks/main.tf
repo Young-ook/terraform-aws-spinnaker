@@ -20,6 +20,7 @@ module "spinnaker-managed-eks" {
   kubernetes_version         = "1.17"
   enabled_cluster_log_types  = ["api", "audit"]
   container_insights_enabled = true
+  app_mesh_enabled           = true
   node_groups = {
     default = {
       min_size      = 1

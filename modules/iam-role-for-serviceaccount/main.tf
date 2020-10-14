@@ -26,9 +26,7 @@ resource "aws_iam_role" "irsa" {
 }
 
 resource "aws_iam_role_policy_attachment" "irsa" {
-  for_each = {
-    for key, val in var.policy_arns : key => val
-  }
+  for_each   = var.enabled ? { for key, val in var.policy_arns : key => val } : {}
   policy_arn = each.value
   role       = aws_iam_role.irsa[0].name
 }

@@ -18,23 +18,23 @@ variable "node_groups" {
   default     = null
 }
 
+variable "managed_node_groups" {
+  description = "Amazon managed node groups definition"
+  type        = map
+  default     = null
+}
+
+variable "fargate_profiles" {
+  description = "Amazon Fargate for EKS profiles"
+  type        = map
+  default     = null
+}
+
 ### feature
 variable "enabled_cluster_log_types" {
   description = "A list of the desired control plane logging to enable"
   type        = list(string)
   default     = []
-}
-
-variable "app_mesh_enabled" {
-  description = "A boolean variable indicating to enable AppMesh"
-  type        = bool
-  default     = false
-}
-
-variable "container_insights_enabled" {
-  description = "A boolean variable indicating to enable ContainerInsights"
-  type        = bool
-  default     = false
 }
 
 ### description

@@ -1,11 +1,11 @@
 module "eks" {
-  source                     = "../eks"
-  name                       = local.name
-  tags                       = var.tags
-  subnets                    = var.subnets
-  kubernetes_version         = var.kubernetes_version
-  enabled_cluster_log_types  = var.enabled_cluster_log_types
-  app_mesh_enabled           = var.app_mesh_enabled
-  container_insights_enabled = var.container_insights_enabled
-  node_groups                = var.node_groups
+  source                    = "Young-ook/eks/aws"
+  version                   = "1.1.0"
+  name                      = local.name
+  tags                      = var.tags
+  subnets                   = var.subnets
+  kubernetes_version        = var.kubernetes_version
+  enabled_cluster_log_types = var.enabled_cluster_log_types
+  node_groups               = var.node_groups
+  managed_node_groups       = var.managed_node_groups
 }

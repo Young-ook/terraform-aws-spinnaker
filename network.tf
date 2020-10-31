@@ -6,7 +6,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = "true"
 
   tags = merge(
-    local.vpc-name-tag,
+    local.vpc-tag,
     local.vpc-k8s-shared-tag,
     var.tags,
   )
@@ -17,7 +17,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
-    local.igw-name-tag,
+    local.igw-tag,
     var.tags,
   )
 }
@@ -33,7 +33,7 @@ resource "aws_nat_gateway" "ngw" {
   subnet_id     = element(compact(aws_subnet.public.*.id), 0)
 
   tags = merge(
-    local.ngw-name-tag,
+    local.ngw-tag,
     var.tags,
   )
 }
@@ -80,7 +80,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
-    local.public-route-name-tag,
+    local.public-route-tag,
     var.tags,
   )
 }
@@ -89,7 +89,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
-    local.private-route-name-tag,
+    local.private-route-tag,
     var.tags,
   )
 }

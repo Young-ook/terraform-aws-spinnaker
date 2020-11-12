@@ -1,5 +1,6 @@
 ## managed container cluster
 
+## features
 locals {
   settings = {
     containerInsights = var.container_insights_enabled ? "enabled" : "disabled"
@@ -9,6 +10,8 @@ locals {
     target_metric_type  = "ASGAverageCPUUtilization",
     target_metric_value = "65.0"
   }
+
+  node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
 }
 
 resource "aws_ecs_cluster" "cp" {
@@ -27,8 +30,9 @@ resource "aws_ecs_cluster" "cp" {
 ## node groups (ng)
 # security/policy
 resource "aws_iam_role" "ng" {
-  name = format("%s-ng", local.name)
-  tags = merge(local.default-tags, var.tags)
+  count = local.node_groups_enabled ? 1 : 0
+  name  = format("%s-ng", local.name)
+  tags  = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
@@ -42,22 +46,26 @@ resource "aws_iam_role" "ng" {
 }
 
 resource "aws_iam_instance_profile" "ng" {
-  name = format("%s-ng", local.name)
-  role = aws_iam_role.ng.name
+  count = local.node_groups_enabled ? 1 : 0
+  name  = format("%s-ng", local.name)
+  role  = aws_iam_role.ng.0.name
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-ng" {
+  count      = local.node_groups_enabled ? 1 : 0
   policy_arn = format("arn:%s:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role", data.aws_partition.current.partition)
-  role       = aws_iam_role.ng.name
+  role       = aws_iam_role.ng.0.name
 }
 
 resource "aws_iam_role_policy_attachment" "ecr-read" {
+  count      = local.node_groups_enabled ? 1 : 0
   policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
-  role       = aws_iam_role.ng.name
+  role       = aws_iam_role.ng.0.name
 }
 
 # ecs-optimized linux
 data "aws_ami" "ecs" {
+  for_each    = { for key, val in var.node_groups : key => val }
   owners      = ["amazon"]
   most_recent = true
 
@@ -68,6 +76,7 @@ data "aws_ami" "ecs" {
 }
 
 data "template_file" "boot" {
+  for_each = { for key, val in var.node_groups : key => val }
   template = <<EOT
 #!/bin/bash -v
 echo ECS_CLUSTER=${aws_ecs_cluster.cp.name} >> /etc/ecs/ecs.config
@@ -76,15 +85,15 @@ EOT
 }
 
 resource "aws_launch_template" "ng" {
-  for_each      = (var.node_groups != null ? var.node_groups : {})
+  for_each      = { for key, val in var.node_groups : key => val }
   name          = format("ecs-%s", uuid())
   tags          = merge(local.default-tags, var.tags)
-  image_id      = data.aws_ami.ecs.id
-  user_data     = base64encode(data.template_file.boot.rendered)
+  image_id      = data.aws_ami.ecs.0.id
+  user_data     = base64encode(data.template_file.boot.0.rendered)
   instance_type = lookup(each.value, "instance_type", "t3.medium")
 
   iam_instance_profile {
-    arn = aws_iam_instance_profile.ng.arn
+    arn = aws_iam_instance_profile.ng.0.arn
   }
 
   block_device_mappings {
@@ -108,7 +117,7 @@ resource "aws_launch_template" "ng" {
 }
 
 resource "aws_autoscaling_group" "ng" {
-  for_each              = (var.node_groups != null ? var.node_groups : {})
+  for_each              = { for key, val in var.node_groups : key => val }
   name                  = format("ecs-%s", uuid())
   vpc_zone_identifier   = local.subnet_ids
   max_size              = lookup(each.value, "max_size", 3)
@@ -180,7 +189,7 @@ resource "aws_autoscaling_group" "ng" {
 }
 
 resource "aws_autoscaling_policy" "ng" {
-  for_each               = (var.node_groups != null ? var.node_groups : {})
+  for_each               = { for key, val in var.node_groups : key => val }
   name                   = each.key
   autoscaling_group_name = aws_autoscaling_group.ng[each.key].name
   policy_type            = "TargetTrackingScaling"

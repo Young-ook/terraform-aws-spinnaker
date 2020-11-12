@@ -8,8 +8,7 @@ variable "subnets" {
 ### ecs cluster
 variable "node_groups" {
   description = "Node groups definition"
-  type        = map
-  default     = null
+  default     = []
 }
 
 ### feature

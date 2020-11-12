@@ -24,8 +24,6 @@ locals {
 # ecs tags
 locals {
   ecs-tag = merge(
-    {
-      "ecs:cluster-name" = local.name
-    },
+    { "ecs:cluster-name" = local.name },
   )
 }

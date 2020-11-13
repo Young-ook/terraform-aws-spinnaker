@@ -12,3 +12,10 @@ output "role_arn" {
     [aws_iam_role.ng.0.name, aws_iam_role.ng.0.arn]
   ) : null)
 }
+
+output "features" {
+  description = "Features configurations for the ECS"
+  value = {
+    "node_groups_enabled"         = local.node_groups_enabled
+  }
+}

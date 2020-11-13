@@ -25,5 +25,6 @@ locals {
 locals {
   ecs-tag = merge(
     { "ecs:cluster-name" = local.name },
+    { "AmazonECSManaged" = "true" },
   )
 }

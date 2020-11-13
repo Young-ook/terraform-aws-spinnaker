@@ -15,8 +15,9 @@ locals {
 }
 
 resource "aws_ecs_cluster" "cp" {
-  name = format("%s", local.name)
-  tags = merge(local.default-tags, var.tags)
+  name               = local.name
+  tags               = merge(local.default-tags, var.tags)
+  capacity_providers = [for ng in aws_ecs_capacity_provider.ng : ng.name]
 
   dynamic "setting" {
     for_each = local.settings
@@ -79,7 +80,7 @@ data "template_file" "boot" {
   for_each = { for key, val in var.node_groups : key => val }
   template = <<EOT
 #!/bin/bash -v
-echo ECS_CLUSTER=${aws_ecs_cluster.cp.name} >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=${local.name} >> /etc/ecs/ecs.config
 start ecs
 EOT
 }
@@ -124,7 +125,7 @@ resource "aws_autoscaling_group" "ng" {
   min_size              = lookup(each.value, "min_size", 1)
   desired_capacity      = lookup(each.value, "desired_size", 1)
   force_delete          = true
-  protect_from_scale_in = false
+  protect_from_scale_in = var.termination_protection
   termination_policies  = ["Default"]
   enabled_metrics = [
     "GroupMinSize",
@@ -186,6 +187,25 @@ resource "aws_autoscaling_group" "ng" {
     aws_iam_role_policy_attachment.ecr-read,
     aws_launch_template.ng,
   ]
+}
+
+## capacity providers (node groups)
+resource "aws_ecs_capacity_provider" "ng" {
+  for_each = { for key, val in var.node_groups : key => val }
+  name     = each.key
+  tags     = merge(local.default-tags, var.tags)
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.ng[each.key].arn
+    managed_termination_protection = var.termination_protection ? "ENABLED" : "DISABLED"
+
+    managed_scaling {
+      maximum_scaling_step_size = lookup(each.value, "max_scaling_step_size", null)
+      minimum_scaling_step_size = lookup(each.value, "min_scaling_step_size", null)
+      status                    = "ENABLED"
+      target_capacity           = lookup(each.value, "target_capacity", 100)
+    }
+  }
 }
 
 resource "aws_autoscaling_policy" "ng" {

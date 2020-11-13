@@ -18,6 +18,12 @@ variable "container_insights_enabled" {
   default     = false
 }
 
+variable "termination_protection" {
+  description = "A boolean variable indicating to enable Termination Protection of autoscaling group"
+  type        = bool
+  default     = true
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"

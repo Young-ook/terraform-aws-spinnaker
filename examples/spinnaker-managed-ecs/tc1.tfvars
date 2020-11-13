@@ -6,6 +6,7 @@ tags = {
   test = "tc1"
 }
 container_insights_enabled = true
+termination_protection     = false
 node_groups = [
   {
     name          = "mixed"

@@ -18,6 +18,7 @@ module "spinnaker-managed-ecs-ec2" {
   detail                     = var.detail
   tags                       = var.tags
   container_insights_enabled = var.container_insights_enabled
+  termination_protection     = var.termination_protection
   node_groups                = var.node_groups
 }
 

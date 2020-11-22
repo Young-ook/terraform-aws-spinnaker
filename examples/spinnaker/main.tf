@@ -27,14 +27,15 @@ module "spinnaker" {
   cidr   = "10.0.0.0/16"
 
   kubernetes_version = "1.17"
-  kubernetes_node_groups = {
-    default = {
+  kubernetes_node_groups = [
+    {
+      name          = "default"
       instance_type = "m5.large"
       min_size      = "1"
       max_size      = "3"
       desired_size  = "2"
     }
-  }
+  ]
 
   aurora_cluster = {
     version = "5.7.12"

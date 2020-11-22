@@ -14,20 +14,17 @@ variable "kubernetes_version" {
 
 variable "node_groups" {
   description = "Node groups definition"
-  type        = map
-  default     = null
+  default     = []
 }
 
 variable "managed_node_groups" {
   description = "Amazon managed node groups definition"
-  type        = map
-  default     = null
+  default     = []
 }
 
 variable "fargate_profiles" {
   description = "Amazon Fargate for EKS profiles"
-  type        = map
-  default     = null
+  default     = []
 }
 
 ### feature

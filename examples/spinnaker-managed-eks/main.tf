@@ -11,20 +11,21 @@ provider "aws" {
 # spinnaker managed eks
 module "spinnaker-managed-eks" {
   source                    = "Young-ook/spinnaker/aws//modules/spinnaker-managed-eks"
-  name                      = "example"
-  stack                     = "dev"
-  detail                    = "module-test"
-  tags                      = { env = "dev" }
+  name                      = var.name
+  stack                     = var.stack
+  detail                    = var.detail
+  tags                      = var.tags
   kubernetes_version        = "1.17"
   enabled_cluster_log_types = ["api", "audit"]
-  managed_node_groups = {
-    default = {
+  managed_node_groups = [
+    {
+      name          = "default"
       min_size      = 1
       max_size      = 3
       desired_size  = 1
       instance_type = "t3.medium"
     }
-  }
+  ]
 }
 
 module "irsa" {

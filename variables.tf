@@ -33,15 +33,15 @@ variable "kubernetes_version" {
 
 variable "kubernetes_node_groups" {
   description = "Node groups definition"
-  type        = map
-  default = {
-    default = {
+  default = [
+    {
+      name          = "default"
       min_size      = 1
       max_size      = 3
       desired_size  = 1
       instance_type = "m5.xlarge"
     }
-  }
+  ]
 }
 
 variable "enabled_cluster_log_types" {

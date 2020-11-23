@@ -14,8 +14,17 @@ variable "kubernetes_version" {
 
 variable "node_groups" {
   description = "Node groups definition"
-  type        = map
-  default     = null
+  default     = []
+}
+
+variable "managed_node_groups" {
+  description = "Amazon managed node groups definition"
+  default     = []
+}
+
+variable "fargate_profiles" {
+  description = "Amazon Fargate for EKS profiles"
+  default     = []
 }
 
 ### feature
@@ -23,18 +32,6 @@ variable "enabled_cluster_log_types" {
   description = "A list of the desired control plane logging to enable"
   type        = list(string)
   default     = []
-}
-
-variable "app_mesh_enabled" {
-  description = "A boolean variable indicating to enable AppMesh"
-  type        = bool
-  default     = false
-}
-
-variable "container_insights_enabled" {
-  description = "A boolean variable indicating to enable ContainerInsights"
-  type        = bool
-  default     = false
 }
 
 ### description

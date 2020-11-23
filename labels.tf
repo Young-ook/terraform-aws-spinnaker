@@ -17,14 +17,26 @@ locals {
   )
 }
 
-# tags
+# user vpc tags
 locals {
-  vpc-name-tag           = { "Name" = join("-", compact([local.name, "vpc"])) }
-  igw-name-tag           = { "Name" = join("-", compact([local.name, "igw"])) }
-  ngw-name-tag           = { "Name" = join("-", compact([local.name, "ngw"])) }
-  public-route-name-tag  = { "Name" = join("-", compact([local.name, "public-route"])) }
-  private-route-name-tag = { "Name" = join("-", compact([local.name, "private-route"])) }
-  private-dns-name-tag   = { "Name" = join("-", compact([local.name, "private-dns"])) }
+  vpc-tag = {
+    Name = format("%s-vpc", local.name)
+  }
+  igw-tag = {
+    Name = format("%s-igw", local.name)
+  }
+  ngw-tag = {
+    Name = format("%s-ngw", local.name)
+  }
+  public-route-tag = {
+    Name = format("%s-public-route", local.name)
+  }
+  private-route-tag = {
+    Name = format("%s-private-route", local.name)
+  }
+  private-dns-tag = {
+    Name = format("%s-private-dns", local.name)
+  }
 }
 
 # kubernetes tags

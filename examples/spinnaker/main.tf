@@ -18,24 +18,24 @@ module "spinnaker" {
   source  = "Young-ook/spinnaker/aws"
   version = "~> 2.0"
 
-  name   = "example"
-  stack  = "dev"
-  detail = "module-test"
-  tags   = { "env" = "dev" }
+  name   = var.name
+  stack  = var.stack
+  detail = var.detail
+  tags   = var.tags
   region = "ap-northeast-2"
   azs    = ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
   cidr   = "10.0.0.0/16"
 
-  container_insights_enabled = true
-  kubernetes_version         = "1.17"
-  kubernetes_node_groups = {
-    default = {
+  kubernetes_version = "1.17"
+  kubernetes_node_groups = [
+    {
+      name          = "default"
       instance_type = "m5.large"
       min_size      = "1"
       max_size      = "3"
       desired_size  = "2"
     }
-  }
+  ]
 
   aurora_cluster = {
     version = "5.7.12"

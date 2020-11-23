@@ -1,19 +1,17 @@
 ### kubernetes
 
 module "eks" {
-  source = "./modules/eks"
-
-  name                       = local.name
-  tags                       = var.tags
-  subnets                    = aws_subnet.private.*.id
-  kubernetes_version         = var.kubernetes_version
-  node_groups                = var.kubernetes_node_groups
-  enabled_cluster_log_types  = var.enabled_cluster_log_types
-  container_insights_enabled = var.container_insights_enabled
+  source              = "Young-ook/eks/aws"
+  version             = "1.4.3"
+  name                = local.name
+  tags                = var.tags
+  subnets             = aws_subnet.private.*.id
+  kubernetes_version  = var.kubernetes_version
+  managed_node_groups = var.kubernetes_node_groups
 }
 
 data "aws_eks_cluster_auth" "eks" {
-  name = module.eks.name
+  name = module.eks.cluster.name
 }
 
 ### aurora

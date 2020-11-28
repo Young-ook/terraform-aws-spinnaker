@@ -53,14 +53,12 @@ variable "enabled_cluster_log_types" {
 ### rdb cluster (aurora-mysql)
 variable "aurora_cluster" {
   description = "RDS Aurora for mysql cluster definition"
-  type        = map
   default     = null
 }
 
 variable "aurora_instances" {
   description = "RDS Aurora for mysql instances definition"
-  type        = map
-  default     = {}
+  default     = []
 }
 
 ### security

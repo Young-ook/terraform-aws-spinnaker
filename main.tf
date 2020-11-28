@@ -17,8 +17,8 @@ data "aws_eks_cluster_auth" "eks" {
 ### aurora
 
 module "rds" {
-  source = "./modules/aurora"
-
+  source           = "Young-ook/aurora/aws"
+  version          = "2.0.0"
   name             = local.name
   vpc              = aws_vpc.vpc.id
   subnets          = aws_subnet.private.*.id

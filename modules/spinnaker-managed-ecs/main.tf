@@ -5,19 +5,20 @@ locals {
   settings = {
     containerInsights = var.container_insights_enabled ? "enabled" : "disabled"
   }
-
-  scaling_config = {
-    target_metric_type  = "ASGAverageCPUUtilization",
-    target_metric_value = "65.0"
-  }
-
   node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
 }
 
 resource "aws_ecs_cluster" "cp" {
   name               = local.name
   tags               = merge(local.default-tags, var.tags)
-  capacity_providers = [for ng in aws_ecs_capacity_provider.ng : ng.name]
+  capacity_providers = [for ng in var.node_groups : ng.name if local.node_groups_enabled]
+
+  dynamic "default_capacity_provider_strategy" {
+    for_each = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
+    content {
+      capacity_provider = default_capacity_provider_strategy.key
+    }
+  }
 
   dynamic "setting" {
     for_each = local.settings
@@ -66,7 +67,7 @@ resource "aws_iam_role_policy_attachment" "ecr-read" {
 
 # ecs-optimized linux
 data "aws_ami" "ecs" {
-  for_each    = { for ng in var.node_groups : ng.name => ng }
+  for_each    = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   owners      = ["amazon"]
   most_recent = true
 
@@ -77,7 +78,7 @@ data "aws_ami" "ecs" {
 }
 
 data "template_file" "boot" {
-  for_each = { for ng in var.node_groups : ng.name => ng }
+  for_each = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   template = <<EOT
 #!/bin/bash -v
 echo ECS_CLUSTER=${local.name} >> /etc/ecs/ecs.config
@@ -86,7 +87,7 @@ EOT
 }
 
 resource "aws_launch_template" "ng" {
-  for_each      = { for ng in var.node_groups : ng.name => ng }
+  for_each      = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   name          = format("ecs-%s", uuid())
   tags          = merge(local.default-tags, var.tags)
   image_id      = data.aws_ami.ecs[each.key].id
@@ -118,7 +119,7 @@ resource "aws_launch_template" "ng" {
 }
 
 resource "aws_autoscaling_group" "ng" {
-  for_each              = { for ng in var.node_groups : ng.name => ng }
+  for_each              = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   name                  = format("ecs-%s", uuid())
   vpc_zone_identifier   = local.subnet_ids
   max_size              = lookup(each.value, "max_size", 3)
@@ -191,7 +192,7 @@ resource "aws_autoscaling_group" "ng" {
 
 ## capacity providers (node groups)
 resource "aws_ecs_capacity_provider" "ng" {
-  for_each = { for ng in var.node_groups : ng.name => ng }
+  for_each = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   name     = each.key
   tags     = merge(local.default-tags, var.tags)
 
@@ -205,19 +206,5 @@ resource "aws_ecs_capacity_provider" "ng" {
       status                    = "ENABLED"
       target_capacity           = lookup(each.value, "target_capacity", 100)
     }
-  }
-}
-
-resource "aws_autoscaling_policy" "ng" {
-  for_each               = { for ng in var.node_groups : ng.name => ng }
-  name                   = each.key
-  autoscaling_group_name = aws_autoscaling_group.ng[each.key].name
-  policy_type            = "TargetTrackingScaling"
-
-  target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = lookup(local.scaling_config, "target_metric_type")
-    }
-    target_value = lookup(local.scaling_config, "target_metric_value")
   }
 }

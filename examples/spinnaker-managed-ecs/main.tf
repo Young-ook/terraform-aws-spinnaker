@@ -10,9 +10,8 @@ provider "aws" {
 
 # spinnaker managed ecs
 module "spinnaker-managed-ecs-ec2" {
-  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-ecs"
-  version = "~> 2.0"
-
+  source                     = "Young-ook/spinnaker/aws//modules/spinnaker-managed-ecs"
+  version                    = ">= 2.0"
   name                       = var.name
   stack                      = var.stack
   detail                     = var.detail
@@ -23,9 +22,8 @@ module "spinnaker-managed-ecs-ec2" {
 }
 
 module "spinnaker-managed-ecs-fargate" {
-  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-ecs"
-  version = "~> 2.0"
-
+  source                     = "Young-ook/spinnaker/aws//modules/spinnaker-managed-ecs"
+  version                    = ">= 2.0"
   name                       = var.name
   stack                      = var.stack
   detail                     = var.detail

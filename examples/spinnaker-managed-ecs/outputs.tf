@@ -1,9 +1,19 @@
 output "ecs-ec2" {
-  value       = module.spinnaker-managed-ecs-ec2.cluster
   description = "The generated AWS ECS cluster"
+  value       = module.spinnaker-managed-ecs-ec2.cluster
+}
+
+output "ecs-ec2-features" {
+  description = "Features configurations of the AWS ECS cluster"
+  value       = module.spinnaker-managed-ecs-ec2.features
 }
 
 output "ecs-fargate" {
-  value       = module.spinnaker-managed-ecs-fargate.cluster
   description = "The generated AWS ECS cluster"
+  value       = module.spinnaker-managed-ecs-fargate.cluster
+}
+
+output "ecs-fargate-features" {
+  description = "Features configurations of the AWS Fargate cluster"
+  value       = module.spinnaker-managed-ecs-fargate.features
 }

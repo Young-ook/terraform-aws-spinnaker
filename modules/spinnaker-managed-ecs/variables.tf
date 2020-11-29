@@ -8,8 +8,7 @@ variable "subnets" {
 ### ecs cluster
 variable "node_groups" {
   description = "Node groups definition"
-  type        = map
-  default     = null
+  default     = []
 }
 
 ### feature
@@ -17,6 +16,12 @@ variable "container_insights_enabled" {
   description = "A boolean variable indicating to enable ContainerInsights"
   type        = bool
   default     = false
+}
+
+variable "termination_protection" {
+  description = "A boolean variable indicating to enable Termination Protection of autoscaling group"
+  type        = bool
+  default     = true
 }
 
 ### description

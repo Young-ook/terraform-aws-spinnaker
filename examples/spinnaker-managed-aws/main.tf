@@ -1,19 +1,17 @@
-# Spinnaker managed IAM Role example
-
 terraform {
-  required_version = "~> 0.12.0"
+  required_version = "~> 0.13.0"
 }
 
 provider "aws" {
   region              = var.aws_region
   allowed_account_ids = [var.aws_account_id]
-  version             = ">= 1.21.0"
+  version             = ">= 3.0"
 }
 
 # spinnaker managed role
 module "spinnaker-managed-role" {
-  source = "../../modules/spinnaker-managed-aws"
-
+  source            = "Young-ook/spinnaker/aws//modules/spinnaker-managed-aws"
+  version           = ">= 2.0"
   name              = var.name
   stack             = var.stack
   detail            = var.detail

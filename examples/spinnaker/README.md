@@ -14,4 +14,4 @@ Also you can use the `-var-file` option for customized paramters when you run th
 terraform plan -var-file=default.tfvars
 terraform apply -var-file=default.tfvars
 ```
-After then you will see so many resources like EKS, S3, IAM, RDS, and others on AWS. For more information about role chaining to integrate `spinnaker managed roles` with `spinnaker role`, please visit the [Quickstart Example](https://github.com/Young-ook/terraform-aws-spinnaker/tree/master/README.md#Quickstart).
+After then you will see so many resources like EKS, S3, IAM, RDS, and others on AWS. For more information about role chaining to integrate `spinnaker managed roles` with `spinnaker role`, please visit the [Update the spinnaker role](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#update-the-spinnaker-role).

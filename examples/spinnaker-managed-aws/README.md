@@ -1,26 +1,8 @@
-# Full example of spinnaker-managed-aws module
+# Example of Spinnaker Managed AWS
 
-## Usage example
-### Setup
-This is the first step to create a spinnaker managed IAM role on your AWS account. Just get terraform module and apply it with your custom variables.
-```hcl
-provider "aws" {
-  region              = var.aws_region
-  allowed_account_ids = [var.aws_account_id]
-  version             = ">= 1.21.0"
-}
+## Setup
+This is the first step to create an IAM role that makes your AWS account to be managed by Spinnaker. [This](main.tf) is the example of terraform configuration file to create an IAM role. Check out and apply it.
 
-# spinnaker managed role
-module "spinnaker-managed-role-preprod" {
-  source  = "Young-ook/spinnaker/aws//modules/spinnaker-managed-aws"
-  version = "~> 2.0"
-
-  name             = "spinnaker"
-  stack            = "preprod"
-  detail           = "additional-desc"
-  trusted_role_arn = [module.spinnaker.role_arn]
-}
-```
 Run terraform:
 ```
 terraform init
@@ -31,4 +13,4 @@ Also you can use the `-var-file` option for customized paramters when you run th
 terraform plan -var-file=default.tfvars
 terraform apply -var-file=default.tfvars
 ```
-After then you will see the generated IAM roles and policies. For more information about role chaining to integrate `spinnaker managed roles` with `spinnaker role`, please visit the [Quickstart Example](https://github.com/Young-ook/terraform-aws-spinnaker/tree/master/README.md#Quickstart).
+After then you will see the generated IAM roles and policies. For more information about role chaining to integrate `spinnaker managed roles` with `spinnaker role`, please visit the [Update the spinnaker role](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#update-the-spinnaker-role). And also check out [Enable AWS account in spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#enable-aws-account-in-spinnaker) for configuration update of the spinnaker to enable AWS account management.

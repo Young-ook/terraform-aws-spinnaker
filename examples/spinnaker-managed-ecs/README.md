@@ -14,4 +14,4 @@ terraform plan -var-file=default.tfvars
 terraform apply -var-file=default.tfvars
 ```
 
-After then you will see the created ECS cluster. And you can see the EC2 autoscaling group(s) if you selected the EC2 for node groups.
+After then you will see the created ECS cluster. For more information about enable ECS account in Spinnaker using halyard, please visit the [Enable AWS ECS account in spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#enable-aws-ecs-account-in-spinnaker).

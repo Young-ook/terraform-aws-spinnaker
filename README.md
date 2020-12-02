@@ -7,10 +7,10 @@
 * This module will create an Amazon Aurora cluster, S3 bucket and accociated permission policy for spinnaker storage.
 
 ## Examples
-- [Spinnaker](examples/spinnaker)
-- [Spinnaker managed AWS](examples/spinnaker-managed-aws)
-- [Spinnaker managed ECS](examples/spinnaker-managed-ecs)
-- [Spinnaker managed EKS](examples/spinnaker-managed-eks)
+- [Spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker)
+- [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-aws)
+- [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-ecs)
+- [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-eks)
 
 ## Quickstart
 ### Setup

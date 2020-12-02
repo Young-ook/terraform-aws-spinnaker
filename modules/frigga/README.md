@@ -6,19 +6,15 @@ From Norse mythology. the name Frigga refers the wife of Odin, queen of Asgard.
 ## Assumptions
 * You have an AWS account you want to manage by Spinnaker. This module will create a name similar to the following, `<name>-<stack>-<detail>-<random-id>`.
 
-## Examples
-- [Quickstart Example](https://github.com/Young-ook/terraform-aws-spinnaker/tree/master/modules/frigga/README.md#Quickstart)
-
 ## Quickstart
 ### Setup
 ```hcl
 module "frigga" {
   source  = "Young-ook/spinnaker/aws//modules/frigga"
-  version = "~> 2.0"
-
-  name             = "app"
-  stack            = "prod"
-  detail           = "additional-desc"
+  version = ">= 2.0"
+  name    = "app"
+  stack   = "prod"
+  detail  = "additional-desc"
 }
 ```
 Run terraform:
@@ -43,11 +39,10 @@ If you don't want to append a random identifier to the end of generated frigga n
 ```hcl
 module "frigga" {
   source  = "Young-ook/spinnaker/aws//modules/frigga"
-  version = "~> 2.0"
-
-  name             = "app"
-  stack            = "prod"
-  detail           = "additional-desc"
-  petname          = false
+  version = ">= 2.0"
+  name    = "app"
+  stack   = "prod"
+  detail  = "additional-desc"
+  petname = false
 }
 ```

@@ -31,7 +31,6 @@ module "spinnaker-managed-eks" {
 
 module "irsa" {
   source         = "Young-ook/eks/aws//modules/iam-role-for-serviceaccount"
-  version        = ">= 2.0"
   enabled        = false
   namespace      = "default"
   serviceaccount = "irsa-test"

@@ -12,6 +12,12 @@ variable "aws_region" {
   default     = "us-east-2"
 }
 
+### kubernetes cluster
+variable "managed_node_groups" {
+  description = "Amazon managed node groups definition"
+  default     = []
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"

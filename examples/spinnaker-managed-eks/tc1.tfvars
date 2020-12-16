@@ -6,3 +6,12 @@ tags = {
   env  = "dev"
   test = "tc1"
 }
+managed_node_groups = [
+  {
+    name          = "default"
+    min_size      = 1
+    max_size      = 3
+    desired_size  = 1
+    instance_type = "t3.medium"
+  }
+]

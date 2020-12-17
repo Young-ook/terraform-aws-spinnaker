@@ -18,15 +18,7 @@ module "spinnaker-managed-eks" {
   tags                      = var.tags
   kubernetes_version        = "1.17"
   enabled_cluster_log_types = ["api", "audit"]
-  managed_node_groups = [
-    {
-      name          = "default"
-      min_size      = 1
-      max_size      = 3
-      desired_size  = 1
-      instance_type = "t3.medium"
-    }
-  ]
+  managed_node_groups       = var.managed_node_groups
 }
 
 module "irsa" {

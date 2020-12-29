@@ -20,3 +20,6 @@ terraform apply
 ```
 ## Update IAM Trusted Relationship
 After applying this module, you will get an ARN of IAM role from output variable. For more information about role chaining to integrate `spinnaker managed roles` with `spinnaker role`, please visit the [Update the spinnaker role](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#update-the-spinnaker-role).
+
+## Enabling AWS account
+After finishing the trust relationship configuration update, you can enable AWS account in your spinnaker. For more details about how to do, please visit the [Enabling AWS account in spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#enabling-aws-account-in-spinnaker).

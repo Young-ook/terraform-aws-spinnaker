@@ -70,7 +70,7 @@ module "spinnaker" {
 }
 ```
 
-## Enable AWS account in spinnaker
+## Enabling AWS account in spinnaker
 To enable AWS account in the spinnaker, you have to access the halyard pod using `kubectl` command.
 ```
 kubectl -n spinnaker exec -it cd-spinnaker-halyard-0 -- bash
@@ -83,7 +83,7 @@ bash $ hal deploy apply
 ```
 After you configure the Spinnaker AWS provider you can manage AWS resources depending on what you included in the AWS policy. You would be able to deploy EC2 resources with Spinnaker.
 
-## Enable AWS ECS account in spinnaker
+## Enabling AWS ECS account in spinnaker
 This is an example code to enable AWS ECS account in the spinnaker. In this example `ecs-test` is the name of the Amazon ECS account in spinnaker, and `aws-test` is the name of previously added, valid AWS account. Please note that the ECS account uses the same credential from correspoding AWS account. You don't need to configure an additional assumeable role for ECS account.
 ```
 kubectl -n spinnaker exec -it cd-spinnaker-halyard-0 -- bash
@@ -93,7 +93,7 @@ bash $ hal deploy apply
 ```
 For more information, please refer to [this](https://spinnaker.io/setup/install/providers/aws/aws-ecs/).
 
-## Enable AWS CodeBuild account in spinnaker
+## Enabling AWS CodeBuild account in spinnaker
 Setting up AWS CodeBuild as a Continuous Integration (CI) system within Spinnaker allows you to:
 - trigger pipelines when an AWS CodeBuild build changes its phase or state
 - add an AWS CodeBuild stage to your pipeline

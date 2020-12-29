@@ -19,4 +19,4 @@ terraform apply
 ```
 
 ## Spinnaker Integration
-After applying this module, you will see CodeBuild project on your AWS environment. And then you can add your CodeBuild project to the spinnaker using Halyard. For more details about codebuild project registration with spinnaker, please visit the [Enable AWS CodeBuild account](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#enable-aws-codebuild-account-in-spinnaker).
+After applying this module, you will see CodeBuild project on your AWS environment. And then you can add your CodeBuild project to the spinnaker using Halyard. For more details about codebuild project registration with spinnaker, please visit the [Enable AWS CodeBuild account](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#enabling-aws-codebuild-account-in-spinnaker).

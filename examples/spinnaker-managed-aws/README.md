@@ -10,7 +10,19 @@ terraform apply
 ```
 Also you can use the `-var-file` option for customized paramters when you run the terraform plan/apply command.
 ```
-terraform plan -var-file=default.tfvars
-terraform apply -var-file=default.tfvars
+terraform plan -var-file default.tfvars
+terraform apply -var-file default.tfvars
 ```
-After then you will see the generated IAM roles and policies. For more information about role chaining to integrate `spinnaker managed roles` with `spinnaker role`, please visit the [Update the spinnaker role](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#update-the-spinnaker-role). And also check out [Enabling AWS account in spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#enabling-aws-account-in-spinnaker) for configuration update of the spinnaker to enable AWS account management.
+
+## Enabling AWS account
+To enable an AWS account in your spinnaker, please check out [this](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-aws) for more details.
+
+## Clean up
+Run terraform:
+```
+$ terraform destroy
+```
+Don't forget you have to use the `-var-file` option when you run terraform destroy command to delete the aws resources created with extra variable files.
+```
+$ terraform destroy -var-file default.tfvars
+```

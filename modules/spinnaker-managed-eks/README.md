@@ -52,6 +52,6 @@ bash $ hal deploy apply
 For more information, please refer to [this](https://spinnaker.io/setup/install/providers/kubernetes-v2/).
 
 ## More information
-[Configuration S3 Storage](https://spinnaker.io/setup/install/storage/s3/)
-[Secrets Management in Halyard](https://spinnaker.io/reference/halyard/secrets/)
-[Halyard Command for Kubernetes Account Management](https://spinnaker.io/reference/halyard/commands/#hal-config-provider-kubernetes-account-add)
+- [Configuration S3 Storage](https://spinnaker.io/setup/install/storage/s3/)
+- [Secrets Management in Halyard](https://spinnaker.io/reference/halyard/secrets/)
+- [Halyard Command for Kubernetes Account Management](https://spinnaker.io/reference/halyard/commands/#hal-config-provider-kubernetes-account-add)

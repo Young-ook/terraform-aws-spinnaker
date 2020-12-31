@@ -8,7 +8,8 @@ provider "aws" {
 
 # codebuild
 module "ci" {
-  source             = "../../modules/codebuild"
+  source             = "Young-ook/spinnaker/aws//modules/codebuild"
+  version            = "~> 2.0"
   name               = var.name
   stack              = var.stack
   detail             = var.detail

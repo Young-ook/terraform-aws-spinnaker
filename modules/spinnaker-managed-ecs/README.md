@@ -25,4 +25,3 @@ bash $ hal config provider ecs enable
 bash $ hal deploy apply
 ```
 For more information, please refer to [this](https://spinnaker.io/setup/install/providers/aws/aws-ecs/).
-

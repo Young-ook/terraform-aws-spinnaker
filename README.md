@@ -27,9 +27,8 @@ terraform apply
 ```
 
 ### Generate kubernetes config
-This terraform module will give you a shell script to get kubeconfig file of an EKS cluster. You will find the [update-kubeconfig.sh](https://github.com/Young-ook/terraform-aws-eks/blob/main/script/update-kubeconfig.sh) script in the `script` directory of this repository. You can get the kubeconfig file with credentials to access your EKS cluster using this script. For more detail of how to use this, please refer to the help message of the script.
-
-**[Important]** Before you run this script you must configure your local environment to have proper permission to get the credentials from EKS cluster on your AWS account whatever you are using aws-cli or aws-vault.
+This terraform module provides users a shell script that extracts the kubeconfig file of the EKS cluster. For more details, please visit the [terraform eks module](
+https://github.com/Young-ook/terraform-aws-eks/blob/main/README.md#generate-kubernetes-config).
 
 ### Access the spinnaker
 ```

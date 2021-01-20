@@ -18,10 +18,8 @@ terraform apply
 After then you will see the created EKS cluster and node groups.
 
 ## Generate kubernetes config
-This terraform module provides users with a shell script that extracts the kubeconfig file of the EKS cluster. When users run the terraform init command in their workspace, the script is downloaded with the terraform module from the terraform registry. User can see how to run this script in terraform output after terraform apply command completes successfully. Using this script, users can easily obtain a kubeconfig file, which contains an RBAC account information. So, they can use this kubeconfig file for access to the EKS cluster (with Spinnaker). The original script is here [update-kubeconfig.sh](https://github.com/Young-ook/terraform-aws-eks/blob/main/script/update-kubeconfig.sh) and users can check out the details of the script.
-
-**[Important]** Before you run this script you must configure your local environment to have proper permission to get the credentials from EKS cluster on your AWS account whatever you are using aws-cli or aws-vault.
-
+This terraform module provides users a shell script that extracts the kubeconfig file of the EKS cluster. For more details, please visit the [terraform eks module](
+https://github.com/Young-ook/terraform-aws-eks/blob/main/README.md#generate-kubernetes-config).
 Prepare the kubeconfig file with credentials to access the EKS cluster using the script described above. This is important when activating your Kubenetes account in the next step.
 
 ## Store kubernetes config

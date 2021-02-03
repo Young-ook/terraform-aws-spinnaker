@@ -40,6 +40,14 @@ resource "aws_iam_role_policy_attachment" "spin-s3admin" {
   role       = module.eks.role.name
 }
 
+resource "aws_s3_bucket_public_access_block" "storage" {
+  bucket                  = aws_s3_bucket.storage.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket" "storage" {
   bucket = local.name
   tags   = var.tags
@@ -80,6 +88,14 @@ resource "aws_iam_policy" "artifact-write" {
     }]
     Version = "2012-10-17"
   })
+}
+
+resource "aws_s3_bucket_public_access_block" "artifact" {
+  bucket                  = aws_s3_bucket.artifact.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket" "artifact" {

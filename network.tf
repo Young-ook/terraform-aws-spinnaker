@@ -120,7 +120,8 @@ resource "aws_route_table_association" "public" {
 
 # vpc endpoints
 data "aws_vpc_endpoint_service" "s3" {
-  service = "s3"
+  service      = "s3"
+  service_type = "Gateway"
 }
 
 resource "aws_vpc_endpoint" "s3" {

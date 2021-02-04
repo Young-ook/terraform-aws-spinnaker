@@ -2,7 +2,7 @@
 
 module "eks" {
   source              = "Young-ook/eks/aws"
-  version             = "1.4.3"
+  version             = "1.4.7"
   name                = local.name
   tags                = var.tags
   subnets             = aws_subnet.private.*.id
@@ -128,7 +128,6 @@ provider "helm" {
     host                   = module.eks.cluster.endpoint
     token                  = data.aws_eks_cluster_auth.eks.token
     cluster_ca_certificate = base64decode(module.eks.cluster.certificate_authority.0.data)
-    load_config_file       = false
   }
 }
 

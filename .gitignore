@@ -5,5 +5,11 @@
 *.tfstate
 *.tfstate.*
 
+# terraform cache
+*.terraform.lock.hcl
+
 # User kubernetes cluster configs
 kubeconfig
+
+# Local .DS_Store
+**/.DS_Store

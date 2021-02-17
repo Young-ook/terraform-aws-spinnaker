@@ -7,6 +7,7 @@
 - [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-aws)
 - [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-ecs)
 - [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-eks)
+- [Chaos Monkey](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/chaosmonkey)
 
 ## Quickstart
 ### Setup

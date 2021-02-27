@@ -10,11 +10,12 @@ provider "aws" {
 
 # spinnaker aware amazon vpc
 module "spinnaker-aware-aws-vpc" {
-  source = "../../modules/spinnaker-aware-aws-vpc"
-  name   = var.name
-  stack  = var.stack
-  detail = var.detail
-  tags   = var.tags
-  azs    = var.azs
-  cidr   = var.cidr
+  source     = "../../modules/spinnaker-aware-aws-vpc"
+  name       = var.name
+  stack      = var.stack
+  detail     = var.detail
+  tags       = var.tags
+  azs        = var.azs
+  cidr       = var.cidr
+  single_ngw = var.single_ngw
 }

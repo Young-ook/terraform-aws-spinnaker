@@ -23,6 +23,13 @@ variable "azs" {
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
+### features
+variable "single_ngw" {
+  description = "A conditional indicator to provision a single shared NAT Gateway"
+  type        = bool
+  default     = false
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"

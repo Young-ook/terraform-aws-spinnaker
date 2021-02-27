@@ -5,6 +5,12 @@ variable "enabled" {
   default     = true
 }
 
+variable "single_ngw" {
+  description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
+  type        = bool
+  default     = false
+}
+
 ### network
 variable "cidr" {
   description = "The vpc CIDR (e.g. 10.0.0.0/16)"

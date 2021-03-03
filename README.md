@@ -4,7 +4,7 @@
 ## Examples
 - [Spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker)
 - [CodeBuild](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/codebuild)
-- [AWS VPC](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-aware-aws-vpc)
+- [Amazon VPC](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-aware-aws-vpc)
 - [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-aws)
 - [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-ecs)
 - [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-eks)

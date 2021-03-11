@@ -1,4 +1,4 @@
-# Example of Spinnaker Managed EKS
+# Spinnaker Managed EKS
 
 ## Setup
 [This](main.tf) is the example of terraform configuration file to create a spinnaker managed EKS on your AWS account. Check out and apply it using terraform command.
@@ -10,8 +10,8 @@ terraform apply
 ```
 Also you can use the `-var-file` option for customized paramters when you run the terraform plan/apply command.
 ```
-terraform plan -var-file=default.tfvars
-terraform apply -var-file=default.tfvars
+terraform plan -var-file default.tfvars
+terraform apply -var-file default.tfvars
 ```
 
 ## Enabling Kubernetes account

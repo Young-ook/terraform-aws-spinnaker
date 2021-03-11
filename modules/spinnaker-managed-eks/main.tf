@@ -1,6 +1,6 @@
 module "eks" {
   source                    = "Young-ook/eks/aws"
-  version                   = "1.4.3"
+  version                   = "1.4.7"
   name                      = local.name
   tags                      = var.tags
   subnets                   = var.subnets

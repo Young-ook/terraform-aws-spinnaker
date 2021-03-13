@@ -1,4 +1,4 @@
-# Example of CodeBuild for Spinnaker Pipeline
+# AWS CodeBuild for Spinnaker Pipeline
 
 ## Setup
 You can use this module like below. This shows how to create the codebuild project for spinnaker pipeline. [This](main.tf) is the example of terraform configuration file to create codebuild projects on your AWS account. Check out and apply it using terraform command.

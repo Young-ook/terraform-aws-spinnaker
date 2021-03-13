@@ -1,4 +1,4 @@
-# Example of Spinnaker Managed AWS
+# Spinnaker Managed AWS
 
 ## Setup
 This is the first step to create an IAM role that makes your AWS account to be managed by Spinnaker. [This](main.tf) is the example of terraform configuration file to create an IAM role. Check out and apply it.

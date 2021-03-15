@@ -18,6 +18,41 @@ locals {
       private_dns_enabled = true
     },
     {
+      service             = "ecs"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "ec2"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "ec2messages"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "autoscaling"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "application-autoscaling"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "kinesis-streams"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "kinesis-firehose"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
       service             = "logs"
       type                = "Interface"
       private_dns_enabled = true
@@ -41,6 +76,11 @@ locals {
       service             = "sagemaker.runtime"
       type                = "Interface"
       private_dns_enabled = true
-    }
+    },
+    {
+      service             = "notebook"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
   ]
 }

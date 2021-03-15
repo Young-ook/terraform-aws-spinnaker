@@ -8,6 +8,7 @@ resource "aws_vpc" "vpc" {
 
   tags = merge(
     local.default-tags,
+    { Name = local.name },
     var.tags,
   )
 }

@@ -13,40 +13,6 @@ resource "aws_vpc" "vpc" {
   )
 }
 
-### isolated subnet
-resource "aws_subnet" "isolated" {
-  for_each          = toset(var.azs)
-  vpc_id            = aws_vpc.vpc.id
-  availability_zone = each.value
-  cidr_block        = cidrsubnet(var.cidr, 8, (index(var.azs, each.value) * 8))
-
-  tags = merge(
-    local.default-tags,
-    { Name = join(".", [local.name, "isolated", each.value]) },
-    var.tags,
-  )
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_route_table" "isolated" {
-  vpc_id = aws_vpc.vpc.id
-
-  tags = merge(
-    local.default-tags,
-    { Name = join("-", [local.name, "isolated", "rt"]) },
-    var.tags,
-  )
-}
-
-resource "aws_route_table_association" "isolated" {
-  for_each       = toset(var.azs)
-  subnet_id      = aws_subnet.isolated[each.key].id
-  route_table_id = aws_route_table.isolated.id
-}
-
 # security/firewall
 resource "aws_security_group" "vpce" {
   name        = format("%s-%s", local.name, "vpce")
@@ -90,8 +56,8 @@ resource "aws_vpc_endpoint" "vpce" {
   vpc_endpoint_type = lookup(each.value, "type", "Gateway")
   vpc_id            = aws_vpc.vpc.id
   subnet_ids = lookup(each.value, "type") == "Interface" ? matchkeys(
-    values(local.isolated_subnets),
-    keys(local.isolated_subnets),
+    values(local.private_subnets),
+    keys(local.private_subnets),
     data.aws_vpc_endpoint_service.vpce[each.key].availability_zones
   ) : null
   security_group_ids  = lookup(each.value, "type") == "Interface" ? [aws_security_group.vpce.id] : null
@@ -99,7 +65,7 @@ resource "aws_vpc_endpoint" "vpce" {
   policy              = lookup(each.value, "policy", null)
   tags = merge(
     local.default-tags,
-    { Name = join("-", [local.name, "isolated", "vpce", each.key]) },
+    { Name = join("-", [local.name, "private", "vpce", each.key]) },
     var.tags,
   )
 }
@@ -127,7 +93,7 @@ locals {
 }
 
 resource "aws_route_table" "private" {
-  for_each = var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)
+  for_each = var.enable_ngw && var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)
   vpc_id   = aws_vpc.vpc.id
 
   tags = merge(
@@ -140,12 +106,12 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   for_each       = toset(var.azs)
   subnet_id      = aws_subnet.private[each.key].id
-  route_table_id = var.single_ngw ? aws_route_table.private[local.selected_az].id : aws_route_table.private[each.key].id
+  route_table_id = var.enable_ngw && var.single_ngw ? aws_route_table.private[local.selected_az].id : aws_route_table.private[each.key].id
 }
 
 resource "aws_route" "private_ngw" {
-  for_each               = var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)
-  route_table_id         = var.single_ngw ? aws_route_table.private[local.selected_az].id : aws_route_table.private[each.key].id
+  for_each               = var.enable_ngw ? (var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)) : toset([])
+  route_table_id         = aws_route_table.private[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.ngw[each.value].id
 
@@ -156,13 +122,13 @@ resource "aws_route" "private_ngw" {
 
 # nat gateway
 resource "aws_eip" "ngw" {
-  for_each = var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)
+  for_each = var.enable_ngw ? (var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)) : toset([])
   vpc      = true
 }
 
 resource "aws_nat_gateway" "ngw" {
   depends_on    = [aws_eip.ngw, aws_subnet.public, aws_internet_gateway.igw]
-  for_each      = var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)
+  for_each      = var.enable_ngw ? (var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)) : toset([])
   allocation_id = aws_eip.ngw[each.key].id
   subnet_id     = local.public_subnets[each.key]
 

@@ -24,8 +24,14 @@ variable "azs" {
 }
 
 ### features
+variable "enable_ngw" {
+  description = "Should be true if you want to provision NAT Gateway(s) across all of private networks"
+  type        = bool
+  default     = false
+}
+
 variable "single_ngw" {
-  description = "A conditional indicator to provision a single shared NAT Gateway"
+  description = "Should be true if you want to provision a single shared NAT Gateway across all of private networks"
   type        = bool
   default     = false
 }

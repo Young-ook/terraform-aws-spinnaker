@@ -17,5 +17,6 @@ module "spinnaker-aware-aws-vpc" {
   tags       = var.tags
   azs        = var.azs
   cidr       = var.cidr
+  enable_ngw = var.enable_ngw
   single_ngw = var.single_ngw
 }

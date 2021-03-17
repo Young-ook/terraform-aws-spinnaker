@@ -28,12 +28,7 @@ module "spinnaker" {
   kubernetes_node_groups = var.kubernetes_node_groups
   aurora_cluster         = var.aurora_cluster
   aurora_instances       = var.aurora_instances
-
-  helm = {
-    version = "2.2.2"
-    values  = join("/", [path.cwd, "values.yaml"])
-  }
-  assume_role_arn = [module.spinnaker-managed-role.role_arn]
+  assume_role_arn        = [module.spinnaker-managed-role.role_arn]
 }
 
 # spinnaker managed role

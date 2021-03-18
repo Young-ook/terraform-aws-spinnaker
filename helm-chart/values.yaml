@@ -1,5 +1,5 @@
 halyard:
-  spinnakerVersion: 1.19.4
+  spinnakerVersion: 1.24.4
   image:
     repository: us-docker.pkg.dev/spinnaker-community/docker/halyard
     tag: stable

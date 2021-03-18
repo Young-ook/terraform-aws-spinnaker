@@ -1,0 +1,9 @@
+dependencies:
+- name: redis
+  repository: https://charts.helm.sh/stable
+  version: 10.5.3
+- name: minio
+  repository: https://charts.helm.sh/stable
+  version: 5.0.32
+digest: sha256:34eef165488222faabe85007324d6dc3a3dcb4ad748749e962e594fb02d43506
+generated: "2021-03-17T23:55:29.996099+09:00"

@@ -132,15 +132,16 @@ provider "helm" {
 }
 
 resource "helm_release" "spinnaker" {
-  depends_on       = [module.eks]
-  provider         = helm.spinnaker
-  name             = lookup(var.helm, "name", local.default_helm_config["name"])
-  chart            = lookup(var.helm, "chart", local.default_helm_config["chart"])
-  repository       = lookup(var.helm, "repository", local.default_helm_config["repository"])
-  namespace        = lookup(var.helm, "namespace", local.default_helm_config["namespace"])
-  timeout          = lookup(var.helm, "timeout", local.default_helm_config["timeout"])
-  version          = lookup(var.helm, "version", local.default_helm_config["version"])
-  values           = [file(lookup(var.helm, "values", local.default_helm_config["values"]))]
-  cleanup_on_fail  = lookup(var.helm, "cleanup_on_fail", local.default_helm_config["cleanup_on_fail"])
-  create_namespace = true
+  depends_on        = [module.eks]
+  provider          = helm.spinnaker
+  name              = lookup(var.helm, "name", local.default_helm_config["name"])
+  chart             = lookup(var.helm, "chart", local.default_helm_config["chart"])
+  repository        = lookup(var.helm, "repository", local.default_helm_config["repository"])
+  namespace         = lookup(var.helm, "namespace", local.default_helm_config["namespace"])
+  timeout           = lookup(var.helm, "timeout", local.default_helm_config["timeout"])
+  version           = lookup(var.helm, "version", null)
+  values            = [file(lookup(var.helm, "values", local.default_helm_config["values"]))]
+  dependency_update = lookup(var.helm, "dependency_update", local.default_helm_config["dependency_update"])
+  cleanup_on_fail   = lookup(var.helm, "cleanup_on_fail", local.default_helm_config["cleanup_on_fail"])
+  create_namespace  = true
 }

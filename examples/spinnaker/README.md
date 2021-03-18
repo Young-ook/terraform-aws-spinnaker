@@ -17,7 +17,7 @@ terraform apply -var-file default.tfvars
 After then you will see so many resources like EKS, S3, IAM, RDS, and others on AWS. For more information about role chaining to integrate `spinnaker managed roles` with `spinnaker role`, please visit the [Cloud Providers](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#cloud-providers) configuration. Follow the instructions to enable accounts for cloud provider integration.
 
 ## Clean up
-Before you using terraform command to delete all resources, make sure to use this utility [script](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/script/pre-uninstall.sh) to clear all resources in the EKS cluster. Because, the Helm can't automatically remove statefulset components and it will keep waiting for the Helm request to time out.
+Before you using terraform command to delete all resources, please check the [known issues](https://github.com/Young-ook/terraform-aws-spinnaker/tree/main#hangs-at-destroying) about uninstall.
 
 Run terraform:
 ```

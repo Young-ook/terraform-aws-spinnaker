@@ -56,3 +56,12 @@ output "kubeconfig" {
   ])
   description = "Bash script to update kubeconfig file"
 }
+
+output "uninstall" {
+  description = "Bash script to prepare helm chart uninstall"
+  value = join(" ", [
+    "bash -e",
+    format("%s/script/pre-uninstall.sh", path.module),
+    "-k kubeconfig",
+  ])
+}

@@ -78,3 +78,26 @@ And users can enable Kubernetes account in the spinnaker using halyard. Please f
 ## Continuous Integration
 #### CodeBuild
 Users can set up AWS CodeBuild as a Continuous Integration (CI) system within spinnaker for cloud backed build system. For more details about codebuild project registration with spinnaker, please visit the [Enable AWS CodeBuild account](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/codebuild).
+
+# Known Issues
+## Hangs at destroying
+When destroying the spinnaker using helm chart, the uninstall progress takes a long time, and may fail. Since the statefulset inside is not terminated, it keeps waiting and the deletion fails due to a timeout. To complete uninstall job, we need to run this [script](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/script/pre-uninstall.sh) on the other terminal when the `terraform destroy` is running. Here is an example:
+```
+$ terraform destroy
+...
+module.spinnaker.helm_release.spinnaker: Destroying... [id=cd]
+module.spinnaker.helm_release.spinnaker: Still destroying... [id=cd, 10s elapsed]
+module.spinnaker.helm_release.spinnaker: Still destroying... [id=cd, 20s elapsed]
+...
+```
+Open a new terminal, and run the script to force removal of the spinnaker resources from kubernetes
+```
+$ bash -e .terraform/modules/spinnaker/script/pre-uninstall.sh -k kubeconfig
+...
+service "cd-redis-master" force deleted
+service "cd-spinnaker-halyard" force deleted
+service "spin-clouddriver" force deleted
+service "spin-deck" force deleted
+service "spin-echo" force deleted
+...
+```

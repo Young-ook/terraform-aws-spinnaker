@@ -27,3 +27,9 @@ output "kubeconfig" {
   ])
   description = "Bash script to update kubeconfig file"
 }
+
+output "helmconfig" {
+  description = "The configurations map for Helm provider"
+  sensitive   = true
+  value       = module.eks.helmconfig
+}

@@ -1,6 +1,24 @@
 # Chaos Monkey
 [Chaos Monkey](https://netflix.github.io/chaosmonkey/) is responsible for randomly terminating instances in production to ensure that engineers implement their services to be resilient to instance failures.
 
+There are many reasons to perform chaos engineering. We see teams across the industry turn to this practice to reduce incidents, lower the cost of downtime, train their team and prepare for moments that matter. In other words, it can also be called vaccination for real events.
+
+**Reduce Incidents**
+
+By practicing chaos engineering you are able to detect issues before they become incidents and before your customers get affected.
+
+**Cost of Downtime**
+
+The cost of downtime is very expensive. The numbers get larger with the companies that operate at web scale, and if it's during a high traffic event like a sale or launch.
+
+**Train your Team**
+
+Give your team a chance to build their muscle memory. Run planned chaos engineering experiments to train engineers on how to be on call and repond to incidents with runbook.
+
+**Prepare for moments that matter**
+
+By working on the three points above your team will feel more confident everyday as they build their respective applications and systems. Less time will be spent fire fighthing and more time building and creating value.
+
 ## Setup
 This is an example to explain how to build and deploy Chaos Monkey container into spinnaker. [This](main.tf) is the example of terraform configuration file to create ECR and CodeBuild resources on your AWS account. Check out and apply it using terraform command.
 

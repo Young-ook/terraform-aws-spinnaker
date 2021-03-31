@@ -80,6 +80,7 @@ resource "aws_subnet" "private" {
   tags = merge(
     local.default-tags,
     { Name = join(".", [local.name, "private", each.value]) },
+    { "kubernetes.io/role/internal-elb" = "1" },
     var.tags,
   )
 
@@ -149,6 +150,7 @@ resource "aws_subnet" "public" {
   tags = merge(
     local.default-tags,
     { Name = join(".", [local.name, "public", each.value]) },
+    { "kubernetes.io/role/elb" = "1" },
     var.tags,
   )
 

@@ -28,10 +28,10 @@ Upload the kubeconfig file received from the script describe in the previous ste
 aws s3 cp kubeconfig s3://spinnaker-dev-tc1-xyzbc/
 ```
 
-## Using S3 as a storage source
+## Using S3 as a persistent storage
 ```
 kubectl -n spinnaker exec -it cd-spinnaker-halyard-0 -- bash
-bash $ hal config storage s3 edit --region ap-northeast-2
+bash $ hal config storage s3 edit --region ap-northeast-2 --bucket spinnaker-dev-tc1-xyzbc
 bash $ hal config storage edit --type s3
 bash $ hal deploy apply
 ```

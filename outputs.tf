@@ -1,60 +1,46 @@
 # output variables 
 
-output "name" {
-  value       = local.name
-  description = "The name of eks cluster to run spinnaker pods"
+output "eks" {
+  description = "The EKS cluster attributes"
+  value       = module.eks.cluster
 }
 
-output "endpoint" {
-  value       = module.eks.cluster.endpoint
-  description = "The enpoint of eks cluster"
+output "role" {
+  description = "The generated role of spinnaker"
+  value       = module.eks.role
 }
 
-output "role_arn" {
-  value       = module.eks.role.arn
-  description = "The generated role ARN of eks node group"
+output "bucket" {
+  description = "The attributes of generated buckets"
+  value = {
+    spinnaker = {
+      name = aws_s3_bucket.storage.id
+    }
+    artifact = {
+      name = aws_s3_bucket.artifact.id
+      policy_arns = zipmap(
+        ["write"],
+        [aws_iam_policy.artifact-write.arn]
+      )
+    }
+  }
 }
 
-output "bucket_name" {
-  value       = aws_s3_bucket.storage.id
-  description = "The name of s3 bucket to store pipelines and applications of spinnaker"
-}
-
-output "artifact_repository" {
-  value       = aws_s3_bucket.artifact.id
-  description = "The S3 path for artifact repository/storage"
-}
-
-output "artifact_write_policy_arn" {
-  value       = aws_iam_policy.artifact-write.arn
-  description = "The policy ARN to allow access to artifact bucket"
-}
-
-output "vpc_id" {
-  value       = aws_vpc.vpc.id
-  description = "The Id. of new VPC"
-}
-
-output "public_subnets" {
-  value       = aws_subnet.public.*.id
-  description = "The Id. list of generated public subnets"
-}
-
-output "private_subnets" {
-  value       = aws_subnet.private.*.id
-  description = "The Id. list of generated private subnets"
+output "vpc" {
+  description = "The attributes of the secure vpc"
+  value       = aws_vpc.vpc
 }
 
 output "db_endpoint" {
+  description = "The endpoint of aurora mysql cluster"
   value       = module.rds.endpoint
-  description = "The enpoint of aurora mysql cluster"
 }
 
 output "kubeconfig" {
+  description = "Bash script to update kubeconfig file"
   value = join(" ", [
     module.eks.kubeconfig,
   ])
-  description = "Bash script to update kubeconfig file"
 }
 
 output "uninstall" {

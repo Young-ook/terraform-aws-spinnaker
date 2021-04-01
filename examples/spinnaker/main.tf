@@ -38,5 +38,5 @@ module "spinnaker-managed-role" {
   providers        = { aws = aws.prod }
   name             = "example"
   stack            = "dev"
-  trusted_role_arn = [module.spinnaker.role_arn]
+  trusted_role_arn = [module.spinnaker.role.arn]
 }

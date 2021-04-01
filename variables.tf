@@ -20,8 +20,7 @@ variable "cidr" {
 ### helm
 variable "helm" {
   description = "The helm chart configuration"
-  type        = map
-  default     = {}
+  default = {}
 }
 
 ### kubernetes cluster

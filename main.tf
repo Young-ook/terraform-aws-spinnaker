@@ -140,8 +140,16 @@ resource "helm_release" "spinnaker" {
   namespace         = lookup(var.helm, "namespace", local.default_helm_config["namespace"])
   timeout           = lookup(var.helm, "timeout", local.default_helm_config["timeout"])
   version           = lookup(var.helm, "version", null)
-  values            = [file(lookup(var.helm, "values", local.default_helm_config["values"]))]
   dependency_update = lookup(var.helm, "dependency_update", local.default_helm_config["dependency_update"])
   cleanup_on_fail   = lookup(var.helm, "cleanup_on_fail", local.default_helm_config["cleanup_on_fail"])
   create_namespace  = true
+
+  # value block with custom values to be merged with the values yaml
+  dynamic "set" {
+    for_each = lookup(var.helm, "values", {})
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
 }

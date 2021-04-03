@@ -1,4 +1,4 @@
-# output variables 
+# output variables
 
 output "bucket" {
   description = "Attributes of the generated S3 bucket"

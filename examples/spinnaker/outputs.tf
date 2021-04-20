@@ -1,11 +1,11 @@
 output "eks_endpoint" {
-  value       = module.spinnaker.endpoint
   description = "The generated endpoint of eks API server to mamage the cluster from spinnaker module"
+  value       = module.spinnaker.eks.endpoint
 }
 
 output "spinnaker_role_arn" {
-  value       = module.spinnaker.role_arn
   description = "The generated role ARN of eks node group from spinnaker module"
+  value       = module.spinnaker.role.arn
 }
 
 output "spinnaker_managed_role_arn" {
@@ -14,13 +14,13 @@ output "spinnaker_managed_role_arn" {
 }
 
 output "artifact_write_policy_arn" {
-  value       = module.spinnaker.artifact_write_policy_arn
   description = "Policy ARN created to allow CI tools to upload the artifacts"
+  value       = module.spinnaker.bucket.artifact.policy_arns.write
 }
 
 output "kubeconfig" {
-  value       = module.spinnaker.kubeconfig
   description = "Bash script to update the kubeconfig file for the EKS cluster"
+  value       = module.spinnaker.kubeconfig
 }
 
 output "uninstall" {

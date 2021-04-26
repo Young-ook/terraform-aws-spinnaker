@@ -2,12 +2,17 @@
 
 module "eks" {
   source              = "Young-ook/eks/aws"
-  version             = "1.4.7"
+  version             = "1.4.8"
   name                = local.name
   tags                = var.tags
   subnets             = aws_subnet.private.*.id
   kubernetes_version  = var.kubernetes_version
   managed_node_groups = var.kubernetes_node_groups
+  policy_arns = flatten([
+    aws_iam_policy.ec2-read.arn,
+    aws_iam_policy.rosco-bake.arn,
+    aws_iam_policy.spin-assume.*.arn,
+  ])
 }
 
 data "aws_eks_cluster_auth" "eks" {
@@ -78,11 +83,6 @@ resource "aws_iam_policy" "rosco-bake" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "rosco-bake" {
-  policy_arn = aws_iam_policy.rosco-bake.arn
-  role       = module.eks.role.name
-}
-
 resource "aws_iam_policy" "ec2-read" {
   name = format("%s-ec2-read", local.name)
   policy = jsonencode({
@@ -95,16 +95,10 @@ resource "aws_iam_policy" "ec2-read" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ec2-read" {
-  policy_arn = aws_iam_policy.ec2-read.arn
-  role       = module.eks.role.name
-}
-
-###
 # assume to cross account spinnaker-managed role
-###
 resource "aws_iam_policy" "spin-assume" {
-  name = format("%s-assume", local.name)
+  count = var.assume_role_arn != null ? ((length(var.assume_role_arn) > 0) ? 1 : 0) : 0
+  name  = format("%s-assume", local.name)
   policy = jsonencode({
     Statement = [{
       Action   = "sts:AssumeRole"
@@ -113,11 +107,6 @@ resource "aws_iam_policy" "spin-assume" {
     }]
     Version = "2012-10-17"
   })
-}
-
-resource "aws_iam_role_policy_attachment" "spin-assume" {
-  policy_arn = aws_iam_policy.spin-assume.arn
-  role       = module.eks.role.name
 }
 
 ### helming!!!

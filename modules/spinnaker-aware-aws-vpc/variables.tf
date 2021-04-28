@@ -5,6 +5,12 @@ variable "enabled" {
   default     = true
 }
 
+variable "enable_igw" {
+  description = "Should be true if you want to provision Internet Gateway for internet facing communication"
+  type        = bool
+  default     = true
+}
+
 variable "enable_ngw" {
   description = "Should be true if you want to provision NAT Gateway(s) across all of private networks"
   type        = bool

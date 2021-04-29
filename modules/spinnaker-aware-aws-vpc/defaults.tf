@@ -82,5 +82,15 @@ locals {
       type                = "Interface"
       private_dns_enabled = true
     },
+    {
+      service             = "ssm"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "ssmmessages"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
   ]
 }

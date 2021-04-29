@@ -27,7 +27,7 @@ function process_args() {
 }
 
 function delete() {
-  kubectl -n spinnaker delete deploy,svc,sts,job,po --force --all
+  kubectl delete ns spinnaker
 }
 
 # main

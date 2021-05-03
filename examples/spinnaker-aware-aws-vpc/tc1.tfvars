@@ -4,6 +4,7 @@ detail = "tc1"
 tags = {
   env         = "dev"
   subnet-type = "isolated"
+  nat-per-az  = "none"
   test        = "tc1"
 }
 aws_region = "ap-northeast-2"

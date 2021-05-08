@@ -3,8 +3,8 @@
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr
   instance_tenancy     = "default"
-  enable_dns_hostnames = "true"
-  enable_dns_support   = "true"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = merge(
     local.default-tags,
@@ -41,8 +41,13 @@ data "aws_region" "current" {}
 # For AWS services the service name is usually in the form com.amazonaws.<region>.<service>
 # The SageMaker Notebook service is an exception to this rule, the service name is in the form 
 # aws.sagemaker.<region>.notebook.
+locals {
+  vpc_endpoint_config  = var.vpc_endpoint_config == null ? local.default_vpc_endpoint_config : var.vpc_endpoint_config
+  vpc_endpoint_enabled = length(local.vpc_endpoint_config) > 0 ? true : false
+}
+
 data "aws_vpc_endpoint_service" "vpce" {
-  for_each     = { for ep in local.default_vpc_endpoint_config : ep.service => ep if var.enabled }
+  for_each     = { for ep in local.vpc_endpoint_config : ep.service => ep if local.vpc_endpoint_enabled }
   service      = each.key == "notebook" ? null : each.key
   service_name = each.key == "notebook" ? format("aws.sagemaker.%s.notebook", data.aws_region.current.name) : null
   service_type = lookup(each.value, "type", "Gateway")
@@ -51,7 +56,7 @@ data "aws_vpc_endpoint_service" "vpce" {
 # How to use matchkey function (https://www.terraform.io/docs/language/functions/matchkeys.html)
 # This matchkey function pick subnet IDs up where VPC endpoints are available
 resource "aws_vpc_endpoint" "vpce" {
-  for_each          = { for ep in local.default_vpc_endpoint_config : ep.service => ep if var.enabled }
+  for_each          = { for ep in local.vpc_endpoint_config : ep.service => ep if local.vpc_endpoint_enabled }
   service_name      = data.aws_vpc_endpoint_service.vpce[each.key].service_name
   vpc_endpoint_type = lookup(each.value, "type", "Gateway")
   vpc_id            = aws_vpc.vpc.id

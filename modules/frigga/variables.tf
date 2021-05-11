@@ -7,7 +7,7 @@ variable "name" {
 variable "stack" {
   description = "Text used to identify stack of infrastructure components (e.g., dev, prod)"
   type        = string
-  default     = "default"
+  default     = ""
 }
 
 variable "detail" {

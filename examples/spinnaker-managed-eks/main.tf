@@ -3,9 +3,7 @@ terraform {
 }
 
 provider "aws" {
-  region              = var.aws_region
-  allowed_account_ids = [var.aws_account_id]
-  version             = ">= 3.0"
+  region = var.aws_region
 }
 
 # spinnaker managed eks

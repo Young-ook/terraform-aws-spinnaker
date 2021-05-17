@@ -27,6 +27,10 @@ resource "aws_ecs_cluster" "cp" {
       value = setting.value
     }
   }
+
+  depends_on = [
+    aws_ecs_capacity_provider.ng,
+  ]
 }
 
 ## node groups (ng)

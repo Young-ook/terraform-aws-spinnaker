@@ -1,11 +1,10 @@
 aws_region = "ap-northeast-2"
-name       = "ecs-tc1"
+name       = "ecs"
 tags = {
-  env  = "dev"
-  test = "tc1"
+  env = "dev"
 }
 container_insights_enabled = true
-termination_protection     = false
+termination_protection     = true
 node_groups = [
   {
     name          = "default"

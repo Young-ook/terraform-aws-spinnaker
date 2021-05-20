@@ -43,7 +43,7 @@ module "spinnaker-managed-role" {
 
 # artifact bucket
 module "artifact" {
-  source = "Young-ook/spinnaker/aws//modules/s3"
+  source = "../../modules/s3"
   name   = var.name
   stack  = var.stack
   detail = var.detail

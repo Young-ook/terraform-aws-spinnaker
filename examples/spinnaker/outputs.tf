@@ -13,9 +13,9 @@ output "spinnaker_managed_role_arn" {
   description = "The generated ARN from spinnaker managed role module"
 }
 
-output "artifact_write_policy_arn" {
-  description = "Policy ARN created to allow CI tools to upload the artifacts"
-  value       = module.spinnaker.bucket.artifact.policy_arns.write
+output "artifact" {
+  description = "Attributes of generated bucket for artifacts"
+  value       = module.artifact.bucket
 }
 
 output "kubeconfig" {

@@ -40,3 +40,12 @@ module "spinnaker-managed-role" {
   stack            = "dev"
   trusted_role_arn = [module.spinnaker.role.arn]
 }
+
+# artifact bucket
+module "artifact" {
+  source = "../../modules/s3"
+  name   = var.name
+  stack  = var.stack
+  detail = var.detail
+  tags   = var.tags
+}

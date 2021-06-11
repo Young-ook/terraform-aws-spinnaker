@@ -1,4 +1,3 @@
-
 ## s3 bucket for front50 storage
 
 # security/role
@@ -11,7 +10,6 @@ resource "aws_iam_policy" "spin-s3admin" {
         Effect = "Allow"
         Resource = [
           format("arn:%s:s3:::%s/*", data.aws_partition.current.partition, aws_s3_bucket.storage.id),
-          format("arn:%s:s3:::%s/*", data.aws_partition.current.partition, aws_s3_bucket.artifact.id),
         ]
       },
       {
@@ -27,7 +25,6 @@ resource "aws_iam_policy" "spin-s3admin" {
         Effect = "Allow"
         Resource = [
           format("arn:%s:s3:::%s", data.aws_partition.current.partition, aws_s3_bucket.storage.id),
-          format("arn:%s:s3:::%s", data.aws_partition.current.partition, aws_s3_bucket.artifact.id),
         ]
       }
     ]
@@ -74,43 +71,4 @@ resource "aws_s3_bucket_object" "keys" {
   bucket  = aws_s3_bucket.storage.id
   key     = format("%s/", element(local.keys, count.index))
   content = format("%s/", element(local.keys, count.index))
-}
-
-resource "aws_iam_policy" "artifact-write" {
-  name = format("%s-write", local.artifact-repo-name)
-  policy = jsonencode({
-    Statement = [{
-      Action = "s3:Put*"
-      Effect = "Allow"
-      Resource = [
-        format("arn:%s:s3:::%s/*", data.aws_partition.current.partition, aws_s3_bucket.artifact.id),
-      ]
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_s3_bucket_public_access_block" "artifact" {
-  bucket                  = aws_s3_bucket.artifact.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket" "artifact" {
-  bucket = local.artifact-repo-name
-  tags   = var.tags
-
-  versioning {
-    enabled = true
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
 }

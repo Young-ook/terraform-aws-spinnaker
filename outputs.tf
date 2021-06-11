@@ -16,13 +16,6 @@ output "bucket" {
     spinnaker = {
       name = aws_s3_bucket.storage.id
     }
-    artifact = {
-      name = aws_s3_bucket.artifact.id
-      policy_arns = zipmap(
-        ["write"],
-        [aws_iam_policy.artifact-write.arn]
-      )
-    }
   }
 }
 

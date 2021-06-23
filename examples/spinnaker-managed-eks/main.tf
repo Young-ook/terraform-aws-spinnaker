@@ -17,6 +17,7 @@ module "spinnaker-managed-eks" {
   kubernetes_version        = var.kubernetes_version
   enabled_cluster_log_types = ["api", "audit"]
   managed_node_groups       = var.managed_node_groups
+  enable_ssm                = var.enable_ssm
 }
 
 module "irsa" {

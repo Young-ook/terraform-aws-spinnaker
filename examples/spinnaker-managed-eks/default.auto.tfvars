@@ -4,6 +4,7 @@ stack      = "dev"
 tags = {
   env = "dev"
 }
+kubernetes_version = "1.20"
 managed_node_groups = [
   {
     name          = "default"

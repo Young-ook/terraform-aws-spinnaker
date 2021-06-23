@@ -9,7 +9,7 @@ variable "subnets" {
 variable "kubernetes_version" {
   description = "The target version of kubernetes"
   type        = string
-  default     = "1.17"
+  default     = "1.20"
 }
 
 variable "node_groups" {
@@ -32,6 +32,12 @@ variable "enabled_cluster_log_types" {
   description = "A list of the desired control plane logging to enable"
   type        = list(string)
   default     = []
+}
+
+variable "enable_ssm" {
+  description = "Allow ssh access using session manager"
+  type        = bool
+  default     = false
 }
 
 ### security

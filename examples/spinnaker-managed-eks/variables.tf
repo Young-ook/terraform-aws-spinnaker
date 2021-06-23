@@ -8,9 +8,21 @@ variable "aws_region" {
 }
 
 ### kubernetes cluster
+variable "kubernetes_version" {
+  description = "The target version of kubernetes"
+  type        = string
+}
+
 variable "managed_node_groups" {
   description = "Amazon managed node groups definition"
   default     = []
+}
+
+### feature
+variable "enable_ssm" {
+  description = "Allow ssh access using session manager"
+  type        = bool
+  default     = false
 }
 
 ### description

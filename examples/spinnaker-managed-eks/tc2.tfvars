@@ -6,6 +6,7 @@ tags = {
   arch = "arm64"
   test = "tc2"
 }
+kubernetes_version = "1.20"
 managed_node_groups = [
   {
     name          = "arm64"

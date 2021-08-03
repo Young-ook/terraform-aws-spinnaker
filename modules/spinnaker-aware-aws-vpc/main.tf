@@ -128,7 +128,7 @@ resource "aws_route" "private_ngw" {
 
 # nat gateway
 resource "aws_eip" "ngw" {
-  for_each = var.enable_ngw ? (var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)) : toset([])
+  for_each = var.enable_ngw ? (var.single_ngw ? toset(tolist(local.selected_az)) : toset(var.azs)) : toset([])
   vpc      = true
 }
 

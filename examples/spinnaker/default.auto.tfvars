@@ -1,6 +1,6 @@
 name = "spinnaker"
 tags = {
-  env = "test"
+  env = "sandbox"
 }
 aws_region         = "ap-northeast-2"
 azs                = ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
@@ -15,3 +15,5 @@ kubernetes_node_groups = [
     desired_size  = "2"
   }
 ]
+aurora_cluster   = {}
+aurora_instances = []

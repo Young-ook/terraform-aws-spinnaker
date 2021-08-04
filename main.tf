@@ -2,12 +2,13 @@
 
 module "eks" {
   source              = "Young-ook/eks/aws"
-  version             = "1.4.8"
+  version             = "1.4.9"
   name                = local.name
   tags                = var.tags
   subnets             = aws_subnet.private.*.id
   kubernetes_version  = var.kubernetes_version
   managed_node_groups = var.kubernetes_node_groups
+  enable_ssm          = true
   policy_arns = flatten([
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,

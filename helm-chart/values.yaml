@@ -251,24 +251,6 @@ nodeSelector: {}
 # Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 tolerations: []
 
-# Redis password to use for the in-cluster redis service
-# Enable redis to use in-cluster redis
-redis:
-  enabled: true
-  # External Redis option will be enabled if in-cluster redis is disabled
-  external:
-    host: "<EXTERNAL-REDIS-HOST-NAME>"
-    port: 6379
-    # password: ""
-  password: password
-  nodeSelector: {}
-  cluster:
-    enabled: false
-# Uncomment if you don't want to create a PVC for redis
-#  master:
-#    persistence:
-#      enabled: false
-
 # Minio access/secret keys for the in-cluster S3 usage
 # Minio is not exposed publically
 minio:

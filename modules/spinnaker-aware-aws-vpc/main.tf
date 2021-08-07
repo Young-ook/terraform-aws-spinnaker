@@ -77,10 +77,11 @@ resource "aws_vpc_endpoint" "vpce" {
 
 ### public subnet
 resource "aws_subnet" "private" {
-  for_each          = toset(var.azs)
-  vpc_id            = aws_vpc.vpc.id
-  availability_zone = each.value
-  cidr_block        = cidrsubnet(var.cidr, 8, (index(var.azs, each.value) * 8) + 1)
+  for_each                = toset(var.azs)
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = each.value
+  cidr_block              = cidrsubnet(var.cidr, 8, (index(var.azs, each.value) * 8) + 1)
+  map_public_ip_on_launch = true
 
   tags = merge(
     local.default-tags,

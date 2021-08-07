@@ -75,13 +75,12 @@ resource "aws_vpc_endpoint" "vpce" {
   )
 }
 
-### public subnet
+### private subnet
 resource "aws_subnet" "private" {
-  for_each                = toset(var.azs)
-  vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = each.value
-  cidr_block              = cidrsubnet(var.cidr, 8, (index(var.azs, each.value) * 8) + 1)
-  map_public_ip_on_launch = true
+  for_each          = toset(var.azs)
+  vpc_id            = aws_vpc.vpc.id
+  availability_zone = each.value
+  cidr_block        = cidrsubnet(var.cidr, 8, (index(var.azs, each.value) * 8) + 1)
 
   tags = merge(
     local.default-tags,
@@ -148,10 +147,11 @@ resource "aws_nat_gateway" "ngw" {
 
 ### public subnet
 resource "aws_subnet" "public" {
-  for_each          = var.enable_igw ? toset(var.azs) : toset([])
-  vpc_id            = aws_vpc.vpc.id
-  availability_zone = each.value
-  cidr_block        = cidrsubnet(var.cidr, 8, (index(var.azs, each.value) * 8) + 2)
+  for_each                = var.enable_igw ? toset(var.azs) : toset([])
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = each.value
+  cidr_block              = cidrsubnet(var.cidr, 8, (index(var.azs, each.value) * 8) + 2)
+  map_public_ip_on_launch = true
 
   tags = merge(
     local.default-tags,

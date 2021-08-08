@@ -99,7 +99,7 @@ locals {
 }
 
 resource "aws_route_table" "private" {
-  for_each = var.enable_ngw && var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)
+  for_each = var.enable_ngw && var.single_ngw ? toset([local.selected_az]) : toset(var.azs)
   vpc_id   = aws_vpc.vpc.id
 
   tags = merge(
@@ -116,7 +116,7 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route" "private_ngw" {
-  for_each               = var.enable_ngw ? (var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)) : toset([])
+  for_each               = var.enable_igw && var.enable_ngw ? (var.single_ngw ? toset([local.selected_az]) : toset(var.azs)) : toset([])
   route_table_id         = aws_route_table.private[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.ngw[each.value].id
@@ -128,13 +128,13 @@ resource "aws_route" "private_ngw" {
 
 # nat gateway
 resource "aws_eip" "ngw" {
-  for_each = var.enable_ngw ? (var.single_ngw ? toset(tolist(local.selected_az)) : toset(var.azs)) : toset([])
+  for_each = var.enable_igw && var.enable_ngw ? (var.single_ngw ? toset([local.selected_az]) : toset(var.azs)) : toset([])
   vpc      = true
 }
 
 resource "aws_nat_gateway" "ngw" {
   depends_on    = [aws_eip.ngw, aws_subnet.public, aws_internet_gateway.igw]
-  for_each      = var.enable_ngw ? (var.single_ngw ? toset(list(local.selected_az)) : toset(var.azs)) : toset([])
+  for_each      = var.enable_igw && var.enable_ngw ? (var.single_ngw ? toset([local.selected_az]) : toset(var.azs)) : toset([])
   allocation_id = aws_eip.ngw[each.key].id
   subnet_id     = local.public_subnets[each.key]
 

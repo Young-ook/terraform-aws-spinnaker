@@ -12,3 +12,8 @@ output "subnets" {
   description = "The map of subnet IDs"
   value       = module.spinnaker-aware-aws-vpc.subnets
 }
+
+output "vgw" {
+  description = "The attributes of VGW"
+  value       = module.spinnaker-aware-aws-vpc.vgw
+}

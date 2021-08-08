@@ -22,3 +22,8 @@ output "subnets" {
     [local.private_subnets, local.public_subnets]
   )
 }
+
+output "vgw" {
+  description = "The attributes of Virtual Private Gateway"
+  value       = aws_vpn_gateway.vgw
+}

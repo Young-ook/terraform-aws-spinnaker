@@ -204,3 +204,29 @@ resource "aws_internet_gateway" "igw" {
     var.tags,
   )
 }
+
+# vpn gateway
+resource "aws_vpn_gateway" "vgw" {
+  count             = var.enable_vgw ? 1 : 0
+  vpc_id            = aws_vpc.vpc.id
+  amazon_side_asn   = var.amazon_side_asn
+  availability_zone = local.selected_az
+
+  tags = merge(
+    local.default-tags,
+    { Name = join("-", [local.name, "vgw"]) },
+    var.tags,
+  )
+}
+
+resource "aws_vpn_gateway_route_propagation" "public" {
+  for_each       = var.enable_igw && var.enable_vgw ? toset(var.azs) : toset([])
+  vpn_gateway_id = aws_vpn_gateway.vgw.0.id
+  route_table_id = aws_route_table.public.0.id
+}
+
+resource "aws_vpn_gateway_route_propagation" "private" {
+  for_each       = var.enable_vgw ? toset(var.azs) : toset([])
+  vpn_gateway_id = aws_vpn_gateway.vgw.0.id
+  route_table_id = var.single_ngw ? aws_route_table.private[local.selected_az].id : aws_route_table.private[each.key].id
+}

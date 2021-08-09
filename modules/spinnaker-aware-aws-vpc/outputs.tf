@@ -11,8 +11,10 @@ output "vpce" {
 }
 
 locals {
-  private_subnets = { for key, val in aws_subnet.private : key => val.id }
-  public_subnets  = { for key, val in aws_subnet.public : key => val.id }
+  private_subnets      = { for key, val in aws_subnet.private : key => val.id }
+  public_subnets       = { for key, val in aws_subnet.public : key => val.id }
+  private_route_tables = { for key, val in aws_route_table.private : key => val.id }
+  public_route_tables  = { for key, val in aws_route_table.public : key => val.id }
 }
 
 output "subnets" {
@@ -20,6 +22,14 @@ output "subnets" {
   value = zipmap(
     ["private", "public"],
     [local.private_subnets, local.public_subnets]
+  )
+}
+
+output "route_tables" {
+  description = "The map of route table IDs"
+  value = zipmap(
+    ["private", "public"],
+    [local.private_route_tables, local.public_route_tables]
   )
 }
 

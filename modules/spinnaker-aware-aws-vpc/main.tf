@@ -166,8 +166,8 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table" "public" {
-  count  = var.enable_igw ? 1 : 0
-  vpc_id = aws_vpc.vpc.id
+  for_each = var.enable_igw ? toset([local.selected_az]) : toset([])
+  vpc_id   = aws_vpc.vpc.id
 
   tags = merge(
     local.default-tags,
@@ -179,14 +179,14 @@ resource "aws_route_table" "public" {
 resource "aws_route_table_association" "public" {
   for_each       = var.enable_igw ? toset(var.azs) : toset([])
   subnet_id      = aws_subnet.public[each.key].id
-  route_table_id = aws_route_table.public.0.id
+  route_table_id = aws_route_table.public[local.selected_az].id
 }
 
 resource "aws_route" "public_igw" {
-  count                  = var.enable_igw ? 1 : 0
-  route_table_id         = aws_route_table.public.0.id
+  for_each               = var.enable_igw ? toset([local.selected_az]) : toset([])
+  route_table_id         = aws_route_table.public[local.selected_az].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.igw.0.id
+  gateway_id             = aws_internet_gateway.igw[local.selected_az].id
 
   timeouts {
     create = "5m"
@@ -195,8 +195,8 @@ resource "aws_route" "public_igw" {
 
 # internet gateway
 resource "aws_internet_gateway" "igw" {
-  count  = var.enable_igw ? 1 : 0
-  vpc_id = aws_vpc.vpc.id
+  for_each = var.enable_igw ? toset([local.selected_az]) : toset([])
+  vpc_id   = aws_vpc.vpc.id
 
   tags = merge(
     local.default-tags,

@@ -1,10 +1,9 @@
 terraform {
-  required_version = "~> 0.13.0"
+  required_version = "~> 1.0.0"
 }
 
 provider "aws" {
-  region  = var.aws_region
-  version = ">= 3.0"
+  region = var.aws_region
 }
 
 # spinnaker aware amazon vpc
@@ -21,4 +20,5 @@ module "spinnaker-aware-aws-vpc" {
   enable_igw          = var.enable_igw
   enable_ngw          = var.enable_ngw
   single_ngw          = var.single_ngw
+  enable_vgw          = var.enable_vgw
 }

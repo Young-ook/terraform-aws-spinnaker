@@ -13,8 +13,14 @@ variable "azs" {
 
 variable "vpc_endpoint_config" {
   description = "A list of vpc endpoint configurations"
-  type        = list
+  type        = list(any)
   default     = null
+}
+
+variable "amazon_side_asn" {
+  description = "The Autonomous System Number (ASN) for the Amazon side of the gateway."
+  type        = string
+  default     = "64512"
 }
 
 ### feature
@@ -32,6 +38,12 @@ variable "enable_ngw" {
 
 variable "single_ngw" {
   description = "Should be true if you want to provision a single shared NAT Gateway across all of private networks"
+  type        = bool
+  default     = false
+}
+
+variable "enable_vgw" {
+  description = "Should be true if you want to create a new Virtual Private Gateway resource and attach it to the VPC"
   type        = bool
   default     = false
 }

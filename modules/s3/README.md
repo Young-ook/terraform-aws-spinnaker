@@ -1,4 +1,4 @@
-**# Amazon S3 (Simple Storage Service)
+# Amazon S3 (Simple Storage Service)
 [Amazon S3](https://aws.amazon.com/s3/) is an object storage service that offers industry-leading scalability, data availability, security, and performance.
 
 ## Quickstart
@@ -7,7 +7,6 @@
 module "s3" {
   source  = "Young-ook/spinnaker/aws//modules/s3"
   name    = var.name
-  region  = "ap-southeast-2"
   tags    = { env = "test" }
 }
 ```
@@ -29,7 +28,6 @@ module "s3" {
   source  = "Young-ook/spinnaker/aws//modules/s3"
   name    = var.name
   tags    = { env = "test" }
-  region  = "ap-southeast-2"
 
   lifecycle_rules = [{
     enabled = "true"

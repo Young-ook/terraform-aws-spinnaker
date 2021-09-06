@@ -130,6 +130,7 @@ resource "aws_route" "private_ngw" {
 resource "aws_eip" "ngw" {
   for_each = var.enable_igw && var.enable_ngw ? (var.single_ngw ? toset([local.selected_az]) : toset(var.azs)) : toset([])
   vpc      = true
+  tags     = merge(local.default-tags, var.tags, )
 }
 
 resource "aws_nat_gateway" "ngw" {

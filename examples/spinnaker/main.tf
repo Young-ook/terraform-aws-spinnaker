@@ -1,16 +1,14 @@
 # Complete example
 
 provider "aws" {
-  region              = "ap-northeast-2"
+  region              = var.aws_region
   allowed_account_ids = [var.aws_account_id]
-  version             = ">= 3.0"
 }
 
 provider "aws" {
   alias               = "prod"
-  region              = "ap-northeast-2"
+  region              = var.aws_region
   allowed_account_ids = [var.aws_account_id]
-  version             = ">= 3.0"
 }
 
 # spinnaker

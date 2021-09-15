@@ -6,7 +6,7 @@ halyard:
     pullSecrets: []
   # Set to false to disable persistence data volume for halyard
   persistence:
-    enabled: true
+    enabled: false
   # Uncomment to add storage class for the persistence data volume
   # storageClass: <storageclass_name>
   # Provide additional parameters to halyard deploy apply command

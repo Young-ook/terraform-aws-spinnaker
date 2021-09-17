@@ -35,6 +35,7 @@ resource "aws_iam_policy" "write" {
       {
         Action = [
           "s3:Put*",
+          "s3:DeleteObject*",
         ]
         Effect = "Allow"
         Resource = [

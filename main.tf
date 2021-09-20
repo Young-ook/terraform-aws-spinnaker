@@ -1,3 +1,7 @@
+module "current" {
+  source = "./modules/aws-partitions"
+}
+
 ### kubernetes
 
 module "eks" {
@@ -13,6 +17,8 @@ module "eks" {
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,
     aws_iam_policy.spin-assume.*.arn,
+    module.s3.policy_arns.read,
+    module.s3.policy_arns.write,
   ])
 }
 
@@ -32,6 +38,27 @@ module "rds" {
   aurora_cluster   = var.aurora_cluster
   aurora_instances = var.aurora_instances
 }
+
+### s3
+
+module "s3" {
+  source          = "./modules/s3"
+  name            = local.name
+  tags            = var.tags
+  lifecycle_rules = []
+}
+
+locals {
+  keys = ["front50", "kayenta", "halyard", ]
+}
+
+resource "aws_s3_bucket_object" "keys" {
+  for_each = toset(local.keys)
+  bucket   = module.s3.bucket.id
+  key      = format("%s/", each.value)
+  content  = format("%s/", each.value)
+}
+
 
 # security/policy
 resource "aws_iam_policy" "rosco-bake" {
@@ -137,6 +164,19 @@ resource "helm_release" "spinnaker" {
   # value block with custom values to be merged with the values yaml
   dynamic "set" {
     for_each = lookup(var.helm, "values", {})
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
+
+  dynamic "set" {
+    for_each = {
+      "minio.enabled" = "false"
+      "s3.enabled"    = "true"
+      "s3.bucket"     = module.s3.bucket.id
+      "s3.region"     = module.current.region.id
+    }
     content {
       name  = set.key
       value = set.value

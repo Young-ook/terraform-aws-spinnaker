@@ -14,7 +14,7 @@ output "bucket" {
   description = "The attributes of generated buckets"
   value = {
     spinnaker = {
-      name = aws_s3_bucket.storage.id
+      name = module.s3.bucket.id
     }
   }
 }

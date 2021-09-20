@@ -2,6 +2,10 @@
 
 data "aws_partition" "current" {}
 
+module "current" {
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
+}
+
 # security/policy
 resource "aws_iam_policy" "read" {
   name        = format("%s-read", local.name)
@@ -146,5 +150,21 @@ resource "aws_s3_bucket" "bucket" {
   # enable object version control
   versioning {
     enabled = var.versioning
+  }
+}
+
+resource "local_file" "empty-bucket" {
+  depends_on      = [aws_s3_bucket.bucket, module.current]
+  content         = local.empty
+  filename        = "${path.module}/empty.sh"
+  file_permission = "0600"
+}
+
+resource "null_resource" "empty-bucket" {
+  count      = var.force_destroy ? 1 : 0
+  depends_on = [local_file.empty-bucket]
+  provisioner "local-exec" {
+    when    = destroy
+    command = "bash -e ${path.module}/empty.sh"
   }
 }

@@ -13,7 +13,7 @@ function process_args() {
     exit -1
   fi
 
-  while getopts ":n:a:r:k:s:" opt; do
+  while getopts ":b:r:" opt; do
     case $opt in
       b) BUCKET_NAME="$OPTARG"
       ;;

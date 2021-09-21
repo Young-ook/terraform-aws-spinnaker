@@ -153,18 +153,35 @@ resource "aws_s3_bucket" "bucket" {
   }
 }
 
-resource "local_file" "empty-bucket" {
-  depends_on      = [aws_s3_bucket.bucket, module.current]
-  content         = local.empty
-  filename        = "${path.module}/empty.sh"
-  file_permission = "0600"
+locals {
+  aws_region  = module.current.region.name
+  bucket_name = aws_s3_bucket.bucket.id
 }
 
-resource "null_resource" "empty-bucket" {
+# cleanup script
+resource "local_file" "empty" {
   count      = var.force_destroy ? 1 : 0
-  depends_on = [local_file.empty-bucket]
+  depends_on = [aws_s3_bucket.bucket]
+  content = join("\n", [
+    "#!/bin/sh",
+    "aws s3api delete-objects \\",
+    "  --region ${local.aws_region} --bucket ${local.bucket_name} \\",
+    "  --delete \"$(aws s3api list-object-versions \\",
+    "    --region ${local.aws_region} --bucket ${local.bucket_name} \\",
+    "    --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}' \\",
+    "    --output json)\"",
+    "echo $?",
+    "exit 0"
+  ])
+  filename        = "${path.module}/empty.sh"
+  file_permission = "0700"
+}
+
+resource "null_resource" "empty" {
+  count      = var.force_destroy ? 1 : 0
+  depends_on = [local_file.empty]
   provisioner "local-exec" {
     when    = destroy
-    command = "bash -e ${path.module}/empty.sh"
+    command = "${path.module}/empty.sh"
   }
 }

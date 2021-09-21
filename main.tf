@@ -1,5 +1,5 @@
 module "current" {
-  source = "./modules/aws-partitions"
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
 }
 
 ### kubernetes
@@ -58,7 +58,6 @@ resource "aws_s3_bucket_object" "keys" {
   key      = format("%s/", each.value)
   content  = format("%s/", each.value)
 }
-
 
 # security/policy
 resource "aws_iam_policy" "rosco-bake" {
@@ -181,5 +180,28 @@ resource "helm_release" "spinnaker" {
       name  = set.key
       value = set.value
     }
+  }
+}
+
+### preuninstall
+
+# cleanup script
+resource "local_file" "preuninst" {
+  depends_on = [helm_release.spinnaker, module.eks, module.rds, module.s3]
+  content = join("\n", [
+    "#!/bin/sh",
+    "aws eks update-kubeconfig --name ${module.eks.cluster.name} --region ${module.current.region.name} -k kubeconfig",
+    "kubectl --kubeconfig kubeconfig -n spinnaker delete deploy,svc,sts,job,po --force --all",
+    "echo $?",
+  ])
+  filename        = "${path.module}/preuninst.sh"
+  file_permission = "0700"
+}
+
+resource "null_resource" "preuninst" {
+  depends_on = [local_file.preuninst]
+  provisioner "local-exec" {
+    when    = destroy
+    command = "${path.module}/preuninst.sh"
   }
 }

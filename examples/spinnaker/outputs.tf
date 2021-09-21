@@ -22,8 +22,3 @@ output "kubeconfig" {
   description = "Bash script to update the kubeconfig file for the EKS cluster"
   value       = module.spinnaker.kubeconfig
 }
-
-output "uninstall" {
-  description = "Bash script to prepare helm chart uninstall"
-  value       = module.spinnaker.uninstall
-}

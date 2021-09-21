@@ -10,16 +10,12 @@ output "policy_arns" {
   value       = zipmap(["read", "write"], [aws_iam_policy.read.arn, aws_iam_policy.write.arn])
 }
 
-locals {
-  empty = join(" ", [
+output "empty" {
+  description = "Bash script to empty the S3 bucket"
+  value = join(" ", [
     "bash -e",
     format("%s/script/empty.sh", path.module),
     format("-r %s", module.current.region.name),
     format("-b %s", aws_s3_bucket.bucket.id),
   ])
-}
-
-output "empty" {
-  description = "Bash script to empty the S3 bucket"
-  value       = local.empty
 }

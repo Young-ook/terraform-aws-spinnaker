@@ -35,6 +35,8 @@ function empty() {
       --bucket $BUCKET_NAME \
       --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}' \
       --output json)"
+
+  echo $?
 }
 
 # main

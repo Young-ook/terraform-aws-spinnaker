@@ -190,7 +190,7 @@ resource "local_file" "preuninst" {
   depends_on = [helm_release.spinnaker, module.eks, module.rds, module.s3]
   content = join("\n", [
     "#!/bin/sh",
-    "aws eks update-kubeconfig --name ${module.eks.cluster.name} --region ${module.current.region.name} -k kubeconfig",
+    "aws eks update-kubeconfig --name ${module.eks.cluster.name} --region ${module.current.region.name} --kubeconfig kubeconfig",
     "kubectl --kubeconfig kubeconfig -n spinnaker delete deploy,svc,sts,job,po --force --all",
     "echo $?",
   ])

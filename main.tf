@@ -182,26 +182,3 @@ resource "helm_release" "spinnaker" {
     }
   }
 }
-
-### preuninstall
-
-# cleanup script
-resource "local_file" "preuninst" {
-  depends_on = [helm_release.spinnaker, module.eks, module.rds, module.s3]
-  content = join("\n", [
-    "#!/bin/sh",
-    "aws eks update-kubeconfig --name ${module.eks.cluster.name} --region ${module.current.region.name} --kubeconfig kubeconfig",
-    "kubectl --kubeconfig kubeconfig -n spinnaker delete deploy,svc,sts,job,po --force --all",
-    "echo $?",
-  ])
-  filename        = "${path.module}/preuninst.sh"
-  file_permission = "0700"
-}
-
-resource "null_resource" "preuninst" {
-  depends_on = [local_file.preuninst]
-  provisioner "local-exec" {
-    when    = destroy
-    command = "${path.module}/preuninst.sh"
-  }
-}

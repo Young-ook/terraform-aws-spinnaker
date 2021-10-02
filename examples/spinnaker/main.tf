@@ -41,9 +41,10 @@ module "spinnaker-managed-role" {
 
 # artifact bucket
 module "artifact" {
-  source = "../../modules/s3"
-  name   = var.name
-  stack  = var.stack
-  detail = var.detail
-  tags   = var.tags
+  source        = "../../modules/s3"
+  name          = var.name
+  stack         = var.stack
+  detail        = var.detail
+  tags          = var.tags
+  force_destroy = true
 }

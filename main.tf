@@ -1,5 +1,5 @@
 module "current" {
-  source = "./modules/aws-partitions"
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
 }
 
 ### kubernetes
@@ -12,7 +12,7 @@ module "eks" {
   subnets             = aws_subnet.private.*.id
   kubernetes_version  = var.kubernetes_version
   managed_node_groups = var.kubernetes_node_groups
-  enable_ssm          = true
+  enable_ssm          = var.kubernetes_enable_ssm
   policy_arns = flatten([
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,
@@ -58,7 +58,6 @@ resource "aws_s3_bucket_object" "keys" {
   key      = format("%s/", each.value)
   content  = format("%s/", each.value)
 }
-
 
 # security/policy
 resource "aws_iam_policy" "rosco-bake" {

@@ -43,6 +43,12 @@ variable "kubernetes_node_groups" {
   ]
 }
 
+variable "kubernetes_enable_ssm" {
+  description = "Allow ssh access using session manager"
+  type        = bool
+  default     = false
+}
+
 variable "enabled_cluster_log_types" {
   description = "A list of the desired control plane logging to enable"
   type        = list(string)

@@ -19,6 +19,11 @@ variable "versioning" {
   default     = false
 }
 
+variable "lifecycle_rules" {
+  description = "A configuration of object lifecycle management"
+  default     = []
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"

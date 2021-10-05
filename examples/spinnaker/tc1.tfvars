@@ -34,3 +34,6 @@ aurora_instances = [
     instance_type = "db.t3.medium"
   }
 ]
+s3_bucket = {
+  force_destroy = true
+}

@@ -66,6 +66,12 @@ variable "aurora_instances" {
   default     = []
 }
 
+### s3 bucket
+variable "s3_bucket" {
+  description = "S3 bucket configuration"
+  default     = {}
+}
+
 ### security
 variable "assume_role_arn" {
   description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"

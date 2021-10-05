@@ -17,3 +17,4 @@ kubernetes_node_groups = [
 ]
 aurora_cluster   = {}
 aurora_instances = []
+s3_bucket        = {}

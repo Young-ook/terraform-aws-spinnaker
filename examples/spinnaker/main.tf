@@ -26,6 +26,7 @@ module "spinnaker" {
   kubernetes_node_groups = var.kubernetes_node_groups
   aurora_cluster         = var.aurora_cluster
   aurora_instances       = var.aurora_instances
+  s3_bucket              = var.s3_bucket
   assume_role_arn        = [module.spinnaker-managed-role.role_arn]
 }
 

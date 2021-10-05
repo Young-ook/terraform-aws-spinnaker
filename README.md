@@ -80,3 +80,14 @@ And users can enable Kubernetes account in the spinnaker using halyard. Please f
 Users can set up AWS CodeBuild as a Continuous Integration (CI) system within spinnaker for cloud backed build system. For more details about codebuild project registration with spinnaker, please visit the [Enable AWS CodeBuild account](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/codebuild).
 
 # Known Issues
+## Requires default VPC
+You will see error message followings when attempting to run terraform apply in the spinnaker example if you deleted the default vpc on your account:
+```
+╷
+│ Error: no matching VPC found
+│
+│ with module.spinnaker.module.eks.data.aws_vpc.default,
+│ on .terraform/modules/spinnaker.eks/network.tf line 4, in data "aws_vpc" "default":
+│ 4: data "aws_vpc" "default"
+```
+This module uses eks module inside that requires default vpc on your aws account. This is the related [issue](https://github.com/Young-ook/terraform-aws-eks/issues/44). For more details, please refer to the [source](https://github.com/Young-ook/terraform-aws-eks/).

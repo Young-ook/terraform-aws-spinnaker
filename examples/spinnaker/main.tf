@@ -43,7 +43,7 @@ module "spinnaker-managed-role" {
 # artifact bucket
 module "artifact" {
   source        = "../../modules/s3"
-  name          = var.name
+  name          = "artifact"
   stack         = var.stack
   detail        = var.detail
   tags          = var.tags

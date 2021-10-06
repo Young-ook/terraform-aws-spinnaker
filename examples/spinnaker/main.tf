@@ -26,6 +26,7 @@ module "spinnaker" {
   kubernetes_node_groups = var.kubernetes_node_groups
   aurora_cluster         = var.aurora_cluster
   aurora_instances       = var.aurora_instances
+  s3_bucket              = var.s3_bucket
   assume_role_arn        = [module.spinnaker-managed-role.role_arn]
 }
 
@@ -42,7 +43,7 @@ module "spinnaker-managed-role" {
 # artifact bucket
 module "artifact" {
   source        = "../../modules/s3"
-  name          = var.name
+  name          = "artifact"
   stack         = var.stack
   detail        = var.detail
   tags          = var.tags

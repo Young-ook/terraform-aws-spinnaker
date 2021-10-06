@@ -7,27 +7,7 @@ variable "canned_acl" {
 
 variable "lifecycle_rules" {
   description = "A configuration of object lifecycle management"
-  default = [
-    {
-      "enabled" : "true",
-      "expiration" : {
-        "days" : "365"
-      },
-      "id" : null,
-      "prefix" : null,
-      "noncurrent_version_expiration" : {
-        "days" : "120"
-      },
-      "noncurrent_version_transition" : [],
-      "tags" : {},
-      "transition" : [
-        {
-          "days" : "180",
-          "storage_class" : "STANDARD_IA"
-        }
-      ]
-    }
-  ]
+  default     = []
 }
 
 variable "logging_rules" {

@@ -45,7 +45,9 @@ module "s3" {
   source          = "./modules/s3"
   name            = local.name
   tags            = var.tags
-  lifecycle_rules = []
+  force_destroy   = lookup(var.s3_bucket, "force_destroy", local.default_s3_bucket_config["force_destroy"])
+  versioning      = lookup(var.s3_bucket, "versioning", local.default_s3_bucket_config["versioning"])
+  lifecycle_rules = lookup(var.s3_bucket, "lifecycle_rules", local.default_s3_bucket_config["lifecycle_rules"])
 }
 
 locals {

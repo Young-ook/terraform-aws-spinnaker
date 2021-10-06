@@ -43,6 +43,12 @@ variable "aurora_instances" {
   default     = []
 }
 
+### s3 bucket
+variable "s3_bucket" {
+  description = "S3 bucket configuration"
+  default     = {}
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"

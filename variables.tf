@@ -27,20 +27,12 @@ variable "helm" {
 variable "kubernetes_version" {
   description = "The target version of kubernetes"
   type        = string
-  default     = "1.17"
+  default     = "1.21"
 }
 
 variable "kubernetes_node_groups" {
   description = "Node groups definition"
-  default = [
-    {
-      name          = "default"
-      min_size      = 1
-      max_size      = 3
-      desired_size  = 1
-      instance_type = "m5.xlarge"
-    }
-  ]
+  default     = null
 }
 
 variable "kubernetes_enable_ssm" {

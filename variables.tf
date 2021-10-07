@@ -41,6 +41,12 @@ variable "kubernetes_enable_ssm" {
   default     = false
 }
 
+variable "kubernetes_policy_arns" {
+  description = "A list of policy ARNs to attach the node groups role"
+  type        = list(string)
+  default     = []
+}
+
 variable "enabled_cluster_log_types" {
   description = "A list of the desired control plane logging to enable"
   type        = list(string)

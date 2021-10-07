@@ -19,6 +19,7 @@ module "eks" {
     aws_iam_policy.spin-assume.*.arn,
     module.s3.policy_arns.read,
     module.s3.policy_arns.write,
+    var.kubernetes_policy_arns,
   ])
 }
 

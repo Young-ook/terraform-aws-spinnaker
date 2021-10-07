@@ -24,6 +24,7 @@ module "spinnaker" {
   cidr                   = var.cidr
   kubernetes_version     = var.kubernetes_version
   kubernetes_node_groups = var.kubernetes_node_groups
+  kubernetes_policy_arns = [module.artifact.policy_arns["read"]]
   aurora_cluster         = var.aurora_cluster
   aurora_instances       = var.aurora_instances
   s3_bucket              = var.s3_bucket

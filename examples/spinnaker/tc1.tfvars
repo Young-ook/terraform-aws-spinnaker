@@ -11,11 +11,11 @@ cidr               = "10.0.0.0/16"
 kubernetes_version = "1.20"
 kubernetes_node_groups = [
   {
-    name          = "default"
-    instance_type = "m5.large"
+    name          = "tc1"
+    instance_type = "m5.xlarge"
     min_size      = "1"
     max_size      = "3"
-    desired_size  = "2"
+    desired_size  = "1"
   }
 ]
 aurora_cluster = {

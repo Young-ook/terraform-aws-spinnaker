@@ -29,7 +29,7 @@ variable "kubernetes_version" {
 
 variable "kubernetes_node_groups" {
   description = "EKS managed node groups definition"
-  default     = []
+  default     = null
 }
 
 ### rdb cluster

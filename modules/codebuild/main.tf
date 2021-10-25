@@ -7,7 +7,7 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 resource "aws_codebuild_project" "cb" {
-  name          = format("%s", local.name)
+  name          = local.name
   tags          = merge(local.default-tags, var.tags)
   description   = "CodeBuild project"
   build_timeout = "5"

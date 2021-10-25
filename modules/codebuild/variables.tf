@@ -1,6 +1,6 @@
 variable "artifact_config" {
   description = "Artifact configuration"
-  type        = map
+  type        = map(any)
   default = {
     type = "NO_ARTIFACTS"
   }
@@ -13,19 +13,19 @@ variable "environment_config" {
 
 variable "source_config" {
   description = "Source repository configuration"
-  type        = map
+  type        = map(any)
   default     = {}
 }
 
 variable "log_config" {
   description = "Log configuration"
-  type        = map
+  type        = map(any)
   default     = null
 }
 
 variable "vpc" {
   description = "VPC configuration"
-  type        = map
+  type        = map(any)
   default     = null
 }
 

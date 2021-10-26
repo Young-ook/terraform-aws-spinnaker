@@ -24,8 +24,11 @@ module "ci" {
 
 # cloudwatch logs
 module "logs" {
-  source     = "Young-ook/lambda/aws//modules/logs"
-  name       = var.name
-  namespace  = "/aws/codebuild"
-  log_config = var.log_config
+  source  = "Young-ook/lambda/aws//modules/logs"
+  version = ">= 0.0.4"
+  name    = var.name
+  log_config = {
+    namespace      = "/aws/codebuild"
+    retension_days = 5
+  }
 }

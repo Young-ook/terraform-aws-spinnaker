@@ -42,11 +42,16 @@ module "spinnaker-managed-role" {
 }
 
 # artifact bucket
+module "frigga" {
+  source = "Young-ook/spinnaker/aws//modules/frigga"
+  name   = "artifact"
+  stack  = var.stack
+  detail = var.detail
+}
+
 module "artifact" {
-  source        = "../../modules/s3"
-  name          = "artifact"
-  stack         = var.stack
-  detail        = var.detail
+  source        = "Young-ook/sagemaker/aws//modules/s3"
+  name          = module.frigga.name
   tags          = var.tags
   force_destroy = true
 }

@@ -3,8 +3,8 @@ locals {
 }
 
 module "vpc" {
-  source  = "Young-ook/sagemaker/aws//modules/vpc"
-  version = "0.0.6"
+  source  = "Young-ook/vpc/aws"
+  version = "1.0.0"
   name    = local.name
   tags    = var.tags
   vpc_config = {

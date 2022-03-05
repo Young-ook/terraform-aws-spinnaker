@@ -1,5 +1,5 @@
 output "name" {
-  value       = local.name
+  value       = local.frigga-name
   description = "The generated name for your AWS resource"
 }
 

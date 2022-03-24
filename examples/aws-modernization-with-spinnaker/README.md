@@ -1,6 +1,6 @@
 # AWS Application Modernization with Spinnaker
 
-![aws-modernization-with-spinnaker](../../images/aws-modernization-with-spinnaker.png)
+![aws-modernization-with-spinnaker](../../images/aws-modernization-with-spinnaker-architecture.png)
 
 ## Setup
 This is an aws modern application with hashicorp and spinnaker. The [main.tf](main.tf) is the terraform configuration file to create network infrastructure and kubernetes cluster, and spinnaker on your AWS account.

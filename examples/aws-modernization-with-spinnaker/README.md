@@ -28,7 +28,7 @@ Run command:
 ```
 ./tunnel.sh
 ```
-Open http://localhost:8080 on a web browser.
+Open `http://localhost:8080` on a web browser.
 
 ## Clean up
 Run command:

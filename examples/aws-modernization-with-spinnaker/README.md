@@ -16,9 +16,23 @@ To set up DevOps platform to another VPC, run below command:
 terraform apply -target module.platform
 ```
 
+## Access Spinnaker
+Halyard is a command-line administration tool that manages the lifecycle of your spinnaker deployment, including writing & validating your deployment’s configuration, deploying each of spinnaker’s microservices, and updating the deployment. All production-capable deployments of spinnaker require halyard in order to install, configure, and update spinnaker.
+
+Run command:
+```
+./halconfig.sh
+```
+
+Run command:
+```
+./tunnel.sh
+```
+Open http://localhost:8080 on a web browser.
+
 ## Clean up
 Run command:
 ```
-./uninstall.sh
+./preuninstall.sh
 terraform destroy
 ```

@@ -44,6 +44,7 @@ module "rds" {
 
 module "s3" {
   source          = "Young-ook/sagemaker/aws//modules/s3"
+  version         = "0.1.0"
   name            = local.name
   tags            = var.tags
   force_destroy   = lookup(var.s3_bucket, "force_destroy", local.default_s3_bucket_config["force_destroy"])
@@ -55,7 +56,7 @@ locals {
   keys = ["front50", "kayenta", "halyard", ]
 }
 
-resource "aws_s3_bucket_object" "keys" {
+resource "aws_s3_object" "keys" {
   for_each = toset(local.keys)
   bucket   = module.s3.bucket.id
   key      = format("%s/", each.value)

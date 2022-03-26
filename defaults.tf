@@ -21,7 +21,7 @@ locals {
   }
   default_s3_bucket_config = {
     force_destroy   = false
-    versioning      = true
-    lifecycle_rules = []
+    versioning      = "Enabled"
+    lifecycle_rules = null
   }
 }

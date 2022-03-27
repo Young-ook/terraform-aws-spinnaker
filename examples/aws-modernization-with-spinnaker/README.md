@@ -1,3 +1,4 @@
+[[English](README.md)] [[한국어](README.ko.md)]
 # AWS Application Modernization with Spinnaker
 
 ![aws-modernization-with-spinnaker](../../images/aws-modernization-with-spinnaker-architecture.png)

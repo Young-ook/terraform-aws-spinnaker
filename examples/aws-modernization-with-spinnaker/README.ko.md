@@ -140,7 +140,7 @@ App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 �
 
 애플리케이션이 새 버전(v002)으로 표시되면 포드를 선택하고, 오른 쪽의 자세히 보기 화면에서 *Console Ourput* 을 누릅니다. 그러면 아래와 같이 포드 안의 컨테이너들의 로그를 볼 수 있습니다. ENVOY, XRAY_DAEMON이 함께 보인다면 제대로 반영된 것입니다.
 
-![yelbv2-app-logs](../../images/spinnaker-yelbv2-app-logs.png)
+![spinnaker-yelbv2-app-logs](../../images/spinnaker-yelbv2-app-logs.png)
 
 #### 가중치 기반 라우팅
 이제 새 버전의 애플리케이션 서버를 배포합니다. AWS CodeBuild 파이프라인에서 생성한 새로운 컨테이너 이미지를 이용하여 배포할 것 입니다. 먼저, 새 파이프라인을 생성합니다. 화면 오른 쪽 윗 부분에 파이프라인 생성 단추가 있습니다. 파이프라인 이름으로 `meshed-app-v2` 입력하고 확인을 누릅니다. *Add stage* 를 눌러서 스테이지의 종류를 선택합니다. 이 번에는 배포를 할 것이므로 *Deploy (Manifest)* 를 선택합니다.

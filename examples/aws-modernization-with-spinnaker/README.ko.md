@@ -69,7 +69,7 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
 
 빌드가 성공했으면, AWS 콘솔로 들어가서 ECR 서비스 화면으로 이동합니다. 새로 생성한 컨테이터 이미지가 나타날 것입니다. 그리고 S3 서비스 화면으로 이동합니다. 버켓 목록 중 *artifact-xxxx-yyyy* 와 같은 형식의 이름을 가진 버켓이 있을 것입니다. 해당 버켓을 눌러서 안으로 들어갑니다.
 
-![s3-artifact-bucket](../../images/spinnaker-s3-artifact-bucket.png)
+![spinnaker-s3-artifact-bucket](../../images/spinnaker-s3-artifact-bucket.png)
 
 #### 베이스 애플리케이션
 기본 설정의 컨테이터 애플리케이션을 배포 합니다. 데이터베이스, 캐시, 애플리케이션 서버, UI 서버를 배포합니다. 먼저, 새 파이프라인을 생성합니다. 화면 오른 쪽 윗 부분에 파이프라인 생성 단추가 있습니다. 파이프라인 이름으로 `base-app-v1` 입력하고 확인을 누릅니다. *Add stage* 를 눌러서 스테이지의 종류를 선택합니다. 이 번에는 배포를 할 것이므로 *Deploy (Manifest)* 를 선택합니다.
@@ -133,8 +133,6 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
 
 파이프라인 설정이 되었으면, *Start Manual Execution* 을 눌러서 파이프라인을 실행합니다.
 
-![spinnaker-pipeline-meshed-app-v1](../../images/spinnaker-pipeline-meshed-app-v1.png)
-
 #### 사이드카 주입
 App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 동작하고 있습니다. 그래서 *Rolling Restart* 를 실행해서 포드가 재시작하도록 해야 합니다. 포드를 재시작할 때 사이드카 프록시도 함께 주입됩니다. 클러스터 화면에 표시된 모든 DB, Redis, Appserver, UI 디플로이먼트 재시작 합니다. 잠시 기다리면 v002 클러스터가 생깁니다. 4개의 디플로이먼트가 v002로 표시되면 재시작을 완료한 것입니다.
 
@@ -142,7 +140,7 @@ App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 �
 
 애플리케이션이 새 버전(v002)으로 표시되면 포드를 선택하고, 오른 쪽의 자세히 보기 화면에서 *Console Ourput* 을 누릅니다. 그러면 아래와 같이 포드 안의 컨테이너들의 로그를 볼 수 있습니다. ENVOY, XRAY_DAEMON이 함께 보인다면 제대로 반영된 것입니다.
 
-![yelbv2-app-logs](../../images/spinnaker-yelbv2-app-logs.png)
+![spinnaker-yelbv2-app-logs](../../images/spinnaker-yelbv2-app-logs.png)
 
 #### 가중치 기반 라우팅
 이제 새 버전의 애플리케이션 서버를 배포합니다. AWS CodeBuild 파이프라인에서 생성한 새로운 컨테이너 이미지를 이용하여 배포할 것 입니다. 먼저, 새 파이프라인을 생성합니다. 화면 오른 쪽 윗 부분에 파이프라인 생성 단추가 있습니다. 파이프라인 이름으로 `meshed-app-v2` 입력하고 확인을 누릅니다. *Add stage* 를 눌러서 스테이지의 종류를 선택합니다. 이 번에는 배포를 할 것이므로 *Deploy (Manifest)* 를 선택합니다.
@@ -166,8 +164,6 @@ App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 �
 화면 맨 아래 *Save Changes*를 눌러서 저장합니다. 저장 후 변경사항이 반영 된 것을 확인했으면, 파이프라인 빠져 나오기 화살표를 눌러서 파이프라인 편집 화면 밖으로 이동합니다. 화면 위 쪽, *build*라고 되어 있는 파이프라인 이름 옆에 작은 화살표가 있습니다.
 
 파이프라인 설정이 되었으면, *Start Manual Execution* 을 눌러서 파이프라인을 실행합니다.
-
-![spinnaker-pipeline-meshed-app-v2](../../images/spinnaker-pipeline-meshed-app-v2.png)
 
 새로운 버전의 애플리케이션이 배포가 되었지만, ALB를 통해서 접속한 서비스는 '새로고침'을 반복해도 변화가 없습니다. 컨테이너만 배포를 했을 뿐, App Mesh에서 트래픽을 새 버전의 서버로 보내지 않고 있기 때문입니다. 이제 새 버전의 애플리케이션 서버에도 트래픽을 보내도록 설정합니다. 예제에서는 50:50으로 예전 서버와 새 버전의 서버로 트래픽을 보내도록 설정할 것입니다. 화면 오른 쪽 윗 부분에 파이프라인 생성 단추를 눌러서 새 파이프라인을 생성합니다. 파이프라인 이름으로 `weighted-route` 입력하고 확인을 누릅니다. *Add stage* 를 눌러서 스테이지의 종류를 선택합니다. 이 번에는 배포를 할 것이므로 *Deploy (Manifest)* 를 선택합니다.
 

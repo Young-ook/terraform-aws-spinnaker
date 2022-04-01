@@ -42,12 +42,12 @@ terraform apply -target module.platform
 ![spinnaker-new-application](../../images/spinnaker-new-application.png)
 
 ### 파이프라인
-야플리케이션을 빌드하고 배포하는 과정을 자동화하는 것을 파이프라인(Pipeline)이라고 부릅니다. 워크플로우(Workflow)라고 표현하기도 하지만 지속적 전달(Continuous Delivery)에서는 파이프라인 이라는 용어를 사용하고 있습니다. 이제 다음 단계로 이동해서 첫 번째 파이프라인을 만들겠습니다.
+애플리케이션을 빌드하고 배포하는 과정을 자동화하는 것을 파이프라인(Pipeline)이라고 부릅니다. 워크플로우(Workflow)라고 표현하기도 하지만 지속적 전달(Continuous Delivery)에서는 파이프라인 이라는 용어를 사용하고 있습니다. 이제 다음 단계로 이동해서 첫 번째 파이프라인을 만들겠습니다.
 
 #### 빌드
-AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드에 성공하면 컨테이너 이미지는 ECR에 저장되며, 쿠버네티스(Kubernetes) 매니페스트 파일들은 S3 버켓에 저장됩니다. S3 버켓 이름은 테라폼에서 생성할 때 임의의 이름이 추가됩니다. S3 서비스에서 배켓을 조회하면 artifact-xxxx-yyyy 와 같은 형식의 이름을 가진 버켓을 볼 수 있습니다.
+AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드에 성공하면 컨테이너 이미지는 ECR에 저장되며, 쿠버네티스(Kubernetes) 매니페스트 파일들은 S3 버켓에 저장됩니다. S3 버켓 이름은 테라폼에서 생성할 때 임의의 이름이 추가됩니다. S3 서비스에서 배켓을 조회하면 *artifact-xxxx-yyyy* 와 같은 형식의 이름을 가진 버켓을 볼 수 있습니다.
 
-**yelb** 어플리케이션을 생성했다면, 이제 그 안에서 파이프라인을 만들어야 합니다. 화면에 나타난 *Create new pipeline* 을 눌러서 파이프라인 이름을 입력합니다. *build* 를 입력하고 확인을 누르면 파이프라인을 편집할 수 있는 화면이 나옵니다.
+**yelb** 어플리케이션을 생성했다면, 이제 그 안에서 파이프라인을 만들어야 합니다. 화면에 나타난 *Create new pipeline* 을 눌러서 파이프라인 이름을 입력합니다. `build` 를 입력하고 확인을 누르면 파이프라인을 편집할 수 있는 화면이 나옵니다.
 
 ![spinnaker-pipeline-create](../..//images/spinnaker-pipeline-create.png)
 
@@ -92,7 +92,7 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
  + 매니페스트 소스를 아티팩트로 지정합니다.
    - **Manifest Source:** Artifact
 
- + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 추가 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. Object Path 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
+ + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 추가 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. *Object Path* 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
    - **Account:** platform
    - **Object Path:** s3://artifact-xxxx-yyyy/1-base-app-v1.yaml
 
@@ -124,12 +124,11 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
  + 매니페스트 소스를 아티팩트로 지정합니다.
    - **Manifest Source:** Artifact
 
- + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 추가 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. Object Path 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다. Object Path 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
+ + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 추가 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. *Object Path* 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
    - **Account:** platform
    - **Object Path:** s3://artifact-xxxx-yyyy/2-meshed-app-v1.yaml
 
-화면 맨 아래 *Save Changes*를 눌러서 저장합니다.
-저장 후 변경사항이 반영 된 것을 확인했으면, 파이프라인 빠져 나오기 화살표를 눌러서 파이프라인 편집 화면 밖으로 이동합니다. 화면 위 쪽, *build*라고 되어 있는 파이프라인 이름 옆에 작은 화살표가 있습니다.
+화면 맨 아래 *Save Changes*를 눌러서 저장합니다. 저장 후 변경사항이 반영 된 것을 확인했으면, 파이프라인 빠져 나오기 화살표를 눌러서 파이프라인 편집 화면 밖으로 이동합니다. 화면 위 쪽, *build*라고 되어 있는 파이프라인 이름 옆에 작은 화살표가 있습니다.
 
 파이프라인 설정이 되었으면, *Start Manual Execution* 을 눌러서 파이프라인을 실행합니다.
 
@@ -138,7 +137,7 @@ App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 �
 
 ![spinnaker-deployment-rolling-restart](../../images/spinnaker-deployment-rolling-restart.png)
 
-애플리케이션이 새 버전(v002)으로 표시되면 포드를 선택하고, 오른 쪽의 자세히 보기 화면에서 *Console Ourput* 을 누릅니다. 그러면 아래와 같이 포드 안의 컨테이너들의 로그를 볼 수 있습니다. ENVOY, XRAY_DAEMON이 함께 보인다면 제대로 반영된 것입니다.
+애플리케이션이 새 버전(v002)으로 표시되면 포드를 선택하고, 오른 쪽의 자세히 보기 화면에서 *Console Output* 을 누릅니다. 그러면 아래와 같이 포드 안의 컨테이너들의 로그를 볼 수 있습니다. ENVOY, XRAY_DAEMON이 함께 보인다면 제대로 반영된 것입니다.
 
 ![spinnaker-yelbv2-app-logs](../../images/spinnaker-yelbv2-app-logs.png)
 
@@ -157,7 +156,7 @@ App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 �
  + 매니페스트 소스를 아티팩트로 지정합니다.
    - **Manifest Source:** Artifact
 
- + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. Object Path 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다. Object Path 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
+ + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. *Object Path* 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
    - **Account:** platform
    - **Object Path:** s3://artifact-xxxx-yyyy/3-meshed-app-v2.yaml
 
@@ -179,7 +178,7 @@ App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 �
  + 매니페스트 소스를 아티팩트로 지정합니다.
    - **Manifest Source:** Artifact
 
- + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. Object Path 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다. Object Path 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
+ + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. *Object Path* 부분에는 앞에서 복사한 S3 URI를 붙여넣으면 됩니다.
    - **Account:** platform
    - **Object Path:** s3://artifact-xxxx-yyyy/4-weighted-route.yaml
 

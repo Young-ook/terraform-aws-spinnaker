@@ -1,10 +1,8 @@
 ## managed continuous integration service
 
-data "aws_partition" "current" {}
-
-data "aws_region" "current" {}
-
-data "aws_caller_identity" "current" {}
+module "aws" {
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
+}
 
 resource "aws_codebuild_project" "cb" {
   name          = local.name
@@ -14,20 +12,20 @@ resource "aws_codebuild_project" "cb" {
   service_role  = aws_iam_role.cb.arn
 
   artifacts {
-    type                = lookup(var.artifact_config, "type", "NO_ARTIFACTS")
-    location            = lookup(var.artifact_config, "location", null)
-    encryption_disabled = lookup(var.artifact_config, "encryption_disabled", false)
+    type                = lookup(var.build.artifact, "type", "NO_ARTIFACTS")
+    location            = lookup(var.build.artifact, "location", null)
+    encryption_disabled = lookup(var.build.artifact, "encryption_disabled", false)
   }
 
   environment {
-    type                        = lookup(var.environment_config, "type", local.default_build_environment["type"])
-    image                       = lookup(var.environment_config, "image", local.default_build_environment["image"])
-    compute_type                = lookup(var.environment_config, "compute_type", local.default_build_environment["compute_type"])
-    image_pull_credentials_type = lookup(var.environment_config, "image_pull_credentials_type", local.default_build_environment["image_pull_credentials_type"])
-    privileged_mode             = lookup(var.environment_config, "privileged_mode", local.default_build_environment["privileged_mode"])
+    type                        = lookup(var.build.environment, "type", local.default_build_environment["type"])
+    image                       = lookup(var.build.environment, "image", local.default_build_environment["image"])
+    compute_type                = lookup(var.build.environment, "compute_type", local.default_build_environment["compute_type"])
+    image_pull_credentials_type = lookup(var.build.environment, "image_pull_credentials_type", local.default_build_environment["image_pull_credentials_type"])
+    privileged_mode             = lookup(var.build.environment, "privileged_mode", local.default_build_environment["privileged_mode"])
 
     dynamic "environment_variable" {
-      for_each = lookup(var.environment_config, "environment_variables", {})
+      for_each = lookup(var.build.environment, "environment_vars", {})
       content {
         name  = environment_variable.key
         value = environment_variable.value
@@ -36,18 +34,18 @@ resource "aws_codebuild_project" "cb" {
   }
 
   source {
-    type            = lookup(var.source_config, "type", local.default_source_config["type"])
-    location        = lookup(var.source_config, "location", local.default_source_config["location"])
-    buildspec       = lookup(var.source_config, "buildspec", local.default_source_config["buildspec"])
-    git_clone_depth = lookup(var.source_config, "git_clone_depth", 1)
+    type            = lookup(var.build.source, "type", local.default_source_config["type"])
+    location        = lookup(var.build.source, "location", local.default_source_config["location"])
+    buildspec       = lookup(var.build.source, "buildspec", local.default_source_config["buildspec"])
+    git_clone_depth = lookup(var.build.source, "git_clone_depth", 1)
   }
-  source_version = lookup(var.source_config, "version", local.default_source_config["version"])
+  source_version = lookup(var.build.source, "version", local.default_source_config["version"])
 
   dynamic "logs_config" {
-    for_each = var.log_config != null ? var.log_config : {}
+    for_each = var.log != null ? var.log : {}
     content {
       dynamic "cloudwatch_logs" {
-        for_each = logs_config.key == "cloudwatch_logs" ? var.log_config : {}
+        for_each = logs_config.key == "cloudwatch_logs" ? var.log : {}
         content {
           status      = lookup(cloudwatch_logs.value, "status", null)
           group_name  = lookup(cloudwatch_logs.value, "group_name", null)
@@ -56,7 +54,7 @@ resource "aws_codebuild_project" "cb" {
       }
 
       dynamic "s3_logs" {
-        for_each = logs_config.key == "s3_logs" ? var.log_config : {}
+        for_each = logs_config.key == "s3_logs" ? var.log : {}
         content {
           status              = lookup(s3_logs.value, "status", null)
           location            = lookup(s3_logs.value, "location", null)
@@ -69,7 +67,7 @@ resource "aws_codebuild_project" "cb" {
   dynamic "vpc_config" {
     for_each = var.vpc != null ? var.vpc : {}
     content {
-      vpc_id             = lookup(vpc_config.value, "vpc_id", null)
+      vpc_id             = lookup(vpc_config.value, "vpc", null)
       subnets            = lookup(vpc_config.value, "subnets", null)
       security_group_ids = lookup(vpc_config.value, "security_group_ids", null)
     }
@@ -85,7 +83,7 @@ resource "aws_iam_role" "cb" {
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
-        Service = [format("codebuild.%s", data.aws_partition.current.dns_suffix)]
+        Service = [format("codebuild.%s", module.aws.partition.dns_suffix)]
       }
     }]
     Version = "2012-10-17"
@@ -93,10 +91,10 @@ resource "aws_iam_role" "cb" {
 }
 
 resource "aws_iam_policy" "cb" {
-  name        = format("%s-codebuild", local.name)
+  name        = join("-", [local.name, "codebuild"])
   description = format("Allow access to ECR and S3 for build process")
-  path        = "/"
   policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [
       {
         Action = [
@@ -105,11 +103,12 @@ resource "aws_iam_policy" "cb" {
           "logs:PutLogEvents",
         ]
         Effect   = "Allow"
-        Resource = [format("arn:${data.aws_partition.current.partition}:logs:*:*:*")]
+        Resource = [format("arn:%s:logs:*:*:*", module.aws.partition.partition)]
       },
       {
         Action = [
-          "ecr:GetAuthorizationToken", "ssm:GetParameters",
+          "ecr:GetAuthorizationToken",
+          "ssm:GetParameters",
         ]
         Effect   = "Allow"
         Resource = ["*"]
@@ -125,14 +124,18 @@ resource "aws_iam_policy" "cb" {
           "ec2:DescribeVpcs"
         ],
         "Effect"   = "Allow",
-        "Resource" = "*"
+        "Resource" = ["*"]
       },
       {
         "Action" = [
           "ec2:CreateNetworkInterfacePermission"
         ],
         "Effect" = "Allow",
-        Resource = [format("arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:network-interface/*")]
+        Resource = [format("arn:%s:ec2:%s:%s:network-interface/*",
+          module.aws.partition.partition,
+          module.aws.region.name,
+          module.aws.caller.account_id,
+        )]
         "Condition" = {
           "StringEquals" = {
             "ec2:AuthorizedService" = "codebuild.amazonaws.com"
@@ -140,7 +143,6 @@ resource "aws_iam_policy" "cb" {
         }
       }
     ]
-    Version = "2012-10-17"
   })
 }
 

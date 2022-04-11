@@ -1,18 +1,20 @@
 name   = "codebuild"
 stack  = "dev"
-detail = "tc2"
+detail = "tc3"
 tags = {
   env  = "dev"
-  test = "tc2"
+  test = "tc3"
 }
 aws_region = "ap-northeast-2"
+source_config = {
+  type      = "CODEPIPELINE"
+  buildspec = "buildspec.yml"
+}
 environment_config = {
   environment_variables = {
     HELLO = "yyo"
   }
 }
 artifact_config = {
-  type                = "S3"
-  location            = "s3-bucket-name"
-  encryption_disabled = true
+  type = "CODEPIPELINE"
 }

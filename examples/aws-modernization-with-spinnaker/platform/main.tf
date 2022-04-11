@@ -15,7 +15,7 @@ module "ecr" {
 module "ci" {
   for_each = toset(local.services)
   source   = "Young-ook/spinnaker/aws//modules/codebuild"
-  version  = "~> 2.0"
+  version  = "2.2.3"
   name     = join("-", [each.key, var.name])
   tags     = var.tags
   environment_config = {

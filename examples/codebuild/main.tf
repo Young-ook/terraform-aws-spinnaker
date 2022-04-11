@@ -12,7 +12,7 @@ module "ci" {
   stack   = var.stack
   detail  = var.detail
   tags    = var.tags
-  build = {
+  project = {
     artifact    = var.artifact_config
     source      = var.source_config
     environment = var.environment_config

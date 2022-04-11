@@ -6,7 +6,7 @@ variable "vpc" {
 }
 
 ### build project
-variable "build" {
+variable "project" {
   description = "Build project configuration"
   type        = any
   default = {
@@ -14,9 +14,7 @@ variable "build" {
     environment = {
       environment_vars = []
     }
-    artifact = {
-      type = "NO_ARTIFACTS"
-    }
+    artifact = {}
   }
 }
 

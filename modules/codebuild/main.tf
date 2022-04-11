@@ -25,7 +25,7 @@ resource "aws_codebuild_project" "cb" {
     privileged_mode             = lookup(var.project.environment, "privileged_mode", local.default_build_environment["privileged_mode"])
 
     dynamic "environment_variable" {
-      for_each = lookup(var.project.environment, "environment_vars", {})
+      for_each = lookup(var.project.environment, "environment_variables", {})
       content {
         name  = environment_variable.key
         value = environment_variable.value

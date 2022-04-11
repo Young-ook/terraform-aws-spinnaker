@@ -9,6 +9,7 @@ aws_region = "ap-northeast-2"
 environment_config = {
   environment_variables = {
     HELLO = "yyo"
+    WORLD = "yyo"
   }
 }
 artifact_config = {

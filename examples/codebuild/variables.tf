@@ -7,6 +7,11 @@ variable "aws_region" {
 }
 
 ### codebuild
+variable "artifact_config" {
+  description = "artifact configuration"
+  default     = {}
+}
+
 variable "environment_config" {
   description = "Environment configuration"
   default     = {}

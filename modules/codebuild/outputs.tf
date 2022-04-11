@@ -9,7 +9,7 @@ output "build" {
   description = "AWS CLI command to start build project"
   value = join(" ", [
     "aws codebuild start-build",
-    "--region ${data.aws_region.current.name}",
+    "--region ${module.aws.region.name}",
     "--output text",
     "--project-name ${aws_codebuild_project.cb.id}",
   ])

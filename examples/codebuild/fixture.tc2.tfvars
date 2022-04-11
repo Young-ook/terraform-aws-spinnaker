@@ -5,7 +5,7 @@ tags = {
   env  = "dev"
   test = "tc2"
 }
-aws_region = "ap-northeast-2"
+aws_region = "ap-northeast-1"
 environment_config = {
   environment_variables = {
     HELLO = "yyo"

@@ -6,6 +6,18 @@ variable "aws_region" {
   type        = string
 }
 
+variable "azs" {
+  description = "A list of availability zones for the vpc to deploy resources"
+  type        = list(string)
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
+}
+
+variable "use_default_vpc" {
+  description = "A feature flag for whether to use default vpc"
+  type        = bool
+  default     = true
+}
+
 ### codebuild
 variable "artifact_config" {
   description = "artifact configuration"

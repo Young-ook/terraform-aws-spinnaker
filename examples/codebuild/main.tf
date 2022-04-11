@@ -41,11 +41,7 @@ module "ci" {
   stack   = var.stack
   detail  = var.detail
   tags    = var.tags
-  project = {
-    artifact    = var.artifact_config
-    source      = var.source_config
-    environment = var.environment_config
-  }
+  project = var.project_config
   log = {
     cloudwatch_logs = {
       group_name = module.logs.log_group.name

@@ -19,18 +19,8 @@ variable "use_default_vpc" {
 }
 
 ### codebuild
-variable "artifact_config" {
-  description = "artifact configuration"
-  default     = {}
-}
-
-variable "environment_config" {
-  description = "Environment configuration"
-  default     = {}
-}
-
-variable "source_config" {
-  description = "Source repository configuration"
+variable "project_config" {
+  description = "build project configuration"
   default     = {}
 }
 

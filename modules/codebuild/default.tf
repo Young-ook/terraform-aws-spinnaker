@@ -1,6 +1,5 @@
 locals {
-  default_source_config = {
-    # allowed values: BITBUCKET | CODECOMMIT | CODEPIPELINE | GITHUB | GITHUB_ENTERPRISE | NO_SOURCE | S3
+  default_source = {
     type     = "NO_SOURCE"
     location = null
     version  = null
@@ -13,7 +12,7 @@ locals {
       }
     })
   }
-  default_build_environment = {
+  default_environment = {
     type                        = "LINUX_CONTAINER"
     image                       = "aws/codebuild/standard:2.0"
     compute_type                = "BUILD_GENERAL1_SMALL"
@@ -21,7 +20,6 @@ locals {
     privileged_mode             = "false"
   }
   default_artifact = {
-    # allowed values : NO_ARTIFACTS | CODEPIPELINE | S3
     type                = "NO_ARTIFACTS"
     location            = null
     encryption_disabled = false

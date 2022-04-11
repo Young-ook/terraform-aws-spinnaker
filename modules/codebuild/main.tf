@@ -4,6 +4,12 @@ module "aws" {
   source = "Young-ook/spinnaker/aws//modules/aws-partitions"
 }
 
+locals {
+  artifact    = lookup(var.project, "artifact", local.default_artifact)
+  environment = lookup(var.project, "environment", local.default_environment)
+  source      = lookup(var.project, "source", local.default_source)
+}
+
 resource "aws_codebuild_project" "cb" {
   name          = local.name
   tags          = merge(local.default-tags, var.tags)
@@ -12,20 +18,20 @@ resource "aws_codebuild_project" "cb" {
   service_role  = aws_iam_role.cb.arn
 
   artifacts {
-    type                = lookup(var.project.artifact, "type", local.default_artifact.type)
-    location            = lookup(var.project.artifact, "location", local.default_artifact.location)
-    encryption_disabled = lookup(var.project.artifact, "encryption_disabled", local.default_artifact.encryption_disabled)
+    type                = lookup(local.artifact, "type", local.default_artifact.type)
+    location            = lookup(local.artifact, "location", local.default_artifact.location)
+    encryption_disabled = lookup(local.artifact, "encryption_disabled", local.default_artifact.encryption_disabled)
   }
 
   environment {
-    type                        = lookup(var.project.environment, "type", local.default_build_environment["type"])
-    image                       = lookup(var.project.environment, "image", local.default_build_environment["image"])
-    compute_type                = lookup(var.project.environment, "compute_type", local.default_build_environment["compute_type"])
-    image_pull_credentials_type = lookup(var.project.environment, "image_pull_credentials_type", local.default_build_environment["image_pull_credentials_type"])
-    privileged_mode             = lookup(var.project.environment, "privileged_mode", local.default_build_environment["privileged_mode"])
+    type                        = lookup(local.environment, "type", local.default_environment["type"])
+    image                       = lookup(local.environment, "image", local.default_environment["image"])
+    compute_type                = lookup(local.environment, "compute_type", local.default_environment["compute_type"])
+    image_pull_credentials_type = lookup(local.environment, "image_pull_credentials_type", local.default_environment["image_pull_credentials_type"])
+    privileged_mode             = lookup(local.environment, "privileged_mode", local.default_environment["privileged_mode"])
 
     dynamic "environment_variable" {
-      for_each = lookup(var.project.environment, "environment_variables", {})
+      for_each = lookup(local.environment, "environment_variables", {})
       content {
         name  = environment_variable.key
         value = environment_variable.value
@@ -34,12 +40,12 @@ resource "aws_codebuild_project" "cb" {
   }
 
   source {
-    type            = lookup(var.project.source, "type", local.default_source_config["type"])
-    location        = lookup(var.project.source, "location", local.default_source_config["location"])
-    buildspec       = lookup(var.project.source, "buildspec", local.default_source_config["buildspec"])
-    git_clone_depth = lookup(var.project.source, "git_clone_depth", 1)
+    type            = lookup(local.source, "type", local.default_source["type"])
+    location        = lookup(local.source, "location", local.default_source["location"])
+    buildspec       = lookup(local.source, "buildspec", local.default_source["buildspec"])
+    git_clone_depth = lookup(local.source, "git_clone_depth", 1)
   }
-  source_version = lookup(var.project.source, "version", local.default_source_config["version"])
+  source_version = lookup(local.source, "version", local.default_source["version"])
 
   dynamic "logs_config" {
     for_each = var.log != null ? var.log : {}

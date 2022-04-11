@@ -7,8 +7,7 @@ tags = {
 }
 aws_region = "ap-northeast-2"
 source_config = {
-  type      = "CODEPIPELINE"
-  buildspec = "buildspec.yml"
+  type = "CODEPIPELINE"
 }
 environment_config = {
   environment_variables = {

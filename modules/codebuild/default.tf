@@ -3,13 +3,14 @@ locals {
     # allowed values: BITBUCKET | CODECOMMIT | CODEPIPELINE | GITHUB | GITHUB_ENTERPRISE | NO_SOURCE | S3
     type     = "NO_SOURCE"
     location = null
-    version = null
+    version  = null
     buildspec = yamlencode({
       version = "0.2"
       phases = {
         build = {
           commands = []
-      } }
+        }
+      }
     })
   }
   default_build_environment = {

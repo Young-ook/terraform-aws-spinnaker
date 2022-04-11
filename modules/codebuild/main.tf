@@ -65,11 +65,11 @@ resource "aws_codebuild_project" "cb" {
   }
 
   dynamic "vpc_config" {
-    for_each = var.vpc != null ? var.vpc : {}
+    for_each = toset(var.vpc != null ? ["vpc"] : [])
     content {
-      vpc_id             = lookup(vpc_config.value, "vpc", null)
-      subnets            = lookup(vpc_config.value, "subnets", null)
-      security_group_ids = lookup(vpc_config.value, "security_group_ids", null)
+      vpc_id             = lookup(var.vpc, "vpc", null)
+      subnets            = lookup(var.vpc, "subnets", null)
+      security_group_ids = lookup(var.vpc, "security_groups", null)
     }
   }
 }

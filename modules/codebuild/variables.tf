@@ -1,7 +1,7 @@
 ### network
 variable "vpc" {
   description = "VPC configuration"
-  type        = map(any)
+  type        = any
   default     = null
 }
 

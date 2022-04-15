@@ -37,7 +37,7 @@ Open `http://localhost:8080` on a web browser. Or if your are running this examp
 🎉 Congrats, you’ve deployed the spinnaker on your kubernetes cluster.
 
 ## Application (Microservice)
-An application is a microservice in spinnaker. When you log in to Spinnaker, there is a *Create Application* button in the upper right corner, click it to create a new application. And fill in the name and email fields. Enter your support name as *yelb* and your email address as Email.
+An application is a microservice in spinnaker. When you log in to Spinnaker, there is a *Create Application* button in the upper right corner, click it to create a new application. And fill in the name and email fields. Enter your application name as *yelb* and your email address as Email.
 
 ![spinnaker-new-application](../../images/spinnaker-new-application.png)
 
@@ -111,7 +111,7 @@ If the deployment is successful, click Clusters in the menu on the left side of 
 ![spinnaker-pipeline-base-app-ingress-dns](../..//images/spinnaker-pipeline-base-app-ingress-dns.png)
 
 #### Meshed App
-In this step, we apply the service mesh (AWS App Mesh) to the base application. Create a new pipeline. There is a Create Pipeline button in the upper right corner of the screen. Enter `meshed-app-v1` as the pipeline name and press OK. Click *Add Step* to select a step type. This time we are going to deploy, so we choose *Deploy (Manifest)* .
+In this step, we apply the service mesh (AWS App Mesh) to the base application. Create a new pipeline. There is a Create Pipeline button in the upper right corner of the screen. Enter `meshed-app-v1` as the pipeline name and press OK. Click *Add Stage* to select a step type. This time we are going to deploy, so we choose *Deploy (Manifest)* .
 
 Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*. (The last 10 characters of the Namespace are anti-duplication serial)
 
@@ -143,7 +143,7 @@ When the application shows as new version (v002), select the pod and press *Cons
 ![spinnaker-yelbv2-app-logs](../../images/spinnaker-yelbv2-app-logs.png)
 
 #### Weighted Routing
-Now deploy the new version of the application server. Deploy using the new container image created by the AWS CodeBuild pipeline. First, create a new pipeline. There is a Create Pipeline button in the upper right corner of the screen. Enter `meshed-app-v2` as the pipeline name and press OK. Click *Add Step* to select a stage type. This time we are going to deploy, so we choose *Deploy (Manifest)* .
+Now deploy the new version of the application server. Deploy using the new container image created by the AWS CodeBuild pipeline. First, create a new pipeline. There is a Create Pipeline button in the upper right corner of the screen. Enter `meshed-app-v2` as the pipeline name and press OK. Click *Add Stage* to select a stage type. This time we are going to deploy, so we choose *Deploy (Manifest)* .
 
 Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*.
 
@@ -165,7 +165,7 @@ Click *Save Changes* at the bottom of the screen to save. After saving and verif
 
 After setting up your pipeline, click *Start Manual Execution* to run your pipeline.
 
-Even though a new version of the application is deployed, you can't access it even if you repeat 'refresh' on your web browser. This is because you only deploy containers and App Mesh doesn't direct traffic to the new version of the server. Now set it to send traffic to the new version of the application server as well. This example sets the traffic to be sent to the old server and the new version server at 50:50. Click the *Create Pipeline* button in the upper-right corner of the screen to create a new pipeline. Enter `weighted-route` as the pipeline name and press OK. Click *Add Step* to select a stage type. This time we are going to deploy, so we choose *Deploy (Manifest)* .
+Even though a new version of the application is deployed, you can't access it even if you repeat 'refresh' on your web browser. This is because you only deploy containers and App Mesh doesn't direct traffic to the new version of the server. Now set it to send traffic to the new version of the application server as well. This example sets the traffic to be sent to the old server and the new version server at 50:50. Click the *Create Pipeline* button in the upper-right corner of the screen to create a new pipeline. Enter `weighted-route` as the pipeline name and press OK. Click *Add Stage* to select a stage type. This time we are going to deploy, so we choose *Deploy (Manifest)* .
 
 Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*.
 

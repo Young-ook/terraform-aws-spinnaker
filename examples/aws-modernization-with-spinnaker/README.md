@@ -51,7 +51,7 @@ Now that we have created the **yelb** application, we need to create a pipeline 
 
 ![spinnaker-pipeline-create](../..//images/spinnaker-pipeline-create.png)
 
-Next, you can click *Add stage* to add to your pipeline. Choose *AWS CodeBuild* here. A space will then appear below where you can enter the necessary information for the build task.
+Next, you can click *Add Stage* to add to your pipeline. Choose *AWS CodeBuild* here. A space will then appear below where you can enter the necessary information for the build task.
 
 ![spinnaker-pipeline-codebuild-stage](../../images/spinnaker-pipeline-codebuild-stage.png)
 

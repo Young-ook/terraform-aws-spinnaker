@@ -27,6 +27,13 @@ ${halyard_kubectl_exec} hal config provider kubernetes account add eks \
   --environment dev
 ${halyard_kubectl_exec} hal config provider kubernetes enable
 
+${halyard_kubectl_exec} hal config provider aws account add ec2 \
+  --regions ap-northeast-2 us-east-1 us-west-2 eu-west-1 eu-central-1 \
+  --account-id ${aws_account_id} \
+  --assume-role ${spinnaker_managed_aws_role} \
+  --environment dev
+${halyard_kubectl_exec} hal config provider aws enable
+
 ${halyard_kubectl_exec} hal deploy apply
 
 unset KUBECONFIG

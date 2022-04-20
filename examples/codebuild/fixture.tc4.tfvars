@@ -9,16 +9,16 @@ tags = {
 aws_region      = "ap-northeast-2"
 azs             = ["ap-northeast-2a", "ap-northeast-2b", ]
 use_default_vpc = false
-project_config = {
-  source_config = {
+project = {
+  source = {
     type = "CODEPIPELINE"
   }
-  environment_config = {
+  environment = {
     environment_variables = {
       HELLO = "yyo"
     }
   }
-  artifact_config = {
+  artifact = {
     type = "CODEPIPELINE"
   }
 }

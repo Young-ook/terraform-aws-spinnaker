@@ -6,14 +6,14 @@ tags = {
   test = "tc2"
 }
 aws_region = "ap-northeast-2"
-project_config = {
-  environment_config = {
+project = {
+  environment = {
     environment_variables = {
       HELLO = "yyo"
       WORLD = "yyo"
     }
   }
-  artifact_config = {
+  artifact = {
     type                = "S3"
     location            = "s3-bucket-name"
     encryption_disabled = true

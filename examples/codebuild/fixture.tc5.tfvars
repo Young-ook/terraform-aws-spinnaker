@@ -9,16 +9,16 @@ tags = {
 aws_region      = "us-east-2"
 azs             = ["us-east-2a", "us-east-2b", ]
 use_default_vpc = false
-project_config = {
-  source_config = {
+project = {
+  source = {
     type = "CODEPIPELINE"
   }
-  environment_config = {
+  environment = {
     environment_variables = {
       HELLO = "yyo"
     }
   }
-  artifact_config = {
+  artifact = {
     type = "CODEPIPELINE"
   }
 }

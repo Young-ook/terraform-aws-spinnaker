@@ -6,16 +6,16 @@ tags = {
   test = "tc3"
 }
 aws_region = "ap-northeast-2"
-project_config = {
-  source_config = {
+project = {
+  source = {
     type = "CODEPIPELINE"
   }
-  environment_config = {
+  environment = {
     environment_variables = {
       HELLO = "yyo"
     }
   }
-  artifact_config = {
+  artifact = {
     type = "CODEPIPELINE"
   }
 }

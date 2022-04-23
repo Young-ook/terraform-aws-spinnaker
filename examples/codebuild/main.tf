@@ -41,7 +41,7 @@ module "ci" {
   stack   = var.stack
   detail  = var.detail
   tags    = var.tags
-  project = var.project_config
+  project = var.project
   log = {
     cloudwatch_logs = {
       group_name = module.logs.log_group.name
@@ -62,6 +62,6 @@ module "logs" {
   name    = var.name
   log_group = {
     namespace      = "/aws/codebuild"
-    retension_days = 5
+    retension_days = 3
   }
 }

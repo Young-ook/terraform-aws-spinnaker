@@ -19,15 +19,9 @@ variable "use_default_vpc" {
 }
 
 ### codebuild
-variable "project_config" {
+variable "project" {
   description = "build project configuration"
   default     = {}
-}
-
-variable "log_config" {
-  description = "Log configuration"
-  type        = map(any)
-  default     = null
 }
 
 ### description

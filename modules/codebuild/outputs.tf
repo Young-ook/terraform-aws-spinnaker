@@ -6,11 +6,11 @@ output "project" {
 }
 
 output "build" {
-  description = "AWS CLI command to start build project"
+  description = "Bash script to start a build proejct"
   value = join(" ", [
-    "aws codebuild start-build",
-    "--region ${module.aws.region.name}",
-    "--output text",
-    "--project-name ${aws_codebuild_project.cb.id}",
+    "bash -e",
+    format("%s/script/start-build.sh", path.module),
+    format("-r %s", module.aws.region.name),
+    format("-n %s", aws_codebuild_project.cb.id),
   ])
 }

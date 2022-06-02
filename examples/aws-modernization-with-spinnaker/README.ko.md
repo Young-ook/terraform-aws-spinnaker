@@ -189,6 +189,13 @@ App Mesh를 생성했지만, 애플리케이션은 여전히 이전 상태로 �
 
 ALB를 통해서 접속한 서비스에서 '새로고침'을 반복하면 화면 하단의 애플리케이션 서버 버전 표시가 변경되는 것을 볼 수 있습니다.
 
+## 관찰
+서비스 배포가 잘 되었는 지, 서비스가 잘 동작하는 지 확인하기 위하여 모니터링이 필요합니다. 이번 실습에서는 Amazon CloudWatch Container Insights(Metrics, Logs)와 AWS X-Ray(Trace)가 적용되어 있습니다. CloudWatch 서비스 화면으로 이동합니다. 내비게이션 메뉴에서 *컨테이너 인사이츠(Container Insights)*와 *서비스 렌즈(Service Lens)*를 선택하면 다음과 같이 모니터링 할 수 있습니다.
+
+![aws-cw-metrics-dashboard](../../images/aws-cw-metrics-dashboard.png)
+![aws-xray-topology](../../images/aws-xray-topology.png)
+![aws-xray-timeline](../../images/aws-xray-timeline.png)
+
 ## 정리
 실습 자원을 정리하기 위하여 다음 명령을 실행합니다:
 ```

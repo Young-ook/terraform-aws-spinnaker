@@ -191,6 +191,13 @@ After setting up your pipeline, click *Start Manual Execution* to run your pipel
 
 Now, if you repeat 'refresh' in your web browser, you can see that the application server version displayed at the bottom of the screen has changed.
 
+## Observability
+Let’s see if the application works. In this workshop, Container Insights(Metrics, Logs) and X-Ray(Trace) agents are already installed and enabled. Move to the CloudWatch service page on the AWS Console for monitoring. You can see metrics and trace map when you select *Container Insights* or *Service Lens* menu on the navigation bar. Here are screenshots of observability example.
+
+![aws-cw-metrics-dashboard](../../images/aws-cw-metrics-dashboard.png)
+![aws-xray-topology](../../images/aws-xray-topology.png)
+![aws-xray-timeline](../../images/aws-xray-timeline.png)
+
 ## Clean up
 Run command:
 ```

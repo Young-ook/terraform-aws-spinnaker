@@ -166,20 +166,12 @@ resource "helm_release" "spinnaker" {
 
   # value block with custom values to be merged with the values yaml
   dynamic "set" {
-    for_each = lookup(var.helm, "values", {})
-    content {
-      name  = set.key
-      value = set.value
-    }
-  }
-
-  dynamic "set" {
-    for_each = {
+    for_each = merge({
       "minio.enabled" = "false"
       "s3.enabled"    = "true"
       "s3.bucket"     = module.s3.bucket.id
       "s3.region"     = module.current.region.id
-    }
+    }, lookup(var.helm, "vars", {}))
     content {
       name  = set.key
       value = set.value

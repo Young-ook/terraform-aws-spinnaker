@@ -89,51 +89,91 @@ module "spinnaker-managed" {
 }
 
 ### platform/fis
-resource "aws_cloudwatch_metric_alarm" "disk" {
-  alarm_name                = join("-", [var.name, "disk-usage-alarm"])
-  alarm_description         = "This metric monitors ec2 disk filesystem usage"
-  tags                      = var.tags
-  metric_name               = "node_filesystem_utilization"
+resource "aws_cloudwatch_metric_alarm" "svc" {
+  alarm_name                = join("-", [var.name, "svc", "health"])
+  alarm_description         = "This metric monitors healty backed pods of a service"
+  tags                      = merge(var.tags)
+  metric_name               = "service_number_of_running_pods"
+  comparison_operator       = "LessThanThreshold"
+  datapoints_to_alarm       = 1
+  evaluation_periods        = 1
+  namespace                 = "ContainerInsights"
+  period                    = 10
+  threshold                 = 1
+  statistic                 = "Average"
+  insufficient_data_actions = []
+  dimensions = {
+    Namespace   = "yelb"
+    Service     = "yelb-ui"
+    ClusterName = var.eks["cluster"].name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu" {
+  alarm_name                = join("-", [var.name, "cpu", "alarm"])
+  alarm_description         = "This metric monitors ec2 cpu utilization"
+  tags                      = merge(var.tags)
+  metric_name               = "node_cpu_utilization"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   datapoints_to_alarm       = 1
   evaluation_periods        = 1
   namespace                 = "ContainerInsights"
   period                    = 30
   threshold                 = 60
-  extended_statistic        = "p90"
+  statistic                 = "Average"
   insufficient_data_actions = []
-
   dimensions = {
-    ClusterName = var.eks_kubeconfig["context"]
+    ClusterName = var.eks["cluster"].name
   }
 }
-
-resource "aws_iam_role" "fis-run" {
-  name = join("-", [var.name, "fis-run"])
-  tags = var.tags
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = [format("fis.%s", module.aws-partitions.partition.dns_suffix)]
+module "logs" {
+  source  = "Young-ook/lambda/aws//modules/logs"
+  version = "0.2.1"
+  for_each = { for l in [
+    {
+      type = "fis"
+      log_group = {
+        namespace      = "/aws/fis"
+        retension_days = 3
       }
-    }]
-    Version = "2012-10-17"
-  })
+    },
+  ] : l.type => l }
+  name      = join("-", [var.name, each.key])
+  log_group = each.value.log_group
 }
 
-resource "aws_iam_role_policy_attachment" "fis-run" {
-  policy_arn = format("arn:%s:iam::aws:policy/PowerUserAccess", module.aws-partitions.partition.partition)
-  role       = aws_iam_role.fis-run.id
+# drawing lots for choosing a subnet
+resource "random_integer" "az" {
+  min = 0
+  max = length(var.azs) - 1
 }
 
-### systems manager document for fault injection simulator experiment
-
-resource "aws_ssm_document" "disk-stress" {
-  name            = "FIS-Run-Disk-Stress"
-  tags            = var.tags
-  document_format = "YAML"
-  document_type   = "Command"
-  content         = file("${path.module}/templates/disk-stress.yaml")
+module "awsfis" {
+  source  = "Young-ook/fis/aws"
+  version = "1.0.1"
+  name    = var.name
+  tags    = var.tags
+  experiments = [
+    {
+      name     = "terminate-eks-nodes"
+      template = "${path.module}/templates/terminate-eks-nodes.tpl"
+      params = {
+        az        = var.azs[random_integer.az.result]
+        vpc       = var.vpc.id
+        nodegroup = var.eks["cluster"].data_plane.managed_node_groups.default.arn
+        role      = module.awsfis.role["fis"].arn
+        logs      = format("%s:*", module.logs["fis"].log_group.arn)
+        alarm = jsonencode([
+          {
+            source = "aws:cloudwatch:alarm"
+            value  = aws_cloudwatch_metric_alarm.svc.arn
+          },
+          {
+            source = "aws:cloudwatch:alarm"
+            value  = aws_cloudwatch_metric_alarm.cpu.arn
+          },
+        ])
+      }
+    },
+  ]
 }

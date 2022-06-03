@@ -6,9 +6,9 @@ output "subnets" {
   value = module.vpc.subnets
 }
 
-output "eks_kubeconfig" {
+output "eks" {
   value = {
-    context = module.eks.cluster.name
+    cluster = module.eks.cluster
     script  = module.eks.kubeconfig
   }
 }

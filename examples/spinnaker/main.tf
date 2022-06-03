@@ -31,6 +31,7 @@ module "spinnaker" {
   helm = {
     vars = {
       "halyard.spinnakerVersion" = "1.27.0"
+      "halyard.image.tag"        = "1.44.0"
     }
   }
 }

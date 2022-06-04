@@ -24,7 +24,7 @@ module "eks" {
       min_size      = 1
       max_size      = 9
       desired_size  = 2
-      instance_type = "t3.medium"
+      instance_type = "t3.small"
     }
   ]
   policy_arns = [
@@ -70,4 +70,12 @@ module "container-insights" {
     enable_metrics = true
     enable_logs    = true
   }
+}
+
+module "cluster-autoscaler" {
+  source       = "Young-ook/eks/aws//modules/cluster-autoscaler"
+  version      = "1.7.5"
+  cluster_name = module.eks.cluster.name
+  oidc         = module.eks.oidc
+  tags         = var.tags
 }

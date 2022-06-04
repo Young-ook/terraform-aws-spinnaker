@@ -90,7 +90,7 @@ module "spinnaker-managed" {
 
 ### platform/fis
 resource "aws_cloudwatch_metric_alarm" "svc" {
-  alarm_name                = join("-", [var.name, "svc", "health"])
+  alarm_name                = join("-", [var.name, "svc", "alarm"])
   alarm_description         = "This metric monitors healty backed pods of a service"
   tags                      = merge(var.tags)
   metric_name               = "service_number_of_running_pods"
@@ -103,9 +103,9 @@ resource "aws_cloudwatch_metric_alarm" "svc" {
   statistic                 = "Average"
   insufficient_data_actions = []
   dimensions = {
-    Namespace   = "yelb"
-    Service     = "yelb-ui"
     ClusterName = var.eks["cluster"].name
+    Namespace   = var.eks["cluster"].name
+    Service     = "yelb-ui"
   }
 }
 
@@ -126,6 +126,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
     ClusterName = var.eks["cluster"].name
   }
 }
+
 module "logs" {
   source  = "Young-ook/lambda/aws//modules/logs"
   version = "0.2.1"

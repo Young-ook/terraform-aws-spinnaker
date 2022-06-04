@@ -22,9 +22,9 @@ module "eks" {
     {
       name          = "default"
       min_size      = 1
-      max_size      = 3
-      desired_size  = 1
-      instance_type = "m5.xlarge"
+      max_size      = 9
+      desired_size  = 2
+      instance_type = "t3.medium"
     }
   ]
   policy_arns = [

@@ -13,8 +13,7 @@ provider "aws" {
 
 # spinnaker
 module "spinnaker" {
-  source                 = "Young-ook/spinnaker/aws"
-  version                = "~> 2.0"
+  source                 = "../../"
   name                   = var.name
   stack                  = var.stack
   detail                 = var.detail
@@ -29,6 +28,12 @@ module "spinnaker" {
   aurora_instances       = var.aurora_instances
   s3_bucket              = var.s3_bucket
   assume_role_arn        = [module.spinnaker-managed-role.role_arn]
+  helm = {
+    vars = {
+      "halyard.spinnakerVersion" = "1.27.0"
+      "halyard.image.tag"        = "1.44.0"
+    }
+  }
 }
 
 # spinnaker managed role

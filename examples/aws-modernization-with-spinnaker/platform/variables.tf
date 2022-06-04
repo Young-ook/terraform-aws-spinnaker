@@ -15,15 +15,20 @@ variable "cidr" {
   default     = "172.16.0.0/16"
 }
 
+variable "vpc" {
+  description = "Property map of the application VPC"
+  type        = any
+}
+
 ### kubernetes
+variable "eks" {
+  description = "Attributes of eks kubeconfig for spinnaker integration (halconfig)"
+  type        = any
+}
+
 variable "kubernetes_version" {
   description = "The target version of kubernetes"
   type        = string
-}
-
-variable "eks_kubeconfig" {
-  description = "Attributes of eks kubeconfig for spinnaker integration (halconfig)"
-  type        = map(any)
 }
 
 variable "spinnaker_version" {

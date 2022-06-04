@@ -43,6 +43,7 @@ provider "helm" {
 
 module "lb-controller" {
   source       = "Young-ook/eks/aws//modules/lb-controller"
+  version      = "1.7.5"
   cluster_name = module.eks.cluster.name
   oidc         = module.eks.oidc
   tags         = var.tags
@@ -50,6 +51,7 @@ module "lb-controller" {
 
 module "app-mesh" {
   source       = "Young-ook/eks/aws//modules/app-mesh"
+  version      = "1.7.5"
   cluster_name = module.eks.cluster.name
   oidc         = module.eks.oidc
   tags         = var.tags
@@ -60,7 +62,12 @@ module "app-mesh" {
 
 module "container-insights" {
   source       = "Young-ook/eks/aws//modules/container-insights"
+  version      = "1.7.5"
   cluster_name = module.eks.cluster.name
   oidc         = module.eks.oidc
   tags         = var.tags
+  features = {
+    enable_metrics = true
+    enable_logs    = true
+  }
 }

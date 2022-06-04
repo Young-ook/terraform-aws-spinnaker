@@ -22,7 +22,8 @@ module "platform" {
   tags               = var.tags
   aws_region         = var.aws_region
   azs                = var.azs
+  vpc                = module.foundation.vpc
+  eks                = module.foundation.eks
   spinnaker_version  = var.spinnaker_version
   kubernetes_version = var.kubernetes_version
-  eks_kubeconfig     = module.foundation.eks_kubeconfig
 }

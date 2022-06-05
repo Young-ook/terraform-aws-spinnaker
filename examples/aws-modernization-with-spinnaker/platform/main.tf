@@ -51,14 +51,15 @@ module "artifact" {
 
 ### platform/spinnaker
 module "spinnaker" {
-  source             = "Young-ook/spinnaker/aws"
-  version            = "2.2.3"
-  name               = "spinnaker"
-  tags               = var.tags
-  region             = var.aws_region
-  azs                = var.azs
-  cidr               = var.cidr
-  kubernetes_version = var.kubernetes_version
+  source                = "Young-ook/spinnaker/aws"
+  version               = "2.2.3"
+  name                  = "spinnaker"
+  tags                  = var.tags
+  region                = var.aws_region
+  azs                   = var.azs
+  cidr                  = var.cidr
+  kubernetes_version    = var.kubernetes_version
+  kubernetes_enable_ssm = true
   kubernetes_node_groups = [
     {
       name          = "default"

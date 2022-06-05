@@ -204,3 +204,10 @@ Run command:
 ./preuninstall.sh
 terraform destroy --auto-approve
 ```
+
+## Additional Resources
+- [Terraform module: Amazon EKS](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)
+- [Terraform module: Amazon VPC](https://registry.terraform.io/modules/Young-ook/vpc/aws/latest)
+- [Terraform module: AWS FIS](https://registry.terraform.io/modules/Young-ook/fis/aws/latest)
+- [Terraform module: AWS IAM](https://registry.terraform.io/modules/Young-ook/passport/aws/latest)
+- [Terraform module: Terraform Backend](https://registry.terraform.io/modules/Young-ook/tfstate-backend/aws/latest)

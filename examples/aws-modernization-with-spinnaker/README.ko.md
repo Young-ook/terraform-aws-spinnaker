@@ -202,3 +202,10 @@ ALB를 통해서 접속한 서비스에서 '새로고침'을 반복하면 화면
 ./preuninstall.sh
 terraform destroy --auto-approve
 ```
+
+## 추가 자료
+- [Terraform module: Amazon EKS](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)
+- [Terraform module: Amazon VPC](https://registry.terraform.io/modules/Young-ook/vpc/aws/latest)
+- [Terraform module: AWS FIS](https://registry.terraform.io/modules/Young-ook/fis/aws/latest)
+- [Terraform module: AWS IAM](https://registry.terraform.io/modules/Young-ook/passport/aws/latest)
+- [Terraform module: Terraform Backend](https://registry.terraform.io/modules/Young-ook/tfstate-backend/aws/latest)

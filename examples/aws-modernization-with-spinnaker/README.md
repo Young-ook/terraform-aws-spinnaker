@@ -199,11 +199,15 @@ Let’s see if the application works. In this workshop, Container Insights(Metri
 ![aws-xray-timeline](../../images/aws-xray-timeline.png)
 
 ## Clean up
-Run command:
+On the screen port-forward logs are shown. Press *ctrl + c* keys to exit port-forward process. Next, run commands:
 ```
 ./preuninstall.sh
 terraform destroy --auto-approve
 ```
+
+It may take servral menuites until delete whole Kubernetes resources including namespace from your cluster. Next, Go to the AWS Management Console and get to CloudWatch service page. Select Log groups on the navigation bar on the left of the screen. Enter `hello` for filtering. When log groups start form '/aws/codebuild', '/aws/containerinsights/' appear, choose them and delete like belows.
+
+![aws-cw-delete-log-groups](../../images/aws-cw-delete-log-groups.png)
 
 ## Additional Resources
 - [Terraform module: Amazon EKS](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)

@@ -99,7 +99,7 @@ resource "aws_cloudwatch_metric_alarm" "svc" {
   datapoints_to_alarm       = 1
   evaluation_periods        = 1
   namespace                 = "ContainerInsights"
-  period                    = 10
+  period                    = 30
   threshold                 = 1
   statistic                 = "Average"
   insufficient_data_actions = []

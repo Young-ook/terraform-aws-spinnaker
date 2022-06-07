@@ -14,7 +14,7 @@ phases:
   post_build:
     commands:
       - docker push "$IMAGE_URI"
-      - sed -i "s@<APPSERVER_V2_IMAGE_URI>@$IMAGE_URI@g" manifests/3-meshed-app-v2.yaml
+      - sed -i "s@<APPSERVER_V2_IMAGE_URI>@$IMAGE_URI@g" manifests/2.app-v2.yaml
       - echo Uploading to ${ARTIFACT_BUCKET}
       - aws s3 cp --recursive manifests/ s3://${ARTIFACT_BUCKET}/
 artifacts:

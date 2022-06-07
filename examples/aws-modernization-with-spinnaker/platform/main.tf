@@ -15,29 +15,36 @@ module "ecr" {
 module "ci" {
   for_each = toset(local.services)
   source   = "Young-ook/spinnaker/aws//modules/codebuild"
-  version  = "2.2.3"
+  version  = "2.3.1"
   name     = join("-", [each.key, var.name])
   tags     = var.tags
-  environment_config = {
-    image           = "aws/codebuild/standard:4.0"
-    privileged_mode = true
-    environment_variables = {
-      ARTIFACT_BUCKET = module.artifact.bucket.id
-      REPOSITORY_URI  = module.ecr[each.key].url
-      APP_NAME        = join("/", [local.buildpath, each.key])
+  project = {
+    source = {
+      type      = "GITHUB"
+      location  = "https://github.com/Young-ook/terraform-aws-spinnaker.git"
+      buildspec = join("/", [local.buildpath, each.key, "buildspec.yml"])
+      version   = "main"
     }
-  }
-  source_config = {
-    type      = "GITHUB"
-    location  = "https://github.com/Young-ook/terraform-aws-spinnaker.git"
-    buildspec = join("/", [local.buildpath, each.key, "buildspec.yml"])
-    version   = "main"
+    environment = {
+      image           = "aws/codebuild/standard:4.0"
+      privileged_mode = true
+      environment_variables = {
+        ARTIFACT_BUCKET = module.artifact.bucket.id
+        REPOSITORY_URI  = module.ecr[each.key].url
+        APP_NAME        = join("/", [local.buildpath, each.key])
+      }
+    }
   }
   policy_arns = [
     module.ecr[each.key].policy_arns["read"],
     module.ecr[each.key].policy_arns["write"],
     module.artifact.policy_arns["write"],
   ]
+  log = {
+    cloudwatch_logs = {
+      group_name = module.logs["codebuild"].log_group.name
+    }
+  }
 }
 
 # artifact bucket
@@ -132,6 +139,13 @@ module "logs" {
   source  = "Young-ook/lambda/aws//modules/logs"
   version = "0.2.1"
   for_each = { for l in [
+    {
+      type = "codebuild"
+      log_group = {
+        namespace      = "/aws/codebuild"
+        retension_days = 3
+      }
+    },
     {
       type = "fis"
       log_group = {

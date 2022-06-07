@@ -174,11 +174,15 @@ ALB를 통해서 접속한 서비스에서 '새로고침'을 반복하면 화면
 ![aws-xray-timeline](../../images/aws-xray-timeline.png)
 
 ## 정리
-실습 자원을 정리하기 위하여 다음 명령을 실행합니다:
+여전히 Port Forward 로그가 찍히고 있을 것입니다. *ctrl + c* 를 눌러서 Port Forward 프로세스를 종료합니다. 다음, 인프라스트럭처 삭제 사전 작업으로 어플리케이션에서 생성한 자원을 삭제합니다. 다음과 같이 스크립트를 수행합니다. 쿠버네티스 네임스페이스를 삭제하는 시간이 오래 걸리니 스크립트가 종료될 때까지 중단하지 않도록 합니다.
 ```
 ./preuninstall.sh
 terraform destroy --auto-approve
 ```
+
+삭제가 완료되면, AWS 콘솔로 가서 CloudWatch 서비스로 이동합니다. 로그 그룹(Log groups)를 선택하고 검색 창에서 `hello` 를 입력합니다. 그림과 같이 '/aws/codebuild', '/aws/containerinsights/'로 시작하는 로그 그룹을 선택한 다음 삭제 합니다.
+
+![aws-cw-delete-log-groups](../../images/aws-cw-delete-log-groups.png)
 
 ## 추가 자료
 - [Terraform module: Amazon EKS](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)

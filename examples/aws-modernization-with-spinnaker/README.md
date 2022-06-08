@@ -6,6 +6,13 @@
 ## Prerequisites
 We use [Terraform](https://terraform.io), and [Kubernetes](https://kubernetes.io/) in this lab. Please visit the main [page](https://github.com/Young-ook/terraform-aws-spinnaker#terraform) and follow the installation instructions if you don't have terraform cli (command-line interface) in your workspace. And also, make sure that you have kubernetes cli. Here is the official web [page](https://kubernetes.io/docs/tasks/tools/#kubectl) and follow the instructions to install kubernetes cli.
 
+## Download example
+Download this example on your workspace
+```sh
+git clone https://github.com/Young-ook/terraform-aws-spinnaker
+cd terraform-aws-spinnaker/examples/aws-modernization-with-spinnaker
+```
+
 ## Setup
 This is an aws modern application with hashicorp and spinnaker. The [main.tf](main.tf) is the terraform configuration file to create network infrastructure and kubernetes cluster, and spinnaker on your AWS account.
 
@@ -119,7 +126,7 @@ We design the pipeline to wait a while before moving on to the next step of depl
 Click *Save Changes* at the bottom of the screen to save. Verfy your changes are reflected properly.
 
 #### Weighted Route Stage
-After the approval step has been added, add a new stage to apply the weighted route configuration. Click *Add Stage* to select a stage type. This time we are going to deploy, so we choose *Deploy (Manifest)* .
+After the approval step has been added, add a new stage to apply the weighted route configuration. Click *Add Stage* to select a stage type. This time we are going to deploy, so we choose *Deploy (Manifest)*.
 
 Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*.
 
@@ -177,6 +184,103 @@ Let’s see if the application works. In this workshop, Container Insights(Metri
 ![aws-xray-topology](../../images/aws-xray-topology.png)
 ![aws-xray-timeline](../../images/aws-xray-timeline.png)
 
+## Chaos Engineering
+Chaos engineering is the process of testing a distributed computing system to ensure that it can withstand unexpected disruptions. The goal of chaos engineering is to identify and remediate weakness in a system through controlled experiments that introduce random and unpredictable behavior. Therefore, Chaos engineering is NOT about breaking thingsrandomly without a purpose, chaos engineering is about breaking things in a controlled environment and through well-planned experiments in order to build confidence in your application to withstand turbulent conditions. For more information, please visit [this](https://github.com/Young-ook/terraform-aws-fis).
+
+#### Define Steady State
+Before we begin a failure experiment, we need to validate the user experience and revise the dashboard and metrics to understand that the systems are working under normal state, in other words, steady state.
+
+Let’s go ahead and explore the application. Some things to try out:
+1. Vote a restaurant that you love.
+1. Refresh your browser several times and check the number of refreshes at the bottom of the screen.
+1. Check the status of all CloudWatch alarms are OK.
+
+![aws-fis-yelb-steady-state](../../images/aws-fis-yelb-steady-state.png)
+![aws-cw-alarms](../../images/aws-cw-alarms.png)
+
+#### Hypothesis
+The experiment we’ll run is to verify and fine-tune our application availability when compute nodes are terminated accidentally. The application is deployed as a container on the Kubernetes cluster, we assume that if some nodes are teminated, the Kubernetes control plane will reschedule the pods to the other healthy nodes. In order for chaos engineering to follow the scientific method, we need to start by making hypotheses. To help with this, you can use an experiment chart (see below) in your experiment design. We encourage you to take at least 5 minutes to write your experiment plan.
+
+**Steady State Hypothesis Example**
+
++ Title: Services are all available and healthy
++ Type: What are your assumptions?
+   - [ ] No Impact
+   - [ ] Degraded Performance
+   - [ ] Service Outage
+   - [ ] Impproved Performance
++ Probes:
+   - Type: CloudWatch Metric
+   - Status: `service_number_of_running_pods` is greater than 0
++ Stop condition (Abort condition):
+   - Type: CloudWatch Alarm
+   - Status: `service_number_of_running_pods` is less than 1
++ Results:
+   - What did you see?
++ Conclusions:
+   - [ ] Everything is as expected
+   - [ ] Detected something
+   - [ ] Handleable error has occurred
+   - [ ] Need to automate
+   - [ ] Need to dig deeper
+
+#### Run Experiment
+Make sure that all your EKS node group instances are running. Go to the AWS FIS service page and select `TerminateEKSNodes` from the list of experiment templates. Then use the on-screen `Actions` button to start the experiment. AWS FIS shuts down EKS nodes for up to 70% of currently running instances. In this experiment, this value is 40% and it is configured in the experiment template. You can edit this value in the target selection mode configuration if you want to change the number of EKS nodes to shut down. You can see the terminated instances on the EC2 service page, and the new instances will appear shortly after the EKS node is shut down.
+
+![aws-ec2-shutting-down](../../images/aws-ec2-shutting-down.png)
+
+You can see some pods being shut down in the cluster. Here is an example showing that the yelb-appserver pod is down.
+
+![spin-yelb-pod-terminated](../../images/spin-yelb-pod-terminated.png)
+
+And the application is not working properly. It looks like partially demaged.
+
+![aws-fis-yelb-broken](../../images/aws-fis-yelb-broken.png)
+
+#### Discussion
+Then access the microservices application again. What happened? Perhaps a node shutdown by a fault injection experiment will cause the application to crash. This is because the first deployment of the application did not consider high availability (stateless, immutable, replicable) characteristics against single node or availability-zone failure. In the next stage, you will learn how to improve the architecture for reliabiliy and high availability.
+
+Before we move to the next step, we need to think about one thing. In this experiment, business healthy state (steady state) is specified as cpu utilization and number of healthy pods. But after the first experiment, you will see the service does not work properly even though the monitoring indicators are in the normal range. It would be weird it is also meaningful. This result shows that unintended problems can occur even if the monitoring numbers are normal. It could be one of the experimental results that can be obtained through chaos engineering.
+
+Go forward.
+
+#### Architecture Improvements
+Cluster Autoscaler is a tool that automatically adjusts the size of the Kubernetes cluster when one of the following conditions is true:
++ there are pods that failed to run in the cluster due to insufficient resources.
++ there are nodes in the cluster that have been underutilized for an extended period of time and their pods can be placed on other existing nodes.
+
+Cluster Autoscaler provides integration with Auto Scaling groups. Cluster Autoscaler will attempt to determine the CPU, memory, and GPU resources provided by an EC2 Auto Scaling Group based on the instance type specified in its Launch Configuration or Launch Template. Click [here](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws) for more information.
+
+Cluster Autoscaler is already installed. You can see the configuration code at the bottom of the [foundation/main.tf](foundation/main.tf).
+
+Let's scale out pods for high availability. Back to Spinnaker and move to the **yelb** application, create a pipeline with `chaos-engineering`. Press *Create* to bring up a screen where you can edit your pipeline. Next, click the *Add Stage* button to add a deploy step to the pipeline. And Chosse *Deploy (Manifest)*.
+
+![spin-yelb-new-pipe-chaos-eng](../../images/spin-yelb-new-pipe-chaos-eng.png)
+
+Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*.
+
+ - **Account:** eks
+ - **Namespace:** hello-xxxxx-yyyyy
+
+Continue setting up your deployment environment.
+
+ + Specifies the manifest source as an artifact.
+   - **Manifest Source:** Artifact
+
+ + Specify detailed settings for the manifest source. When you click the list next to *Manifest Artifact*, the text *New Artifact Definition* appears. If you press and select, a screen for entering various information appears. Here, select *Account* as shown below. And, fill out the *Object Path* field with the full S3 URI of `4.high-availability.yaml` file.
+
+   - **Account:** Platform
+   - **object path:** s3://artifact-xxxx-yyyy/4.high-availability.yaml
+
+![spin-yelb-pipe-app-ha](../../images/spin-yelb-pipe-app-ha.png)
+
+Click *Save Changes* at the bottom of the screen to save. Verfy your changes are reflected properly.
+
+#### Rerun Experiment
+After saving and verifying that your changes are reflected, click the *End Pipeline* arrow to navigate to the Edit Pipeline screen. At the top of the screen, there is a small arrow next to the pipeline name *chaos-engineering*. Then, click *Start Manual Execution* to run your pipeline.
+
+Back to the AWS FIS service page, and rerun the terminate eks nodes experiment against the target to ensure that the microservices application is working in the previously assumed steady state.
+
 ## Clean up
 On the screen port-forward logs are shown. Press *ctrl + c* keys to exit port-forward process. Next, run commands:
 ```
@@ -189,8 +293,8 @@ It may take servral menuites until delete whole Kubernetes resources including n
 ![aws-cw-delete-log-groups](../../images/aws-cw-delete-log-groups.png)
 
 ## Additional Resources
-- [Terraform module: Amazon EKS](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)
-- [Terraform module: Amazon VPC](https://registry.terraform.io/modules/Young-ook/vpc/aws/latest)
-- [Terraform module: AWS FIS](https://registry.terraform.io/modules/Young-ook/fis/aws/latest)
-- [Terraform module: AWS IAM](https://registry.terraform.io/modules/Young-ook/passport/aws/latest)
+- [Terraform module: Amazon EKS (Elastic Kubernetes Service)](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)
+- [Terraform module: Amazon VPC (Virtual Private Cloud)](https://registry.terraform.io/modules/Young-ook/vpc/aws/latest)
+- [Terraform module: AWS FIS (Fault Injection Simulator)](https://registry.terraform.io/modules/Young-ook/fis/aws/latest)
+- [Terraform module: AWS IAM (Identity Access Management)](https://registry.terraform.io/modules/Young-ook/passport/aws/latest)
 - [Terraform module: Terraform Backend](https://registry.terraform.io/modules/Young-ook/tfstate-backend/aws/latest)

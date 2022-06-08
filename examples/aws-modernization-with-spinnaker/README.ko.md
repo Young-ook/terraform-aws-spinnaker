@@ -6,6 +6,13 @@
 ## 사전 준비
 실습 예제에서는 테라폼([Terraform](https://terraform.io))과 쿠버네티스([Kubernetes](https://kubernetes.io/))를 사용합니다. 테라폼 CLI 가 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#terraform)로가서 안내에 따라 설치합니다. 쿠버네티스 CLI가 없다면 공식 [페이지](https://kubernetes.io/docs/tasks/tools/#kubectl)의 안내에 따라 설치합니다.
 
+## 예제 내려받기
+실습환경에 예제를 내려받습니다.
+```sh
+git clone https://github.com/Young-ook/terraform-aws-spinnaker
+cd terraform-aws-spinnaker/examples/aws-modernization-with-spinnaker
+```
+
 ## 생성
 이 예제는 하시코프(HashCorp)와 스핀에커(Spinnaker)를 활용한 현대 애플리케이션을 구축하는 방법을 보여줍니다. [main.tf](main.tf)은 쿠버네티스(Kubernetes) 클러스터와 인프라스트럭처, 스핀에커를 여러 분의 AWS 계정에 생성하는 테라폼(Terraform) 설정 파일입니다.
 
@@ -173,6 +180,102 @@ ALB를 통해서 접속한 서비스에서 '새로고침'을 반복하면 화면
 ![aws-xray-topology](../../images/aws-xray-topology.png)
 ![aws-xray-timeline](../../images/aws-xray-timeline.png)
 
+## 카오스 엔지니어링 (Chaos Engineering)
+카오스 엔지니어링은 계획되지 않은 중단을 견딜 수 있는지 확인하기 위해 분산 컴퓨팅 시스템을 테스트하는 프로세스입니다. 카오스 엔지니어링의 목표는 무작위적이고 예측할 수 없는 행동을 도입하는 통제된 실험을 통해 시스템의 약점을 식별하고 수정하는 것입니다. 따라서 카오스 엔지니어링은 목적 없이 무작위로 대상을 파괴하는 것이 아니라 통제된 환경에서 잘 계획된 실험을 통해 응용 프로그램이 혼란스러운 조건을 견딜 수 있도록 애플리케이션에 대한 신뢰를 구축하는 것입니다. 보다 자세한 내용은 [문서](https://github.com/Young-ook/terraform-aws-fis)를 참고하시기 바랍니다.
+
+#### 안정 상태 정의
+장애 주입 실험을 시작하기 전에 사용자 경험에 이상이 없는 지, 시스템이 정상동작하는 지, 모니터링 수치는 잘 나오고 있는 지 확인할 필요가 있습니다. 그래서 서비스에 문제가 없다고 판단할 기준을 정의해야 합니다. 우리는 이 것을 '안정 상태'라고 부를 것입니다. 이 번 실습에서는 UI 프론트엔드를 담당하는 컨테이너가 한 개 이상 존재하고 노드의 CPU 사용율이 60% 이하일 경우 안정 상태라고 판단할 것입니다.
+
+애플리케이션의 기능 점검을 위해 다음과 같은 것들을 시도해 볼 것입니다:
+1. 좋아하는 음식점에 투표합니다.
+1. 화면 아래 새로 고침 횟수에 표시 되는 값이 바뀌는 지 확인하기 위하여 브라우저를 여러 번 새로고침 합니다.
+1. 클라우드와치(CloudWatch) 알람들이 OK인 지 확인합니다.
+
+![aws-fis-yelb-steady-state](../../images/aws-fis-yelb-steady-state.png)
+![aws-cw-alarms](../../images/aws-cw-alarms.png)
+
+#### 가설 수립
+이 실험에서 우리는 컴퓨팅 노드가 갑자기 종료되었을 경우, 애플리케이션이 가용성 확보를 위한 설정이 잘 되었는 지 확인해 볼 것입니다. 애플리케이션은 쿠버네티스 클러스터에 배포 되었기 때문에, 만약 몇몇 노드가 종료된다고 하더라도 쿠버네티스 스케쥴러에서 다른 정상 노드에 포드(Pod)를 재배포 할 것이라고 가정하였습니다. 카오스 엔지니어링이 과학적 방법을 따르기 위하여 가설을 세우는 것부터 시작할 필요가 있습니다. 아래와 같은 실험 차트를 활용하여 실험 설계를 할 수 있습니다. 5분 정도의 시간을 내어 여러분의 실험 계획을 세우시길 바랍니다.
+
+**안정 상태 가설 예제**
+
++ 제목: 모든 서비스에 접근할 수 있고 잘 동작합니다.
++ 종류: 여러 분이 가정한 것은 무엇입니까?
+   - [ ] 영향 없음
+   - [ ] 성능 저하
+   - [ ] 서비스 단절
+   - [ ] 성능 향상
++ 측정:
+   - 종류: CloudWatch Metric
+   - 상태: `service_number_of_running_pods` 값이 0보다 큼
++ 실험 중단 조건 (실험 취소 조건):
+   - 종류: CloudWatch Alarm
+   - 상태: `service_number_of_running_pods` 값이 1보다 적음
++ 결과:
+   - 어떤 현상을 확인했습니까?
++ 결론:
+   - [ ] 모든 것이 예상한 것과 같음
+   - [ ] 이상 현상 감지
+   - [ ] 대응 가능한 오류 발생
+   - [ ] 자동화 필요
+   - [ ] 정밀 분석 필요
+
+#### 실험
+EKS 노드 그룹의 모든 인스턴스가 잘 동작하고 있는 지 확인합니다. AWS 콘설에서 AWS FIS 서비스 페이지로 이동합니다. 그리고 실험 템플릿 목록 중에서 `TerminateEKSNodes` 을 선택합니다. 다음, `Actions` 단추를 눌러서 실험을 시작합니다. AWS FIS는 현재 실행 중인 EKS 노드의 최대 70%까지 종료시킬 수 있는데, 그 이유는 운영환경에서 모든 노드를 한 번에 종료시키는 것은 위험 동작이기 때문입니다. 이 실험에서는 동작중인 노드 중에서 40%의 노드를 종료 시킵니다. 만약 종료시킬 노드의 수를 변경하고 싶다면, 실험 템플릿을 편집하면됩니다. 노드가 종료 중인 상황을 확인하려면 EC2 서비스 페이지로 이동합니다. 인스턴스 목록 중에서 일부 인스턴스가 종료 되는 것을 볼 수 있습니다.
+
+![aws-ec2-shutting-down](../../images/aws-ec2-shutting-down.png)
+
+스핀에커에서 포드가 (갑자기) 종료되는 것을 볼 수 있습니다. 아래 그림은 yelb-appserver 포드가 종료되는 상황을 보여줍니다. 어떤 포드가 종료될 지는 상황에 따라 다릅니다.
+
+![spin-yelb-pod-terminated](../../images/spin-yelb-pod-terminated.png)
+
+애플리케이션을 다시 접속해 보면, 제대로 동작하지 않는 것을 볼 수 있습니다. 아마도 일부 포드가 종료되면서 부분적으로 손상되었기 때문일 것입니다.
+
+![aws-fis-yelb-broken](../../images/aws-fis-yelb-broken.png)
+
+#### 토의
+마이크로서비스 애플리케이션에 다시 접속해 봅시다. 어떤가요? 아마도 장애 주입 실험을 통하여 노드가 종료 되었을 것이고, 그래서 애플리케이션은 망가졌을 것입니다. 이 것은 처음에 배포한 애플리케이션의 아키텍처가 고가용성 특성(stateless, immutable, replicable)을 고려하지 않았기 때문입니다. 특정 노드, 특정 가용영역에서 문제 발생 시 대응하기 위한 준비가 없었습니다. 다음 단계를 통하여, 실험에서 발견된 내용을 바탕으로 어떻게 아키텍처 개선을 할 지 살펴 보겠습니다.
+
+한 가지 더 살펴볼 것이 있습니다. 이 번 실험에서는, 서비스가 잘 동작하는 상태 (안정 상태)를 CPU 활용비용과 실행 중인 포드의 개수를 가지고 정의하였습니다. 그러나 첫 번째 실험 후, 여러 분은 모니터링 지표가 정상 범위에 있었음에도 애플리케이션이 제대로 동작하지 않는 상황을 보았습니다. 이러한 결과는 모니터링 간격 등의 이유로 인해서 상황을 인지하지 못한 경우에도, 장애가 일어날 수 있다는 것을 보여 줍니다. 실험을 통해서 알게 된 결과는 이상해 보일 수 있지만, 충분히 의미가 있습니다. 카오스 엔지니어링을 통하여 모니터링 지표와 서비스 품질 사이의 괴리를 직접 확인할 수 있었기 때문입니다. 카오스 엔지니어링을 통하여 가설을 검증하는 과정에서 의도한 결과를 얻는 것도 의미가 있으며, 의도하지 않게 알게 된 것도 의미가 있습니다. 다음 번 실험을 설계할 때 고려할 요소로 추가할 수 있기 때문입니다.
+
+다음 단계로 이동합니다.
+
+#### 아키텍처 개선
+클러스터 오토스케일러(Cluster Autoscaler)는 아래 조건에 해당하는 경우 쿠버네티스 클러스터의 크기를 자동으로 조정하는 도구 입니다:
++ 클러스터의 자원이 부족하여 포드(Pod) 배치에 실패하는 경우
++ 특정 시간동안 사용량이 적은 클러스터 자원이 있을 때, 그 위에서 동작하는 포드가 다른 곳으로 옮겨서 실행해도 괜찮은 경우
+
+클러스터 오토스케일러는 EC2 오토스케일링 그룹과 연동하여 동작합니다. 클러스터 오토스케일러는 런치 컨피규레이션(Launch Configuration) 또는 런치 템플릿(Launch Template)에 정의된 인스턴스 타입을 기준으로 EC2 오토스케일링 그룹의 CPU, 메모리, GPU 자원을 확인합니다. 보다 자세한 내용이 궁금하다면 [문서](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws)의 내용을 참고하시기 바랍니다.
+
+클러스터 오토스케일러는 이미 설치 되어 있습니다. 클러스터 오토스케일러를 설치하는 코드는 [foundation/main.tf](foundation/main.tf) 파일의 맨 아래 부분에서 확인할 수 있습니다.
+
+이제 포드(Pod)의 고가용성을 위한 설정을 추가하겠습니다. 스핀에커 화면으로 돌아간 다음 **yelb** 애플리케이션 화면으로 이동합니다. 그리고 `chaos-engineering`이라는 이름으로 파이프라인을 새로 만듭니다. *Create* 단추를 누르면 파이프라인 생성 창이 나타납니다. 파이프라인 편집 화면으로 이동한 다음, *Add stage* 를 누릅니다. 그리고, 스테이지의 종류로 *Deploy (Manifest)* 를 선택합니다.
+
+![spin-yelb-new-pipe-chaos-eng](../../images/spin-yelb-new-pipe-chaos-eng.png)
+
+필요한 정보를 선택합니다. Account는 *eks* 를 선택하고 Namespace는 *Override Namespace* 를 눌러서 나오는 목록 중 *hello* 로 시작하는 것을 선택합니다.
+
+ - **Account:** eks
+ - **Namespace:** hello-xxxxx-yyyyy
+
+배포환경 설정을 이어서 진행합니다.
+
+ + 매니페스트 소스를 아티팩트로 지정합니다.
+   - **Manifest Source:** Artifact
+
+ + 매니페스트 소스의 세부 설정을 지정합니다. *Manifest Artifact* 옆의 목록을 누르면 *Define a new artifact* 문구가 나타납니다. 눌러서 선택하면 여러 정보들을 입력하는 화면이 나타납니다. 여기서 *Account* 를 아래와 같이 선택합니다. *Object Path* 부분에는 `4.high-availability.yaml`파일의 S3 경로를 입력하면 됩니다.
+   - **Account:** Platform
+   - **object path:** s3://artifact-xxxx-yyyy/4.high-availability.yaml
+
+![spin-yelb-pipe-app-ha](../../images/spin-yelb-pipe-app-ha.png)
+
+화면 맨 아래 *Save Changes*를 눌러서 저장합니다. 저장 후 변경사항이 반영 된 것을 확인합니다.
+
+#### 반복 실험
+파이프라인 편집을 완료하고 저장한 것까지 확인하였다면, *End Pipeline* 화살표를 눌러서 파이프라인 목록 화면으로 이동합니다. 화면 상단의 *chaos-engineering* 파이프라인 이름 왼 쪽에 보면 작은 화살표가 있습니다. 다음, *Start Manual Execution* 단추를 눌러서 파이프라인을 실행합니다.
+
+AWS FIS 서비스 페이지로 돌아가서, EKS 노드 종료 실험을 다시 실행합니다. 실험을 반복적으로 실행했을 때, 마이크로서비스 애플리케이션이 사전에 정의한 안정 상태를 유지하는 지 살펴봅니다.
+
 ## 정리
 여전히 Port Forward 로그가 찍히고 있을 것입니다. *ctrl + c* 를 눌러서 Port Forward 프로세스를 종료합니다. 다음, 인프라스트럭처 삭제 사전 작업으로 어플리케이션에서 생성한 자원을 삭제합니다. 다음과 같이 스크립트를 수행합니다. 쿠버네티스 네임스페이스를 삭제하는 시간이 오래 걸리니 스크립트가 종료될 때까지 중단하지 않도록 합니다.
 ```
@@ -185,8 +288,8 @@ terraform destroy --auto-approve
 ![aws-cw-delete-log-groups](../../images/aws-cw-delete-log-groups.png)
 
 ## 추가 자료
-- [Terraform module: Amazon EKS](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)
-- [Terraform module: Amazon VPC](https://registry.terraform.io/modules/Young-ook/vpc/aws/latest)
-- [Terraform module: AWS FIS](https://registry.terraform.io/modules/Young-ook/fis/aws/latest)
-- [Terraform module: AWS IAM](https://registry.terraform.io/modules/Young-ook/passport/aws/latest)
+- [Terraform module: Amazon EKS (Elastic Kubernetes Service)](https://registry.terraform.io/modules/Young-ook/eks/aws/latest)
+- [Terraform module: Amazon VPC (Virtual Private Cloud)](https://registry.terraform.io/modules/Young-ook/vpc/aws/latest)
+- [Terraform module: AWS FIS (Fault Injection Simulator)](https://registry.terraform.io/modules/Young-ook/fis/aws/latest)
+- [Terraform module: AWS IAM (Identity Access Management)](https://registry.terraform.io/modules/Young-ook/passport/aws/latest)
 - [Terraform module: Terraform Backend](https://registry.terraform.io/modules/Young-ook/tfstate-backend/aws/latest)

@@ -23,7 +23,7 @@ module "eks" {
       name          = "default"
       min_size      = 1
       max_size      = 9
-      desired_size  = 2
+      desired_size  = 3
       instance_type = "t3.small"
     }
   ]

@@ -13,28 +13,54 @@ git clone https://github.com/Young-ook/terraform-aws-spinnaker
 cd terraform-aws-spinnaker/examples/aws-modernization-with-spinnaker
 ```
 
+## Terraform Backend
+Terraform backend stores and manages the state of resources created using Terraform. By defaut, without additional user configuration, it exists as a file in the local workspace that performs terraform run. This is called a local backend. This local backend is currently inconvenient to manage and share the up-to-date state of resources. So, you can use S3 and DynamoDB to support collaboration, and have a backend that keeps the state of the created resource in a storage with stability.
+
+```sh
+cd backend
+terraform init
+terraform apply
+```
+
+When you finish creating the Terraform backend, it will generate configuration file specifying the Terraform backend in the same directory. When you open the file, the content is similar as below. You will see The name of the S3 bucket to store the Terraform state in the generated configuration file. More information is in the [terraform-aws-tfstate-backend](https://github.com/Young-ook/terraform-aws-tfstate-backend) repository.
+```sh
+terraform {
+  backend "s3" {
+    region = "ap-northeast-2"
+    bucket = "hello-tfstate-gyyqc"
+    key    = "state"
+  }
+}
+```
+
+Move the generated terraform configuration file to the workspace, actually, the parent directory.
+```sh
+mv backend.tf ../
+cd ../
+```
+
 ## Setup
 This is an aws modern application with hashicorp and spinnaker. The [main.tf](main.tf) is the terraform configuration file to create network infrastructure and kubernetes cluster, and spinnaker on your AWS account.
 
 Run terraform:
-```
+```sh
 terraform init
 terraform apply -target module.foundation
 ```
 
 To set up DevOps platform to another VPC, run below command:
-```
+```sh
 terraform apply -target module.platform
 ```
 
 ## Access Spinnaker
 Halyard is a command-line administration tool that manages the lifecycle of your spinnaker deployment, including writing & validating your deployment’s configuration, deploying each of spinnaker’s microservices, and updating the deployment. All production-capable deployments of spinnaker require halyard in order to install, configure, and update spinnaker. To install spinnaker using halyard, run script:
-```
+```sh
 ./halconfig.sh
 ```
 
 After installation and configuration is complete, start port-forwarding through the kubernetes proxy.
-```
+```sh
 ./tunnel.sh
 ```
 Open `http://localhost:8080` on a web browser. Or if your are running this example in Cloud9, click `Preview` and `Preview Running Application`. This opens up a preview tab and shows the spinnaker application.
@@ -85,13 +111,13 @@ Select the required information. Select *eks* for Account and *Override Namespac
 
 Continue setting up your deployment environment.
 
-+ Specifies the manifest source as an artifact.
-    - **Manifest Source:** Artifact
+ + Specifies the manifest source as an artifact.
+   - **Manifest Source:** Artifact
 
-+ Specify detailed settings for the manifest source. When you click the list next to *Manifest Artifact*, the text *Define a new Artifact* appears. If you press to select, a screen for entering various additional information appears. Here, select *Account* as shown below. And, fill out the *Object Path* field with the full S3 URI of `1.app-v1.yaml` file.
+ + Specify detailed settings for the manifest source. When you click the list next to *Manifest Artifact*, the text *Define a new Artifact* appears. If you press to select, a screen for entering various additional information appears. Here, select *Account* as shown below. And, fill out the *Object Path* field with the full S3 URI of `1.app-v1.yaml` file.
 
-    - **Account:** platform
-    - **Object Path:** s3://artifact-xxxx-yyyy/1.app-v1.yaml
+   - **Account:** platform
+   - **Object Path:** s3://artifact-xxxx-yyyy/1.app-v1.yaml
 
 ![spin-yelb-pipe-app-v1](../../images/spin-yelb-pipe-app-v1.png)
 
@@ -112,12 +138,12 @@ Select the required information. Choose *eks* for Account, *Override Namespace* 
 Continue setting up your deployment environment.
 
  + Specifies the manifest source as an artifact.
-     - **Manifest Source:** Artifact
+   - **Manifest Source:** Artifact
 
  + Specify detailed settings for the manifest source. When you click the list next to *Manifest Artifact*, the text *New Artifact Definition* appears. If you press and select, a screen for entering various information appears. Here, select *Account* as shown below. And, fill out the *Object Path* field with the full S3 URI of `2.app-v2.yaml` file.
 
-     - **Account:** Platform
-     - **object path:** s3://artifact-xxxx-yyyy/2.app-v2.yaml
+   - **Account:** Platform
+   - **object path:** s3://artifact-xxxx-yyyy/2.app-v2.yaml
 
 ![spin-yelb-pipe-app-v2](../../images/spin-yelb-pipe-app-v2.png)
 
@@ -136,12 +162,12 @@ Select the required information. Choose *eks* for Account, *Override Namespace* 
 Continue setting up your deployment environment.
 
  + Specifies the manifest source as an artifact.
-     - **Manifest Source:** Artifact
+   - **Manifest Source:** Artifact
 
  + Specify detailed settings for the manifest source. When you click the list next to *Manifest Artifact*, the text *New Artifact Definition* appears. If you press and select, a screen for entering various information appears. Here, select *Account* as shown below. And, fill out the *Object Path* field with the full S3 URI of `3.weighted-route.yaml` file.
 
-     - **Account:** Platform
-     - **object path:** s3://artifact-xxxx-yyyy/3.weighted-route.yaml
+   - **Account:** Platform
+   - **object path:** s3://artifact-xxxx-yyyy/3.weighted-route.yaml
 
 ![spin-yelb-pipe-app-wr](../../images/spin-yelb-pipe-app-wr.png)
 
@@ -283,12 +309,19 @@ Back to the AWS FIS service page, and rerun the terminate eks nodes experiment a
 
 ## Clean up
 On the screen port-forward logs are shown. Press *ctrl + c* keys to exit port-forward process. Next, run commands:
-```
+```sh
 ./preuninstall.sh
 terraform destroy --auto-approve
 ```
 
-It may take servral menuites until delete whole Kubernetes resources including namespace from your cluster. Next, Go to the AWS Management Console and get to CloudWatch service page. Select Log groups on the navigation bar on the left of the screen. Enter `hello` for filtering. When log groups start form '/aws/codebuild', '/aws/containerinsights/' appear, choose them and delete like belows.
+It may take servral menuites until delete whole Kubernetes resources including namespace from your cluster. Then, delete terraform (state) backend. Move to the terraform backend configuration directory and run terraform destroy command:
+```sh
+rm backend.tf
+cd backend
+terraform destroy --auto-approve
+```
+
+Next, Go to the AWS Management Console and get to CloudWatch service page. Select Log groups on the navigation bar on the left of the screen. Enter `hello` for filtering. When log groups start form `/aws/codebuild`, `/aws/containerinsights/` appear, choose them and delete like belows.
 
 ![aws-cw-delete-log-groups](../../images/aws-cw-delete-log-groups.png)
 

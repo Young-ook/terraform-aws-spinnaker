@@ -2,9 +2,6 @@
 
 ## features
 locals {
-  settings = {
-    containerInsights = var.container_insights_enabled ? "enabled" : "disabled"
-  }
   node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
 }
 
@@ -21,7 +18,9 @@ resource "aws_ecs_cluster" "cp" {
   }
 
   dynamic "setting" {
-    for_each = local.settings
+    for_each = {
+      containerInsights = var.container_insights_enabled ? "enabled" : "disabled"
+    }
     content {
       name  = setting.key
       value = setting.value

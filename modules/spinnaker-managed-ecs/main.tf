@@ -81,13 +81,19 @@ data "aws_ami" "ecs" {
   }
 }
 
-data "template_file" "boot" {
-  for_each = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
-  template = <<EOT
-#!/bin/bash -v
-echo ECS_CLUSTER=${local.name} >> /etc/ecs/ecs.config
-start ecs
-EOT
+data "template_cloudinit_config" "boot" {
+  for_each      = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
+  base64_encode = true
+  gzip          = false
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = <<-EOT
+    #!/bin/bash -v
+    echo ECS_CLUSTER=${local.name} >> /etc/ecs/ecs.config
+    start ecs
+    EOT
+  }
 }
 
 resource "aws_launch_template" "ng" {
@@ -95,7 +101,7 @@ resource "aws_launch_template" "ng" {
   name          = format("ecs-%s", uuid())
   tags          = merge(local.default-tags, var.tags)
   image_id      = data.aws_ami.ecs[each.key].id
-  user_data     = base64encode(data.template_file.boot[each.key].rendered)
+  user_data     = data.template_cloudinit_config.boot[each.key].rendered
   instance_type = lookup(each.value, "instance_type", "t3.medium")
 
   iam_instance_profile {

@@ -17,6 +17,6 @@ output "features" {
   description = "Features configurations for the ECS"
   value = {
     "node_groups_enabled" = local.node_groups_enabled
-    "fargate_enabled"     = ! local.node_groups_enabled
+    "fargate_enabled"     = !local.node_groups_enabled
   }
 }

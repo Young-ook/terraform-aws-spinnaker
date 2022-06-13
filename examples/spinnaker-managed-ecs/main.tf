@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 0.13.0"
+  required_version = "~> 1.0"
 }
 
 provider "aws" {
@@ -9,7 +9,7 @@ provider "aws" {
 # spinnaker managed ecs
 module "spinnaker-managed-ecs-ec2" {
   source                     = "Young-ook/spinnaker/aws//modules/spinnaker-managed-ecs"
-  version                    = ">= 2.0"
+  version                    = "2.3.2"
   name                       = var.name
   stack                      = var.stack
   detail                     = var.detail
@@ -21,7 +21,7 @@ module "spinnaker-managed-ecs-ec2" {
 
 module "spinnaker-managed-ecs-fargate" {
   source                     = "Young-ook/spinnaker/aws//modules/spinnaker-managed-ecs"
-  version                    = ">= 2.0"
+  version                    = "2.3.2"
   name                       = var.name
   stack                      = var.stack
   detail                     = var.detail

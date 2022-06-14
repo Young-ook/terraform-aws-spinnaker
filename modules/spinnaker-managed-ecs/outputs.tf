@@ -2,7 +2,10 @@
 
 output "cluster" {
   description = "The ECS cluster attributes"
-  value       = aws_ecs_cluster.cp
+  value = {
+    control_plane = aws_ecs_cluster.cp
+    data_plane    = aws_ecs_capacity_provider.ng
+  }
 }
 
 output "role_arn" {

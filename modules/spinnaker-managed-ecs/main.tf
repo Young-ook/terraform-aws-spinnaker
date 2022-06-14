@@ -9,16 +9,8 @@ locals {
 }
 
 resource "aws_ecs_cluster" "cp" {
-  name               = local.name
-  tags               = merge(local.default-tags, var.tags)
-  capacity_providers = [for ng in var.node_groups : ng.name if local.node_groups_enabled]
-
-  dynamic "default_capacity_provider_strategy" {
-    for_each = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
-    content {
-      capacity_provider = default_capacity_provider_strategy.key
-    }
-  }
+  name = local.name
+  tags = merge(local.default-tags, var.tags)
 
   dynamic "setting" {
     for_each = local.settings
@@ -217,4 +209,9 @@ resource "aws_ecs_capacity_provider" "ng" {
       target_capacity           = lookup(each.value, "target_capacity", 100)
     }
   }
+}
+
+resource "aws_ecs_cluster_capacity_providers" "ng" {
+  cluster_name       = aws_ecs_cluster.cp.name
+  capacity_providers = local.node_groups_enabled ? keys(aws_ecs_capacity_provider.ng) : ["FARGATE"]
 }

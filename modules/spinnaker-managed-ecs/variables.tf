@@ -1,8 +1,11 @@
 ### network
 variable "subnets" {
-  description = "The list of subnet IDs to deploy your EKS cluster"
+  description = "The list of subnet IDs to deploy your ECS cluster"
   type        = list(string)
-  default     = null
+  validation {
+    error_message = "Subnet list must not be null."
+    condition     = var.subnets != null
+  }
 }
 
 ### ecs cluster

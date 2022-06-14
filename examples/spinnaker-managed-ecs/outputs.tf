@@ -1,3 +1,8 @@
+output "vpc" {
+  description = "The attributes of Amazon VPC"
+  value       = module.vpc.vpc
+}
+
 output "ecs-ec2" {
   description = "The generated AWS ECS cluster"
   value       = module.spinnaker-managed-ecs-ec2.cluster

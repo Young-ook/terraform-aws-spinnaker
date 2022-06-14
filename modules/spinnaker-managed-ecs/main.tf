@@ -2,9 +2,6 @@
 
 ## features
 locals {
-  settings = {
-    containerInsights = var.container_insights_enabled ? "enabled" : "disabled"
-  }
   node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
 }
 
@@ -13,7 +10,9 @@ resource "aws_ecs_cluster" "cp" {
   tags = merge(local.default-tags, var.tags)
 
   dynamic "setting" {
-    for_each = local.settings
+    for_each = {
+      containerInsights = var.container_insights_enabled ? "enabled" : "disabled"
+    }
     content {
       name  = setting.key
       value = setting.value
@@ -123,7 +122,7 @@ resource "aws_launch_template" "ng" {
 resource "aws_autoscaling_group" "ng" {
   for_each              = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   name                  = format("ecs-%s", uuid())
-  vpc_zone_identifier   = local.subnet_ids
+  vpc_zone_identifier   = var.subnets
   max_size              = lookup(each.value, "max_size", 3)
   min_size              = lookup(each.value, "min_size", 1)
   desired_capacity      = lookup(each.value, "desired_size", 1)

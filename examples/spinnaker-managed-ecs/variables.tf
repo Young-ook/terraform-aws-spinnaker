@@ -7,6 +7,16 @@ variable "aws_region" {
   default     = "us-east-2"
 }
 
+variable "use_default_vpc" {
+  description = "A feature flag for whether to use default vpc"
+  type        = bool
+}
+
+variable "azs" {
+  description = "A list of availability zones for the vpc to deploy resources"
+  type        = list(string)
+}
+
 ### ecs cluster
 variable "node_groups" {
   description = "Node groups definition"

@@ -1,12 +1,15 @@
 aws_region      = "ap-northeast-2"
 azs             = ["ap-northeast-2a", "ap-northeast-2c", "ap-northeast-2d"]
-use_default_vpc = true
-name            = "ecs"
+use_default_vpc = false
+name            = "ecs-tc1"
 tags = {
-  env = "dev"
+  env                    = "dev"
+  test                   = "tc1"
+  default_vpc            = "false"
+  termination_protection = "false"
 }
 container_insights_enabled = true
-termination_protection     = true
+termination_protection     = false
 node_groups = [
   {
     name          = "default"

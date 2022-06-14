@@ -1,8 +1,13 @@
-aws_region = "ap-northeast-2"
-name       = "ecs-tc2"
+aws_region      = "ap-northeast-2"
+azs             = ["ap-northeast-2a", "ap-northeast-2c", "ap-northeast-2d"]
+use_default_vpc = true
+name            = "ecs-tc2-mixed"
 tags = {
-  env  = "dev"
-  test = "tc2"
+  env                   = "dev"
+  test                  = "tc2"
+  default_vpc           = "true"
+  termination_protected = "false"
+  node_groups_type      = "mixed"
 }
 container_insights_enabled = false
 termination_protection     = false

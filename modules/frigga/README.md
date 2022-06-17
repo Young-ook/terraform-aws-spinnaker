@@ -1,4 +1,4 @@
-# Frigga naming rule
+# Frigga naming convention
 [Netflix Frigga](https://github.com/Netflix/frigga) is a standalone Java library containing the logic Netflix's Asgard project uses for generating and parsing AWS object names. This is a terraform module to generate a resource name following Frigga naming rule to avoid resource name duplication, and it makes your resources are aware of Spinnaker.
 
 From Norse mythology. the name Frigga refers the wife of Odin, queen of Asgard.

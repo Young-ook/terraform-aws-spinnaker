@@ -279,7 +279,11 @@ Cluster Autoscaler provides integration with Auto Scaling groups. Cluster Autosc
 
 Cluster Autoscaler is already installed. You can see the configuration code at the bottom of the [foundation/main.tf](foundation/main.tf).
 
-Let's scale out pods for high availability. Back to Spinnaker and move to the **yelb** application, create a pipeline with `chaos-engineering`. Press *Create* to bring up a screen where you can edit your pipeline. Next, click the *Add Stage* button to add a deploy step to the pipeline. And Chosse *Deploy (Manifest)*.
+Let's scale out pods and apply pod-anti-affinity policy for high availability.
+
+![aws-fis-eks-pod-anti-affinity](../../images/aws-fis-eks-pod-anti-affinity.png)
+
+Back to Spinnaker and move to the **yelb** application, create a pipeline with `chaos-engineering`. Press *Create* to bring up a screen where you can edit your pipeline. Next, click the *Add Stage* button to add a deploy step to the pipeline. And Chosse *Deploy (Manifest)*.
 
 ![spin-yelb-new-pipe-chaos-eng](../../images/spin-yelb-new-pipe-chaos-eng.png)
 

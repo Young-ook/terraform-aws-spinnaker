@@ -275,7 +275,11 @@ EKS 노드 그룹의 모든 인스턴스가 잘 동작하고 있는 지 확인�
 
 클러스터 오토스케일러는 이미 설치 되어 있습니다. 클러스터 오토스케일러를 설치하는 코드는 [foundation/main.tf](foundation/main.tf) 파일의 맨 아래 부분에서 확인할 수 있습니다.
 
-이제 포드(Pod)의 고가용성을 위한 설정을 추가하겠습니다. 스핀에커 화면으로 돌아간 다음 **yelb** 애플리케이션 화면으로 이동합니다. 그리고 `chaos-engineering`이라는 이름으로 파이프라인을 새로 만듭니다. *Create* 단추를 누르면 파이프라인 생성 창이 나타납니다. 파이프라인 편집 화면으로 이동한 다음, *Add stage* 를 누릅니다. 그리고, 스테이지의 종류로 *Deploy (Manifest)* 를 선택합니다.
+이제 포드(Pod)의 고가용성을 위한 pod-anti-affinity 설정을 추가하겠습니다.
+
+![aws-fis-eks-pod-anti-affinity](../../images/aws-fis-eks-pod-anti-affinity.png)
+
+스핀에커 화면으로 돌아간 다음 **yelb** 애플리케이션 화면으로 이동합니다. 그리고 `chaos-engineering`이라는 이름으로 파이프라인을 새로 만듭니다. *Create* 단추를 누르면 파이프라인 생성 창이 나타납니다. 파이프라인 편집 화면으로 이동한 다음, *Add stage* 를 누릅니다. 그리고, 스테이지의 종류로 *Deploy (Manifest)* 를 선택합니다.
 
 ![spin-yelb-new-pipe-chaos-eng](../../images/spin-yelb-new-pipe-chaos-eng.png)
 

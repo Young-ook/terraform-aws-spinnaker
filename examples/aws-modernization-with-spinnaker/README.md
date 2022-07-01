@@ -4,7 +4,32 @@
 ![aws-modernization-with-spinnaker](../../images/aws-modernization-with-spinnaker-architecture.png)
 
 ## Prerequisites
-We use [Terraform](https://terraform.io), and [Kubernetes](https://kubernetes.io/) in this lab. Please visit the main [page](https://github.com/Young-ook/terraform-aws-spinnaker#terraform) and follow the installation instructions if you don't have terraform cli (command-line interface) in your workspace. And also, make sure that you have kubernetes cli. Here is the official web [page](https://kubernetes.io/docs/tasks/tools/#kubectl) and follow the instructions to install kubernetes cli.
+We use [Terraform](https://terraform.io), and [Kubernetes](https://kubernetes.io/) in this lab. Please visit the main [page](https://github.com/Young-ook/terraform-aws-spinnaker#terraform) and follow the installation instructions if you don't have terraform cli (command-line interface) in your workspace. And also, make sure that you have kubernetes cli. Here is the official web [page](https://kubernetes.io/docs/tasks/tools/#kubectl) and follow the instructions to install kubernetes cli. In this workshop, aws cli version 2.5.8 or higher is required. For aws cli install guide, please refer to the main [page](https://github.com/Young-ook/terraform-aws-spinnaker#aws-cli). And here is [troubleshooting guide](https://github.com/Young-ook/terraform-aws-fis#unknown-parameter) if you see 'unknown parameter' error message.
+
+### AWS CLI
+If you are on cloud9 workspace, you can upgrade or install the aws-cli-v2 using simple command:
+sh```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+### Kubernetes CLI
+Also, you can install kubectl (kubernetes-cli) on your cloud9 environment:
+sh```
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+```
+
+### Terraform CLI
+And you can install terraform-cli:
+sh```
+export TF_VER=1.0.3
+curl --silent --location "https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip" -o /tmp/terraform.zip
+unzip /tmp/terraform.zip -d /tmp
+sudo mv -v /tmp/terraform /usr/local/bin/terraform
+```
 
 ## Download example
 Download this example on your workspace

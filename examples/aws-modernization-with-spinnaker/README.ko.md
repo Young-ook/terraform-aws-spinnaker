@@ -4,7 +4,10 @@
 ![aws-modernization-with-spinnaker](../../images/aws-modernization-with-spinnaker-architecture.png)
 
 ## 사전 준비
-실습 예제에서는 테라폼([Terraform](https://terraform.io))과 쿠버네티스([Kubernetes](https://kubernetes.io/))를 사용합니다. 테라폼 CLI 가 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#terraform)로가서 안내에 따라 설치합니다. 쿠버네티스 CLI가 없다면 공식 [페이지](https://kubernetes.io/docs/tasks/tools/#kubectl)의 안내에 따라 설치합니다. 그리고 최소 2.5.8 이상 버전의 AWS CLI가 필요합니다. AWS CLI 설치는 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#aws-cli)의 안내를 확인하시기 바랍니다. AWS CLI 버전이 낮을 때 나타나는 오류는 [알 수 없는 파라메터](https://github.com/Young-ook/terraform-aws-fis#unknown-parameter)을 참고하시기 바랍니다.
+
+:warning: **실습 예제에서는 AWS CLI 버전 2.5.8 또는 그 이상이 필요합니다.**
+
+실습 예제에서는 테라폼([Terraform](https://terraform.io))과 쿠버네티스([Kubernetes](https://kubernetes.io/))를 사용합니다. 테라폼 CLI 가 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#terraform)로가서 안내에 따라 설치합니다. 쿠버네티스 CLI가 없다면 공식 [페이지](https://kubernetes.io/docs/tasks/tools/#kubectl)의 안내에 따라 설치합니다. 그리고 최소 2.5.8 이상 버전의 AWS CLI가 필요합니다. AWS CLI 설치는 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#aws-cli)의 안내를 확인하시기 바랍니다. AWS CLI 버전이 낮을 때 나타나는 오류는 [알 수 없는 파라메터](https://github.com/Young-ook/terraform-aws-fis#unknown-parameter)를 참고하시기 바랍니다.
 
 ### AWS 명령줄 도구
 여러 분의 실습환경이 클라우드9이라면, 다음과 같은 간단한 명령을 사용하여 AWS 명령줄 도구를 설치하거나 업그레이드 할 수 있습니다:

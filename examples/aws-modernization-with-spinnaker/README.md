@@ -8,7 +8,7 @@ We use [Terraform](https://terraform.io), and [Kubernetes](https://kubernetes.io
 
 ### AWS CLI
 If you are on cloud9 workspace, you can upgrade or install the aws-cli-v2 using simple command:
-sh```
+```sh
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
@@ -16,7 +16,7 @@ sudo ./aws/install
 
 ### Kubernetes CLI
 Also, you can install kubectl (kubernetes-cli) on your cloud9 environment:
-sh```
+```sh
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
@@ -24,7 +24,7 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 
 ### Terraform CLI
 And you can install terraform-cli:
-sh```
+```sh
 export TF_VER=1.0.3
 curl --silent --location "https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip" -o /tmp/terraform.zip
 unzip /tmp/terraform.zip -d /tmp

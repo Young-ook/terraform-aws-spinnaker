@@ -4,7 +4,32 @@
 ![aws-modernization-with-spinnaker](../../images/aws-modernization-with-spinnaker-architecture.png)
 
 ## 사전 준비
-실습 예제에서는 테라폼([Terraform](https://terraform.io))과 쿠버네티스([Kubernetes](https://kubernetes.io/))를 사용합니다. 테라폼 CLI 가 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#terraform)로가서 안내에 따라 설치합니다. 쿠버네티스 CLI가 없다면 공식 [페이지](https://kubernetes.io/docs/tasks/tools/#kubectl)의 안내에 따라 설치합니다.
+실습 예제에서는 테라폼([Terraform](https://terraform.io))과 쿠버네티스([Kubernetes](https://kubernetes.io/))를 사용합니다. 테라폼 CLI 가 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#terraform)로가서 안내에 따라 설치합니다. 쿠버네티스 CLI가 없다면 공식 [페이지](https://kubernetes.io/docs/tasks/tools/#kubectl)의 안내에 따라 설치합니다. 그리고 최소 2.5.8 이상 버전의 AWS CLI가 필요합니다. AWS CLI 설치는 메인 [페이지](https://github.com/Young-ook/terraform-aws-spinnaker#aws-cli)의 안내를 확인하시기 바랍니다. AWS CLI 버전이 낮을 때 나타나는 오류는 [알 수 없는 입력](https://github.com/Young-ook/terraform-aws-fis#unknown-parameter)을 참고하시기 바랍니다.
+
+### AWS 명령줄 도구
+여러 분의 실습환경이 클라우드9이라면, 다음과 같은 간단한 명령을 사용하여 AWS 명령줄 도구를 설치하거나 업그레이드 할 수 있습니다:
+sh```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+### 쿠버네티스 명령줄 도구
+또한, 여러 분은 쿠버네티스 명령줄 도구를 클라우드9 환경에 설치할 수 있습니다:
+sh```
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+```
+
+### 테라폼 명령줄 도구
+마찬가지로 테라폼 명령줄 도구를 여러 분의 실습환경에 설치할 수 있습니다:
+sh```
+export TF_VER=1.0.3
+curl --silent --location "https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip" -o /tmp/terraform.zip
+unzip /tmp/terraform.zip -d /tmp
+sudo mv -v /tmp/terraform /usr/local/bin/terraform
+```
 
 ## 예제 내려받기
 실습환경에 예제를 내려받습니다.

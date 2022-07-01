@@ -4,6 +4,9 @@
 ![aws-modernization-with-spinnaker](../../images/aws-modernization-with-spinnaker-architecture.png)
 
 ## Prerequisites
+
+:warning: **This example requires the aws cli version 2.5.8 or higher**
+
 We use [Terraform](https://terraform.io), and [Kubernetes](https://kubernetes.io/) in this lab. Please visit the main [page](https://github.com/Young-ook/terraform-aws-spinnaker#terraform) and follow the installation instructions if you don't have terraform cli (command-line interface) in your workspace. And also, make sure that you have kubernetes cli. Here is the official web [page](https://kubernetes.io/docs/tasks/tools/#kubectl) and follow the instructions to install kubernetes cli. In this workshop, aws cli version 2.5.8 or higher is required. For aws cli install guide, please refer to the main [page](https://github.com/Young-ook/terraform-aws-spinnaker#aws-cli). And here is [troubleshooting guide](https://github.com/Young-ook/terraform-aws-fis#unknown-parameter) if you see 'unknown parameter' error message.
 
 ### AWS CLI

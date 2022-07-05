@@ -18,7 +18,8 @@ ${halyard_kubectl_exec} hal config artifact s3 account add platform \
 ${halyard_kubectl_exec} hal config artifact s3 enable
 
 ${eks_update_kubeconfig}
-kubectl -n spinnaker cp kubeconfig cd-spinnaker-halyard-0:/home/spinnaker/.kube/
+${halyard_kubectl_exec} mkdir /home/spinnaker/.kube
+kubectl -n spinnaker cp kubeconfig cd-spinnaker-halyard-0:/home/spinnaker/.kube/kubeconfig
 rm kubeconfig
 
 ${halyard_kubectl_exec} hal config provider kubernetes account add eks \

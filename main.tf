@@ -6,7 +6,7 @@ module "current" {
 
 module "eks" {
   source              = "Young-ook/eks/aws"
-  version             = "1.4.9"
+  version             = "1.7.5"
   name                = local.name
   tags                = var.tags
   subnets             = aws_subnet.private.*.id
@@ -21,10 +21,6 @@ module "eks" {
     module.s3.policy_arns.write,
     var.kubernetes_policy_arns,
   ])
-}
-
-data "aws_eks_cluster_auth" "eks" {
-  name = module.eks.cluster.name
 }
 
 ### aurora
@@ -145,9 +141,9 @@ resource "aws_iam_policy" "spin-assume" {
 provider "helm" {
   alias = "spinnaker"
   kubernetes {
-    host                   = module.eks.cluster.endpoint
-    token                  = data.aws_eks_cluster_auth.eks.token
-    cluster_ca_certificate = base64decode(module.eks.cluster.certificate_authority.0.data)
+    host                   = module.eks.helmconfig.host
+    token                  = module.eks.helmconfig.token
+    cluster_ca_certificate = base64decode(module.eks.helmconfig.ca)
   }
 }
 

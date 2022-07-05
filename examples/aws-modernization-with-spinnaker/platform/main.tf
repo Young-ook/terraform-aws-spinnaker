@@ -84,6 +84,11 @@ module "spinnaker" {
   s3_bucket = {
     force_destroy = true
   }
+  helm = {
+    values = {
+      "halyard.image.tag" = "1.44.0"
+    }
+  }
   assume_role_arn = [
     module.spinnaker-managed.role_arn,
   ]
@@ -91,7 +96,7 @@ module "spinnaker" {
 
 module "spinnaker-managed" {
   source           = "Young-ook/spinnaker/aws//modules/spinnaker-managed-aws"
-  version          = "~> 2.0"
+  version          = "2.2.3"
   name             = var.name
   trusted_role_arn = [module.spinnaker.role.arn]
 }

@@ -109,7 +109,7 @@ terraform apply -target module.platform
 
 ![spin-yelb-new-pipe-svc-mesh](../../images/spin-yelb-new-pipe-svc-mesh.png)
 
-##### 빌드 스테이지
+#### 빌드 스테이지
 AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드에 성공하면 컨테이너 이미지는 ECR에 저장되며, 쿠버네티스(Kubernetes) 매니페스트 파일들은 S3 버켓에 저장됩니다. S3 버켓 이름은 테라폼에서 생성할 때 임의의 이름이 추가됩니다. S3 서비스에서 배켓을 조회하면 *artifact-xxxx-yyyy* 와 같은 형식의 이름을 가진 버켓을 볼 수 있습니다. 버켓 이름은 파이프라인 설정에 필요하므로 별도로 메모하시길 바랍니다.
 
 *Add stage* 를 누르면 파이프라인에 추가할 작업을 선택할 수 있습니다. 여기서 *AWS CodeBuild*를 선택합니다. 그러면 아래에 빌드 작업에 필요한 정보를 입력하는 공간이 나타납니다.

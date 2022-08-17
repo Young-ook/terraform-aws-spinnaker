@@ -16,6 +16,6 @@ resource "random_pet" "name" {
 locals {
   suffix      = var.petname ? random_string.suffix.result : ""
   name        = var.name == null || var.name == "" ? random_pet.name.id : var.name
-  frigga-name = join("-", compact([local.name, var.stack, var.detail, local.suffix]))
+  frigga-name = substr(join("-", compact([local.name, var.stack, var.detail, local.suffix])), 0, 64)
   name-tag    = { "Name" = local.frigga-name }
 }

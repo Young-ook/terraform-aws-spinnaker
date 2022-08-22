@@ -9,13 +9,12 @@ resource "random_string" "suffix" {
 }
 
 resource "random_pet" "name" {
-  length    = 3
+  length    = 1
   separator = "-"
 }
 
 locals {
   suffix      = var.petname ? random_string.suffix.result : ""
-  name        = var.name == null || var.name == "" ? random_pet.name.id : var.name
-  frigga-name = join("-", compact([local.name, var.stack, var.detail, local.suffix]))
+  frigga-name = substr(join("-", compact([(var.name == null || var.name == "" ? random_pet.name.id : var.name), var.stack, var.detail, local.suffix])), 0, var.max_length)
   name-tag    = { "Name" = local.frigga-name }
 }

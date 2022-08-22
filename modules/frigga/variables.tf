@@ -34,3 +34,9 @@ variable "petname" {
   type        = bool
   default     = true
 }
+
+variable "max_length" {
+  description = "The maximum length of generated logical name"
+  type        = number
+  default     = 64
+}

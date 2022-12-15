@@ -10,9 +10,10 @@ termination_protection     = true
 node_groups = [
   {
     name          = "default"
+    desired_size  = 1
     min_size      = 1
     max_size      = 3
-    desired_size  = 1
-    instance_type = "t3.large"
+    instance_type = "m6g.large"
+    ami_type      = "AL2_ARM_64"
   }
 ]

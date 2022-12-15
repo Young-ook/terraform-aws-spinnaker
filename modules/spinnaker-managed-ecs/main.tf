@@ -68,7 +68,11 @@ data "aws_ami" "ecs" {
 
   filter {
     name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
+    values = ["amzn2-ami-ecs-hvm-*"]
+  }
+  filter {
+    name   = "architecture"
+    values = [length(regexall("ARM", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? "arm64" : "x86_64"]
   }
 }
 
@@ -102,7 +106,7 @@ resource "aws_launch_template" "ng" {
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
-      volume_size           = lookup(each.value, "disk_size", "20")
+      volume_size           = lookup(each.value, "disk_size", "30")
       volume_type           = "gp2"
       delete_on_termination = true
     }

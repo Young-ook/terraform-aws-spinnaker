@@ -6,8 +6,8 @@
 - [CodeBuild](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/codebuild)
 - [Amazon VPC](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-aware-aws-vpc)
 - [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-aws)
-- [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-ecs)
-- [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-eks)
+- [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-ecs)
+- [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-eks)
 - [Chaos Monkey](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/chaosmonkey)
 - [AWS Modernization with Spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/aws-modernization-with-spinnaker)
 

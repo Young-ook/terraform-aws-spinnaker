@@ -58,7 +58,6 @@ module "codebuild" {
     }
   }
 }
-
 ```
 
 ```

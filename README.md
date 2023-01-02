@@ -3,7 +3,6 @@
 
 ## Examples
 - [Spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker)
-- [Chaos Monkey](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/chaosmonkey)
 - [AWS Modernization with Spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/aws-modernization-with-spinnaker)
 - [Spinnaker aware Amazon VPC](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-aware-aws-vpc)
 - [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-aws)

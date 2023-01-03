@@ -4,10 +4,6 @@
 ## Examples
 - [Spinnaker Blueprint](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/blueprint)
 - [AWS Modernization with Spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/aws-modernization-with-spinnaker)
-- [Spinnaker aware Amazon VPC](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-aware-aws-vpc)
-- [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/examples/spinnaker-managed-aws)
-- [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-ecs)
-- [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-eks)
 
 ## Getting started
 ### AWS CLI

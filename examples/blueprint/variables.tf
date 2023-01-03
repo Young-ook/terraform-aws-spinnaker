@@ -1,30 +1,29 @@
 # Variables for providing to module fixture codes
 
-### aws credential
-variable "aws_account_id" {
-  description = "The aws account id (e.g. 857026751867)"
-}
-
 ### network
 variable "aws_region" {
   description = "The aws region to deploy"
   type        = string
+  default     = "ap-northeast-2"
 }
 
 variable "azs" {
   description = "A list of availability zones for the vpc to deploy resources"
   type        = list(string)
+  default     = ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
 }
 
 variable "cidr" {
   description = "The list of CIDR blocks to allow ingress traffic for db access"
   type        = string
+  default     = "10.0.0.0/16"
 }
 
 ### kubernetes cluster
 variable "kubernetes_version" {
   description = "The target version of kubernetes"
   type        = string
+  default     = "1.24"
 }
 
 variable "kubernetes_node_groups" {

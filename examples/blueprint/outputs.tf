@@ -6,7 +6,7 @@ output "spinnaker" {
   }
 }
 
-output "spinnaker_managed_role_arn" {
-  description = "The generated ARN from spinnaker managed role module"
-  value       = module.spinnaker-managed-role.role_arn
+output "account" {
+  description = "Spinnaker managed role has PowerUser policy in your AWS account that you want manage by spinnaker"
+  value       = module.spinnaker-managed.role_arn
 }

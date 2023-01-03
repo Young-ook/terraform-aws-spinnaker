@@ -1,0 +1,14 @@
+[chaosmonkey]
+enabled = true
+schedule_enabled = false
+leashed = false
+accounts = ["default"]
+
+[database]
+host = {rds_endpoint}
+name = "chaosmonkey"
+user = "chaosmonkey_service"
+encrypted_password = {password}
+
+[spinnaker]
+endpoint = "http://spin-gate:8084"

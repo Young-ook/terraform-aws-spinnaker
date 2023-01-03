@@ -9,8 +9,7 @@ module "chaosmonkey-repo" {
 ### pipeline/registry
 module "artifact" {
   source        = "Young-ook/sagemaker/aws//modules/s3"
-  name          = "artifact"
-  stack         = "preprod"
+  name          = "artifact-preprod"
   tags          = var.tags
   force_destroy = true
 }

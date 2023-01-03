@@ -6,19 +6,13 @@ provider "aws" {
 
 ### network
 module "spinnaker-aware-aws-vpc" {
-  source              = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
-  version             = "2.3.6"
-  name                = var.name
-  stack               = var.stack
-  detail              = var.detail
-  tags                = var.tags
-  azs                 = var.azs
-  cidr                = var.cidr
-  vpc_endpoint_config = var.vpc_endpoint_config
-  enable_igw          = var.enable_igw
-  enable_ngw          = var.enable_ngw
-  single_ngw          = var.single_ngw
-  enable_vgw          = var.enable_vgw
+  source  = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
+  version = "2.3.6"
+  name    = var.name
+  stack   = "preprod"
+  tags    = var.tags
+  azs     = var.azs
+  cidr    = var.cidr
 }
 
 ### platform/spinnaker
@@ -31,7 +25,7 @@ module "spinnaker" {
   region                 = var.aws_region
   azs                    = var.azs
   cidr                   = var.cidr
-  assume_role_arn        = [module.spinnaker-managed-role.role_arn]
+  assume_role_arn        = [module.spinnaker-managed.role_arn]
   kubernetes_version     = var.kubernetes_version
   kubernetes_policy_arns = [module.artifact.policy_arns["read"]]
   kubernetes_node_groups = [

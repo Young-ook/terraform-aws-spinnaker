@@ -92,3 +92,7 @@ You will see error message followings when attempting to run terraform apply in 
 │ 4: data "aws_vpc" "default"
 ```
 This module uses eks module inside that requires default vpc on your aws account. This is the related [issue](https://github.com/Young-ook/terraform-aws-eks/issues/44). For more details, please refer to the [source](https://github.com/Young-ook/terraform-aws-eks/).
+
+# Additional Resources
+## Case Study
+- [Google Waze SRE](https://sre.google/workbook/organizational-change/)

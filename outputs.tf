@@ -35,12 +35,3 @@ output "kubeconfig" {
     module.eks.kubeconfig,
   ])
 }
-
-output "uninstall" {
-  description = "Bash script to prepare helm chart uninstall"
-  value = join(" ", [
-    "bash -e",
-    format("%s/script/pre-uninstall.sh", path.module),
-    "-k kubeconfig",
-  ])
-}

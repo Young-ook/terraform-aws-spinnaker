@@ -1,6 +1,7 @@
 ### foundation/network
 module "vpc" {
   source     = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
+  version    = "2.3.5"
   name       = var.name
   tags       = merge(var.tags, (module.eks.tags.shared == null ? {} : module.eks.tags.shared))
   azs        = var.azs

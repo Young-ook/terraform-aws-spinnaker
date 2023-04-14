@@ -28,8 +28,8 @@ output "kubeconfig" {
   description = "Bash script to update kubeconfig file"
 }
 
-output "helmconfig" {
-  description = "The configurations map for Helm provider"
+output "kubeauth" {
+  description = "The kubernetes cluster authentication information for Kubernetes/Helm providers"
   sensitive   = true
-  value       = module.eks.helmconfig
+  value       = module.eks.kubeauth
 }

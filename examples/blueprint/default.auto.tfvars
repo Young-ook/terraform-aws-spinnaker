@@ -1,1 +1,1 @@
-tags = { example = "rds_blueprint" }
+tags = { example = "spinnaker_blueprint" }

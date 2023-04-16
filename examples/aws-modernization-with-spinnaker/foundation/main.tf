@@ -5,14 +5,16 @@ module "aws" {
 
 ### foundation/network
 module "vpc" {
-  source     = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
-  version    = "2.3.5"
-  name       = var.name
-  tags       = merge(var.tags, (module.eks.tags.shared == null ? {} : module.eks.tags.shared))
-  azs        = var.azs
-  cidr       = var.cidr
-  enable_ngw = true
-  single_ngw = true
+  source  = "Young-ook/vpc/aws"
+  version = "1.0.3"
+  name    = var.name
+  tags    = merge(var.tags, (module.eks.tags.shared == null ? {} : module.eks.tags.shared))
+  vpc_config = {
+    azs         = var.azs
+    cidr        = var.cidr
+    single_ngw  = true
+    subnet_type = "private"
+  }
 }
 
 ### foundation/kubernetes

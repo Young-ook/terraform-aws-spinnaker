@@ -119,7 +119,7 @@ To add a build step to the pipeline, you can click *Add Stage*. Choose *AWS Code
 Please enter the required information (The last 10 characters of the project name are anti-duplication serial automatically assigned by Terraform, and may vary depending on the situation).
 
  - **Account:** platform
- - **Project Name:** yelb-hello-xxxxx-yyyyy
+ - **Project Name:** yelb-hello-xxxxx
 
 ![spin-yelb-pipe-build-proj](../../images/spin-yelb-pipe-build-proj.png)
 
@@ -133,7 +133,7 @@ Deploy the container application with default settings. Deploy the database, cac
 Select the required information. Select *eks* for Account and *Override Namespace* for Namespace and choose the list that starts with *hello*.
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 ![spin-yelb-pipe-app-ns](../../images/spin-yelb-pipe-app-ns.png)
 
@@ -161,7 +161,7 @@ Now configure the pipeline stage to deploy the new version of the application se
 Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*.
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 Continue setting up your deployment environment.
 
@@ -185,7 +185,7 @@ After the approval step has been added, add a new stage to apply the weighted ro
 Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*.
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 Continue setting up your deployment environment.
 
@@ -318,7 +318,7 @@ Back to Spinnaker and move to the **yelb** application, create a pipeline with `
 Select the required information. Choose *eks* for Account, *Override Namespace* for Namespace, and select the list that starts with *hello*.
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 Continue setting up your deployment environment.
 

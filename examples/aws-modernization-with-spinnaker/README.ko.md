@@ -116,10 +116,10 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
 
 ![spin-yelb-pipe-build-stage](../../images/spin-yelb-pipe-build-stage.png)
 
-필요한 정보를 입력합니다. (프로젝트 이름의 뒷 10자리는 테라폼을 수행할 때 자동으로 지정되는 중복방지 일련번호이므로 상황에 따라 달라질 수 있습니다)
+필요한 정보를 입력합니다. (프로젝트 이름의 뒷 5자리는 테라폼을 수행할 때 자동으로 지정되는 중복방지 일련번호이므로 상황에 따라 달라질 수 있습니다)
 
  - **Account:** platform
- - **Project Name:** yelb-hello-xxxxx-yyyyy
+ - **Project Name:** yelb-hello-xxxxx
 
 ![spin-yelb-pipe-build-proj](../../images/spin-yelb-pipe-build-proj.png)
 
@@ -130,10 +130,10 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
 
 ![spin-yelb-pipe-deploy-stage](../../images/spin-yelb-pipe-deploy-stage.png)
 
-필요한 정보를 선택합니다. Account는 *eks* 를 선택하고 Namespace는 *Override Namespace* 를 눌러서 나오는 목록 중 *hello* 로 시작하는 것을 선택합니다. (네임스페이스 이름의 뒷 10자리는 테라폼을 수행할 때 자동으로 지정되는 pet name 이므로 상황에 따라 달라질 수 있습니다)
+필요한 정보를 선택합니다. Account는 *eks* 를 선택하고 Namespace는 *Override Namespace* 를 눌러서 나오는 목록 중 *hello* 로 시작하는 것을 선택합니다. (네임스페이스 이름의 뒷 5자리는 테라폼을 수행할 때 자동으로 지정되는 pet name 이므로 상황에 따라 달라질 수 있습니다)
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 ![spin-yelb-pipe-app-ns](../../images/spin-yelb-pipe-app-ns.png)
 
@@ -159,7 +159,7 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
 필요한 정보를 선택합니다. Account는 *eks* 를 선택하고 Namespace는 *Override Namespace* 를 눌러서 나오는 목록 중 *hello* 로 시작하는 것을 선택합니다.
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 배포환경 설정을 이어서 진행합니다.
 
@@ -182,7 +182,7 @@ AWS CodeBuild를 이용하여 컨테이너 이미지를 빌드 합니다. 빌드
 필요한 정보를 선택합니다. Account는 *eks* 를 선택하고 Namespace는 *Override Namespace* 를 눌러서 나오는 목록 중 *hello* 로 시작하는 것을 선택합니다.
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 배포환경 설정을 이어서 진행합니다.
 
@@ -314,7 +314,7 @@ EKS 노드 그룹의 모든 인스턴스가 잘 동작하고 있는 지 확인�
 필요한 정보를 선택합니다. Account는 *eks* 를 선택하고 Namespace는 *Override Namespace* 를 눌러서 나오는 목록 중 *hello* 로 시작하는 것을 선택합니다.
 
  - **Account:** eks
- - **Namespace:** hello-xxxxx-yyyyy
+ - **Namespace:** hello-xxxxx
 
 배포환경 설정을 이어서 진행합니다.
 

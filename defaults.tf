@@ -12,8 +12,8 @@ locals {
   ]
   default_helm_config = {
     name              = "cd"
-    repository        = join("/", [path.module])
-    chart             = "helm-chart"
+    repository        = join("/", [path.module, "charts"])
+    chart             = "spinnaker"
     namespace         = "spinnaker"
     timeout           = "500"
     cleanup_on_fail   = true

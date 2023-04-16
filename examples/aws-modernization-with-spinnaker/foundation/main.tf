@@ -58,21 +58,13 @@ module "helm-addons" {
   addons = [
     {
       repository     = "https://aws.github.io/eks-charts"
-      name           = "appmesh-controller"
-      chart_name     = "appmesh-controller"
+      name           = "aws-load-balancer-controller"
+      chart_name     = "aws-load-balancer-controller"
       namespace      = "kube-system"
-      serviceaccount = "appmesh-controller"
-      values = {
-        "region"           = module.aws.region.name
-        "tracing.enabled"  = true
-        "tracing.provider" = "x-ray"
-      }
-      oidc = module.eks.oidc
-      policy_arns = [
-        format("arn:%s:iam::aws:policy/AWSAppMeshEnvoyAccess", module.aws.partition.partition),
-        format("arn:%s:iam::aws:policy/AWSCloudMapFullAccess", module.aws.partition.partition),
-        format("arn:%s:iam::aws:policy/AWSXRayDaemonWriteAccess", module.aws.partition.partition),
-      ]
+      serviceaccount = "aws-load-balancer-controller"
+      values         = { "clusterName" = module.eks.cluster.name }
+      oidc           = module.eks.oidc
+      policy_arns    = [aws_iam_policy.lbc.arn]
     },
     {
       repository     = "https://aws.github.io/eks-charts"
@@ -108,16 +100,6 @@ module "helm-addons" {
       ]
     },
     {
-      repository     = "https://aws.github.io/eks-charts"
-      name           = "aws-load-balancer-controller"
-      chart_name     = "aws-load-balancer-controller"
-      namespace      = "kube-system"
-      serviceaccount = "aws-load-balancer-controller"
-      values         = { "clusterName" = module.eks.cluster.name }
-      oidc           = module.eks.oidc
-      policy_arns    = [aws_iam_policy.lbc.arn]
-    },
-    {
       repository     = "${path.module}/charts/"
       name           = "cluster-autoscaler"
       chart_name     = "cluster-autoscaler"
@@ -129,6 +111,24 @@ module "helm-addons" {
       }
       oidc        = module.eks.oidc
       policy_arns = [aws_iam_policy.cas.arn]
+    },
+    {
+      repository     = "https://aws.github.io/eks-charts"
+      name           = "appmesh-controller"
+      chart_name     = "appmesh-controller"
+      namespace      = "kube-system"
+      serviceaccount = "appmesh-controller"
+      values = {
+        "region"           = module.aws.region.name
+        "tracing.enabled"  = true
+        "tracing.provider" = "x-ray"
+      }
+      oidc = module.eks.oidc
+      policy_arns = [
+        format("arn:%s:iam::aws:policy/AWSAppMeshEnvoyAccess", module.aws.partition.partition),
+        format("arn:%s:iam::aws:policy/AWSCloudMapFullAccess", module.aws.partition.partition),
+        format("arn:%s:iam::aws:policy/AWSXRayDaemonWriteAccess", module.aws.partition.partition),
+      ]
     },
   ]
 }

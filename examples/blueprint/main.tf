@@ -30,7 +30,7 @@ module "spinnaker" {
   kubernetes_policy_arns = [module.artifact.policy_arns["read"]]
   kubernetes_node_groups = [
     {
-      name          = "tc1"
+      name          = "cd"
       instance_type = "m5.xlarge"
       min_size      = "1"
       max_size      = "3"

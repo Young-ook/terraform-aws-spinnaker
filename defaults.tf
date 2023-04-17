@@ -1,5 +1,9 @@
 ### default values
 
+module "aws" {
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
+}
+
 locals {
   default_kubernetes_node_groups = [
     {
@@ -12,8 +16,8 @@ locals {
   ]
   default_helm_config = {
     name              = "cd"
-    repository        = join("/", [path.module])
-    chart             = "helm-chart"
+    repository        = join("/", [path.module, "charts"])
+    chart             = "spinnaker"
     namespace         = "spinnaker"
     timeout           = "500"
     cleanup_on_fail   = true

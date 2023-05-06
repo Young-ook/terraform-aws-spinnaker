@@ -7,6 +7,7 @@ locals {
 module "ecr" {
   for_each     = toset(local.services)
   source       = "Young-ook/eks/aws//modules/ecr"
+  version      = "2.0.3"
   name         = each.key
   scan_on_push = false
 }

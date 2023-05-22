@@ -1,11 +1,15 @@
-### kubernetes
+### aws partitions
+module "aws" {
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
+}
 
+### kubernetes
 module "eks" {
   source              = "Young-ook/eks/aws"
   version             = "1.7.5"
   name                = local.name
   tags                = var.tags
-  subnets             = aws_subnet.private.*.id
+  subnets             = try(var.subnets, null)
   kubernetes_version  = var.kubernetes_version
   managed_node_groups = var.kubernetes_node_groups == null ? local.default_kubernetes_node_groups : var.kubernetes_node_groups
   enable_ssm          = var.kubernetes_enable_ssm
@@ -20,20 +24,18 @@ module "eks" {
 }
 
 ### aurora
-
 module "rds" {
   source           = "Young-ook/aurora/aws"
   version          = "2.0.0"
   name             = local.name
-  vpc              = aws_vpc.vpc.id
-  subnets          = aws_subnet.private.*.id
-  cidrs            = [aws_vpc.vpc.cidr_block]
+  vpc              = try(var.vpc, null)
+  subnets          = try(var.subnets, null)
+  cidrs            = try(var.cidrs, [])
   aurora_cluster   = var.aurora_cluster
   aurora_instances = var.aurora_instances
 }
 
 ### s3
-
 module "s3" {
   source          = "Young-ook/sagemaker/aws//modules/s3"
   version         = "0.1.0"

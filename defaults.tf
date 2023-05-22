@@ -1,9 +1,5 @@
 ### default values
 
-module "aws" {
-  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
-}
-
 locals {
   default_kubernetes_node_groups = [
     {

@@ -19,11 +19,6 @@ output "bucket" {
   }
 }
 
-output "vpc" {
-  description = "The attributes of the secure vpc"
-  value       = aws_vpc.vpc
-}
-
 output "db_endpoint" {
   description = "The endpoint of aurora mysql cluster"
   value       = module.rds.endpoint

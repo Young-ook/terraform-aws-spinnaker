@@ -49,11 +49,32 @@ provider "helm" {
   }
 }
 
-### helm-addons
-module "helm-addons" {
+### kubernetes-addons
+module "base" {
   depends_on = [module.eks]
   source     = "Young-ook/eks/aws//modules/helm-addons"
-  version    = "2.0.0"
+  version    = "2.0.4"
+  tags       = var.tags
+  addons = [
+    {
+      ### for more details, https://cert-manager.io/docs/installation/helm/
+      repository       = "https://charts.jetstack.io"
+      name             = "cert-manager"
+      chart_name       = "cert-manager"
+      chart_version    = "v1.11.2"
+      namespace        = "cert-manager"
+      create_namespace = true
+      values = {
+        "installCRDs" = "true"
+      }
+    },
+  ]
+}
+
+module "awsctl" {
+  depends_on = [module.base]
+  source     = "Young-ook/eks/aws//modules/helm-addons"
+  version    = "2.0.4"
   tags       = var.tags
   addons = [
     {
@@ -62,9 +83,12 @@ module "helm-addons" {
       chart_name     = "aws-load-balancer-controller"
       namespace      = "kube-system"
       serviceaccount = "aws-load-balancer-controller"
-      values         = { "clusterName" = module.eks.cluster.name }
-      oidc           = module.eks.oidc
-      policy_arns    = [aws_iam_policy.lbc.arn]
+      values = {
+        "clusterName"                 = module.eks.cluster.name
+        "enableServiceMutatorWebhook" = "false"
+      }
+      oidc        = module.eks.oidc
+      policy_arns = [aws_iam_policy.lbc.arn]
     },
     {
       repository     = "https://aws.github.io/eks-charts"

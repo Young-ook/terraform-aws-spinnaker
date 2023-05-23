@@ -36,7 +36,7 @@ module "rds" {
 
 module "s3" {
   source          = "Young-ook/sagemaker/aws//modules/s3"
-  version         = "0.1.0"
+  version         = "0.3.4"
   name            = local.name
   tags            = var.tags
   force_destroy   = lookup(var.s3_bucket, "force_destroy", local.default_s3_bucket_config["force_destroy"])

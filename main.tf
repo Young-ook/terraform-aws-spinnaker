@@ -3,7 +3,7 @@ module "aws" {
   source = "Young-ook/spinnaker/aws//modules/aws-partitions"
 }
 
-### kubernetes
+### application/kubernetes
 module "eks" {
   source              = "Young-ook/eks/aws"
   version             = "1.7.5"
@@ -23,7 +23,7 @@ module "eks" {
   ])
 }
 
-### aurora
+### database/aurora
 module "rds" {
   source           = "Young-ook/aurora/aws"
   version          = "2.0.0"
@@ -35,29 +35,18 @@ module "rds" {
   aurora_instances = var.aurora_instances
 }
 
-### s3
+### staoge/s3
 module "s3" {
   source          = "Young-ook/sagemaker/aws//modules/s3"
   version         = "0.3.4"
   name            = local.name
   tags            = var.tags
-  force_destroy   = lookup(var.s3_bucket, "force_destroy", local.default_s3_bucket_config["force_destroy"])
-  versioning      = lookup(var.s3_bucket, "versioning", local.default_s3_bucket_config["versioning"])
-  lifecycle_rules = lookup(var.s3_bucket, "lifecycle_rules", local.default_s3_bucket_config["lifecycle_rules"])
+  force_destroy   = lookup(var.s3_bucket, "force_destroy", local.default_s3_bucket["force_destroy"])
+  versioning      = lookup(var.s3_bucket, "versioning", local.default_s3_bucket["versioning"])
+  lifecycle_rules = lookup(var.s3_bucket, "lifecycle_rules", local.default_s3_bucket["lifecycle_rules"])
 }
 
-locals {
-  keys = ["front50", "kayenta", "halyard", ]
-}
-
-resource "aws_s3_object" "keys" {
-  for_each = toset(local.keys)
-  bucket   = module.s3.bucket.id
-  key      = format("%s/", each.value)
-  content  = format("%s/", each.value)
-}
-
-# security/policy
+### security/policy
 resource "aws_iam_policy" "rosco-bake" {
   name = format("%s-bake", local.name)
   policy = jsonencode({

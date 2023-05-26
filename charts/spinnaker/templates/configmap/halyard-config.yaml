@@ -35,9 +35,9 @@ data:
   config.sh: |
     # Spinnaker version
     {{ if .Values.halyard.bom }}
-    $HAL_COMMAND config version edit --version local:{{ .Values.halyard.spinnakerVersion }}
+    $HAL_COMMAND config version edit --version local:{{ .Values.spinnaker.version }}
     {{ else }}
-    $HAL_COMMAND config version edit --version {{ .Values.halyard.spinnakerVersion }}
+    $HAL_COMMAND config version edit --version {{ .Values.spinnaker.version }}
     {{ end }}
 
     # Storage
@@ -75,18 +75,6 @@ data:
       {{- end }}
 
     $HAL_COMMAND config storage edit --type s3
-    {{ end }}
-    {{ if .Values.gcs.enabled }}
-    $HAL_COMMAND config storage gcs edit --project {{ .Values.gcs.project }} --json-path /opt/gcs/key.json --bucket {{ .Values.gcs.bucket }}
-    $HAL_COMMAND config storage edit --type gcs
-    {{ end }}
-    {{ if .Values.azs.enabled }}
-    $HAL_COMMAND config storage azs edit --storage-account-name {{ .Values.azs.storageAccountName }} \
-      {{- if .Values.azs.containerName }}
-      --storage-container-name {{ .Values.azs.containerName }} \
-      {{- end }}
-      --storage-account-key "{{ .Values.azs.accessKey }}"
-    $HAL_COMMAND config storage edit --type azs
     {{ end }}
 
     # Docker Registry

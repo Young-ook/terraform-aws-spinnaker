@@ -1,5 +1,6 @@
+spinnaker:
+  version: 1.29.4
 halyard:
-  spinnakerVersion: 1.24.4
   image:
     repository: us-docker.pkg.dev/spinnaker-community/docker/halyard
     tag: stable
@@ -255,31 +256,21 @@ tolerations: []
 # Minio is not exposed publically
 minio:
   enabled: true
-  image:
-    tag: RELEASE.2020-01-03T19-12-21Z
-  service:
-    type: ClusterIP
+  resources:
+    requests:
+      memory: 512Mi
   accessKey: spinnakeradmin
   secretKey: spinnakeradmin
   defaultBucket:
     enabled: true
     name: "spinnaker"
   nodeSelector: {}
+# Use an single replica for deveopment or test
+  replicas: 1
+  mode: standalone
+  persistence:
 # Uncomment if you don't want to create a PVC for minio
-#  persistence:
-#    enabled: false
-
-# Google Cloud Storage
-gcs:
-  enabled: false
-  project: my-project-name
-  bucket: "<GCS-BUCKET-NAME>"
-  ## if jsonKey is set, will create a secret containing it
-  jsonKey: '<INSERT CLOUD STORAGE JSON HERE>'
-  ## override the name of the secret to use for jsonKey, if `jsonKey`
-  ## is empty, it will not create a secret assuming you are creating one
-  ## external to the chart. the key for that secret should be `key.json`.
-  secretName:
+    enabled: false
 
 # AWS Simple Storage Service
 s3:
@@ -294,13 +285,6 @@ s3:
   ## Here you can pass extra arguments to configure s3 storage options
   extraArgs: []
   #  - "--path-style-access true"
-
-# Azure Storage Account
-azs:
-  enabled: false
-#   storageAccountName: ""
-#   accessKey: ""
-#   containerName: "spinnaker"
 
 rbac:
   # Specifies whether RBAC resources should be created

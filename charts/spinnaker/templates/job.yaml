@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-install-using-hal"
+  name: {{ template "spinnaker.fullname" . }}-install
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
   annotations:
@@ -74,15 +74,6 @@ spec:
         configMap:
           name: {{ template "spinnaker.fullname" . }}-halyard-bom
       {{- end }}
-      {{- if .Values.gcs.enabled }}
-      - name: gcs-key
-        secret:
-        {{- if .Values.gcs.secretName }}
-          secretName: {{ .Values.gcs.secretName }}
-        {{- else }}
-          secretName: {{ template "spinnaker.fullname" . }}-gcs
-        {{- end }}
-      {{- end }}
       {{- if and .Values.s3.enabled .Values.s3.accessKey .Values.s3.secretKey }}
       - name: s3-secrets
         secret:
@@ -120,10 +111,6 @@ spec:
         - name: halyard-bom
           mountPath: /opt/halyard/bom
         {{- end }}
-        {{- if .Values.gcs.enabled }}
-        - name: gcs-key
-          mountPath: /opt/gcs
-        {{- end }}
         {{- if and .Values.s3.enabled .Values.s3.accessKey .Values.s3.secretKey }}
         - name: s3-secrets
           mountPath: /opt/s3
@@ -136,3 +123,54 @@ spec:
         - bash
         - -xe
         - "/opt/halyard/scripts/install.sh"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ template "spinnaker.fullname" . }}-cleanup"
+  labels:
+{{ include "spinnaker.standard-labels" . | indent 4 }}
+    component: halyard
+  annotations:
+    "helm.sh/hook": "pre-delete"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  template:
+    metadata:
+    {{- if .Values.halyard.annotations }}
+      annotations:
+{{ toYaml .Values.halyard.annotations | indent 8 }}
+    {{- end }}
+      labels:
+{{ include "spinnaker.standard-labels" . | indent 8 }}
+        component: halyard
+    spec:
+      restartPolicy: OnFailure
+      volumes:
+      - name: halyard-config
+        configMap:
+          name: {{ template "spinnaker.fullname" . }}-halyard-config
+      {{- if .Values.halyard.image.pullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.halyard.image.pullSecrets }}
+        - name: {{ . }}
+        {{- end}}
+      {{- end}}
+      containers:
+      - name: halyard-install
+        image: {{ .Values.halyard.image.repository }}:{{ .Values.halyard.image.tag }}
+        volumeMounts:
+        - name: halyard-config
+          mountPath: /opt/halyard/scripts
+        command:
+        - bash
+        - -xe
+        - "/opt/halyard/scripts/clean.sh"
+    {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if .Values.tolerations }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+    {{- end }}

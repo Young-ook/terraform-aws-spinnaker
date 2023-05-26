@@ -6,6 +6,6 @@ metadata:
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
 data:
-  {{ .Values.halyard.spinnakerVersion }}.yml:
+  {{ .Chart.Version }}.yml:
   {{ .Values.halyard.bom | toYaml | indent 4 }}
 {{- end }}

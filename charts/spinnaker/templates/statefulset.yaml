@@ -82,15 +82,6 @@ spec:
         secret:
           secretName: {{ .Values.kubeConfig.secretName }}
       {{- end }}
-      {{- if .Values.gcs.enabled }}
-      - name: gcs-key
-        secret:
-        {{- if .Values.gcs.secretName }}
-          secretName: {{ .Values.gcs.secretName }}
-        {{- else }}
-          secretName: {{ template "spinnaker.fullname" . }}-gcs
-        {{- end }}
-      {{- end }}
       - name: reg-secrets
         secret:
           {{- if .Values.dockerRegistryAccountSecret }}
@@ -167,10 +158,6 @@ spec:
 {{ toYaml .Values.halyard.resources | indent 10 }}
         {{- end }}
         volumeMounts:
-        {{- if .Values.gcs.enabled }}
-        - name: gcs-key
-          mountPath: /opt/gcs
-        {{- end }}
         {{- if and .Values.s3.enabled .Values.s3.accessKey .Values.s3.secretKey }}
         - name: s3-secrets
           mountPath: /opt/s3

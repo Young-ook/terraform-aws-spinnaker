@@ -4,7 +4,7 @@ locals {
 
 module "vpc" {
   source  = "Young-ook/vpc/aws"
-  version = "1.0.0"
+  version = "1.0.3"
   name    = local.name
   tags    = var.tags
   vpc_config = {

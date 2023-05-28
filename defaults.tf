@@ -1,9 +1,5 @@
 ### default values
 
-module "aws" {
-  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
-}
-
 locals {
   default_kubernetes_node_groups = [
     {
@@ -23,7 +19,7 @@ locals {
     cleanup_on_fail   = true
     dependency_update = true
   }
-  default_s3_bucket_config = {
+  default_s3_bucket = {
     force_destroy   = false
     versioning      = "Enabled"
     lifecycle_rules = null

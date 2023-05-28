@@ -1,20 +1,17 @@
 ### network
-variable "region" {
-  description = "The aws region to deploy the service into"
+variable "vpc" {
+  description = "A VPC Id. for spinnaker"
   type        = string
-  default     = "us-east-1"
 }
 
-variable "azs" {
-  description = "A list of availability zones for the vpc"
+variable "subnets" {
+  description = "A list of subnet IDs for spinnaker"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
-variable "cidr" {
-  description = "The vpc CIDR (e.g. 10.0.0.0/16)"
-  type        = string
-  default     = "10.0.0.0/16"
+variable "cidrs" {
+  description = "The CIDR block to allow database traffic (e.g. 10.0.0.0/16)"
+  type        = list(string)
 }
 
 ### helm

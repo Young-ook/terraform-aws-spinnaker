@@ -61,17 +61,6 @@ variable "enabled_cluster_log_types" {
   default     = []
 }
 
-### rdb cluster (aurora-mysql)
-variable "aurora_cluster" {
-  description = "RDS Aurora for mysql cluster definition"
-  default     = null
-}
-
-variable "aurora_instances" {
-  description = "RDS Aurora for mysql instances definition"
-  default     = []
-}
-
 ### security
 variable "assume_role_arn" {
   description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"

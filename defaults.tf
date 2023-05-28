@@ -23,4 +23,17 @@ locals {
     force_destroy = false
     versioning    = "Enabled"
   }
+  default_aurora_cluster = {
+    engine            = "aurora-mysql"
+    version           = "8.0.mysql_aurora.3.01.0"
+    port              = "3306"
+    apply_immediately = "true"
+    cluster_parameters = {
+      character_set_server = "utf8"
+      character_set_client = "utf8"
+    }
+  }
+  default_aurora_instance = {
+    instance_type = "db.r6g.large"
+  }
 }

@@ -4,7 +4,8 @@ module "aws" {
 }
 
 locals {
-  s3_enabled = try(var.features.s3.enabled, false) ? true : false
+  aurora_enabled = try(var.features.aurora.enabled, false) ? true : false
+  s3_enabled     = try(var.features.s3.enabled, false) ? true : false
   spinnaker_storage = local.s3_enabled ? {
     "minio.enabled" = "false"
     "s3.enabled"    = "true"
@@ -46,14 +47,15 @@ module "eks" {
 
 ### database/aurora
 module "rds" {
+  for_each         = local.aurora_enabled ? toset(["enabled"]) : []
   source           = "Young-ook/aurora/aws"
   version          = "2.0.0"
   name             = local.name
   vpc              = try(var.vpc, null)
   subnets          = try(var.subnets, null)
   cidrs            = try(var.cidrs, [])
-  aurora_cluster   = var.aurora_cluster
-  aurora_instances = var.aurora_instances
+  aurora_cluster   = local.default_aurora_cluster
+  aurora_instances = [local.default_aurora_instance]
 }
 
 ### staoge/s3

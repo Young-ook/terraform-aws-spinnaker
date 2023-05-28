@@ -3,24 +3,45 @@ module "aws" {
   source = "Young-ook/spinnaker/aws//modules/aws-partitions"
 }
 
+locals {
+  s3_enabled = try(var.features.s3.enabled, false) ? true : false
+  spinnaker_storage = local.s3_enabled ? {
+    "minio.enabled" = "false"
+    "s3.enabled"    = "true"
+    "s3.bucket"     = module.s3.bucket.id
+    "s3.region"     = module.aws.region.name
+  } : {}
+}
+
 ### application/kubernetes
 module "eks" {
-  source              = "Young-ook/eks/aws"
-  version             = "1.7.5"
-  name                = local.name
-  tags                = var.tags
-  subnets             = try(var.subnets, null)
-  kubernetes_version  = var.kubernetes_version
-  managed_node_groups = var.kubernetes_node_groups == null ? local.default_kubernetes_node_groups : var.kubernetes_node_groups
-  enable_ssm          = var.kubernetes_enable_ssm
-  policy_arns = flatten([
+  source             = "Young-ook/eks/aws"
+  version            = "1.7.5"
+  name               = local.name
+  tags               = var.tags
+  subnets            = try(var.subnets, null)
+  enable_ssm         = var.kubernetes_enable_ssm
+  kubernetes_version = var.kubernetes_version
+  managed_node_groups = [
+    {
+      name          = "cd"
+      instance_type = "m5.xlarge"
+      min_size      = "1"
+      max_size      = "3"
+      desired_size  = "1"
+    }
+  ]
+  policy_arns = flatten(concat([
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,
     aws_iam_policy.spin-assume.*.arn,
-    module.s3.policy_arns.read,
-    module.s3.policy_arns.write,
     var.kubernetes_policy_arns,
-  ])
+    ],
+    local.s3_enabled ? [
+      module.s3["enabled"].policy_arns.read,
+      module.s3["enabled"].policy_arns.write,
+    ] : []
+  ))
 }
 
 ### database/aurora
@@ -37,13 +58,13 @@ module "rds" {
 
 ### staoge/s3
 module "s3" {
-  source          = "Young-ook/sagemaker/aws//modules/s3"
-  version         = "0.3.4"
-  name            = local.name
-  tags            = var.tags
-  force_destroy   = lookup(var.s3_bucket, "force_destroy", local.default_s3_bucket["force_destroy"])
-  versioning      = lookup(var.s3_bucket, "versioning", local.default_s3_bucket["versioning"])
-  lifecycle_rules = lookup(var.s3_bucket, "lifecycle_rules", local.default_s3_bucket["lifecycle_rules"])
+  for_each      = local.s3_enabled ? toset(["enabled"]) : []
+  source        = "Young-ook/sagemaker/aws//modules/s3"
+  version       = "0.3.4"
+  name          = local.name
+  tags          = var.tags
+  force_destroy = try(var.features.s3.force_destroy, local.default_s3_bucket["force_destroy"])
+  versioning    = try(var.features.s3.versioning, local.default_s3_bucket["versioning"])
 }
 
 ### security/policy
@@ -149,12 +170,7 @@ resource "helm_release" "spinnaker" {
 
   # value block with custom values to be merged with the values yaml
   dynamic "set" {
-    for_each = merge({
-      "minio.enabled" = "false"
-      "s3.enabled"    = "true"
-      "s3.bucket"     = module.s3.bucket.id
-      "s3.region"     = module.aws.region.name
-    }, lookup(var.helm, "vars", {}))
+    for_each = merge(local.spinnaker_storage, lookup(var.helm, "vars", {}))
     content {
       name  = set.key
       value = set.value

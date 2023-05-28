@@ -1,3 +1,19 @@
+### features
+variable "features" {
+  description = "Feature toggles for spinnaker configuration"
+  type        = any
+  default = {
+    aurora = {
+      enabled = false
+    }
+    s3 = {
+      enabled       = false
+      force_destroy = false
+      versioning    = false
+    }
+  }
+}
+
 ### network
 variable "vpc" {
   description = "A VPC Id. for spinnaker"
@@ -27,11 +43,6 @@ variable "kubernetes_version" {
   default     = "1.21"
 }
 
-variable "kubernetes_node_groups" {
-  description = "Node groups definition"
-  default     = null
-}
-
 variable "kubernetes_enable_ssm" {
   description = "Allow ssh access using session manager"
   type        = bool
@@ -59,12 +70,6 @@ variable "aurora_cluster" {
 variable "aurora_instances" {
   description = "RDS Aurora for mysql instances definition"
   default     = []
-}
-
-### s3 bucket
-variable "s3_bucket" {
-  description = "S3 bucket configuration"
-  default     = {}
 }
 
 ### security

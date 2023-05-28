@@ -20,8 +20,7 @@ locals {
     dependency_update = true
   }
   default_s3_bucket = {
-    force_destroy   = false
-    versioning      = "Enabled"
-    lifecycle_rules = null
+    force_destroy = false
+    versioning    = "Enabled"
   }
 }

@@ -15,22 +15,14 @@ locals {
 
 ### application/kubernetes
 module "eks" {
-  source             = "Young-ook/eks/aws"
-  version            = "1.7.5"
-  name               = local.name
-  tags               = var.tags
-  subnets            = try(var.subnets, null)
-  enable_ssm         = var.kubernetes_enable_ssm
-  kubernetes_version = var.kubernetes_version
-  managed_node_groups = [
-    {
-      name          = "cd"
-      instance_type = "m5.xlarge"
-      min_size      = "1"
-      max_size      = "3"
-      desired_size  = "1"
-    }
-  ]
+  source              = "Young-ook/eks/aws"
+  version             = "1.7.5"
+  name                = local.name
+  tags                = var.tags
+  subnets             = try(var.subnets, null)
+  enable_ssm          = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
+  managed_node_groups = [local.default_eks_node_group]
   policy_arns = flatten(concat([
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,

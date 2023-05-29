@@ -20,3 +20,12 @@ output "halconfig" {
     "kubectl -n spinnaker exec -it ${local.halyard_pod} -- bash",
   ])
 }
+
+output "features" {
+  description = "Feature configurations of spinnaker"
+  value = {
+    "aurora_enabled" = local.aurora_enabled
+    "s3_enabled"     = local.s3_enabled
+    "ssm_enabled"    = local.ssm_enabled
+  }
+}

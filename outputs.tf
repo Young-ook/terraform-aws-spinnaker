@@ -6,22 +6,18 @@ output "eks" {
 }
 
 output "role" {
-  description = "The generated role of spinnaker"
+  description = "The IAM role for Spinnaker"
   value       = module.eks.role
 }
 
 output "bucket" {
-  description = "The attributes of generated buckets"
-  value = {
-    spinnaker = {
-      name = module.s3.bucket.id
-    }
-  }
+  description = "The S3 bucket attributes"
+  value       = local.s3_enabled ? module.s3["enabled"].bucket.id : null
 }
 
 output "db_endpoint" {
   description = "The endpoint of aurora mysql cluster"
-  value       = module.rds.endpoint
+  value       = local.aurora_enabled ? module.rds["enabled"].endpoint : null
 }
 
 output "kubeconfig" {

@@ -17,7 +17,7 @@ output "bucket" {
 
 output "db_endpoint" {
   description = "The endpoint of aurora mysql cluster"
-  value       = module.rds.endpoint
+  value       = local.aurora_enabled ? module.rds["enabled"].endpoint : null
 }
 
 output "kubeconfig" {

@@ -1,4 +1,9 @@
-# output variables 
+### output variables
+
+output "role" {
+  description = "The IAM role for Spinnaker"
+  value       = module.eks.role
+}
 
 locals {
   helm_chart_name   = helm_release.spinnaker.chart

@@ -57,10 +57,6 @@ spec:
           mountPath: /tmp/spinnaker
         - name: additional-profile-config-maps
           mountPath: /tmp/additionalProfileConfigMaps
-        {{- if .Values.halyard.bom }}
-        - name: halyard-bom
-          mountPath: /tmp/halyard-bom
-        {{- end }}
         - name: halyard-initscript
           mountPath: /tmp/initscript
         {{- if .Values.halyard.customCerts.enabled }}
@@ -81,15 +77,6 @@ spec:
       - name: kube-config
         secret:
           secretName: {{ .Values.kubeConfig.secretName }}
-      {{- end }}
-      {{- if .Values.gcs.enabled }}
-      - name: gcs-key
-        secret:
-        {{- if .Values.gcs.secretName }}
-          secretName: {{ .Values.gcs.secretName }}
-        {{- else }}
-          secretName: {{ template "spinnaker.fullname" . }}-gcs
-        {{- end }}
       {{- end }}
       - name: reg-secrets
         secret:
@@ -124,11 +111,6 @@ spec:
       - name: additional-profile-config-maps
         configMap:
           name: {{ template "spinnaker.fullname" . }}-additional-profile-config-maps
-      {{- if .Values.halyard.bom }}
-      - name: halyard-bom
-        configMap:
-          name: {{ template "spinnaker.fullname" . }}-halyard-bom
-      {{- end }}
       - name: halyard-config
         emptyDir: {}
       - name: service-settings
@@ -167,10 +149,6 @@ spec:
 {{ toYaml .Values.halyard.resources | indent 10 }}
         {{- end }}
         volumeMounts:
-        {{- if .Values.gcs.enabled }}
-        - name: gcs-key
-          mountPath: /opt/gcs
-        {{- end }}
         {{- if and .Values.s3.enabled .Values.s3.accessKey .Values.s3.secretKey }}
         - name: s3-secrets
           mountPath: /opt/s3

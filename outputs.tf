@@ -1,28 +1,22 @@
 # output variables 
 
-output "eks" {
-  description = "The EKS cluster attributes"
-  value       = module.eks.cluster
+locals {
+  helm_chart_name   = helm_release.spinnaker.chart
+  helm_release_name = helm_release.spinnaker.name
+  halyard_pod = (
+    local.helm_chart_name == local.helm_release_name ? (
+      join("-", [local.helm_chart_name, "halyard-0"])
+      ) : (
+      join("-", [local.helm_release_name, local.helm_chart_name, "halyard-0"])
+    )
+  )
 }
 
-output "role" {
-  description = "The IAM role for Spinnaker"
-  value       = module.eks.role
-}
-
-output "bucket" {
-  description = "The S3 bucket attributes"
-  value       = local.s3_enabled ? module.s3["enabled"].bucket.id : null
-}
-
-output "db_endpoint" {
-  description = "The endpoint of aurora mysql cluster"
-  value       = local.aurora_enabled ? module.rds["enabled"].endpoint : null
-}
-
-output "kubeconfig" {
-  description = "Bash script to update kubeconfig file"
-  value = join(" ", [
+output "halconfig" {
+  description = "Bash command to access halyard in interactive mode"
+  value = join("\n", [
     module.eks.kubeconfig,
+    "export KUBECONFIG=kubeconfig",
+    "kubectl -n spinnaker exec -it ${local.halyard_pod} -- bash",
   ])
 }

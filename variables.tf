@@ -6,6 +6,10 @@ variable "features" {
     aurora = {
       enabled = false
     }
+    eks = {
+      version     = "1.24"
+      ssm_enabled = false
+    }
     s3 = {
       enabled       = false
       force_destroy = false
@@ -34,19 +38,6 @@ variable "cidrs" {
 variable "helm" {
   description = "The helm chart configuration"
   default     = {}
-}
-
-### kubernetes cluster
-variable "kubernetes_version" {
-  description = "The target version of kubernetes"
-  type        = string
-  default     = "1.21"
-}
-
-variable "kubernetes_enable_ssm" {
-  description = "Allow ssh access using session manager"
-  type        = bool
-  default     = false
 }
 
 variable "kubernetes_policy_arns" {

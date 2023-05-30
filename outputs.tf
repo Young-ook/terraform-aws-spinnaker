@@ -19,10 +19,13 @@ locals {
 
 output "halconfig" {
   description = "Bash command to access halyard in interactive mode"
-  value = join("\n", [
-    module.eks.kubeconfig,
-    "export KUBECONFIG=kubeconfig",
-    "kubectl -n spinnaker exec -it ${local.halyard_pod} -- bash",
+  value = join(" ", [
+    "bash -e",
+    format("%s/scripts/halconfig.sh", path.module),
+    format("-r %s", module.aws.region.name),
+    format("-n %s", module.eks.cluster.name),
+    format("-p %s", local.halyard_pod),
+    "-k kubeconfig",
   ])
 }
 

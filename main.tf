@@ -6,6 +6,7 @@ module "aws" {
 locals {
   aurora_enabled = try(var.features.aurora.enabled, false) ? true : false
   s3_enabled     = try(var.features.s3.enabled, false) ? true : false
+  ssm_enabled    = try(var.features.eks.ssm_enabled, false) ? true : false
   spinnaker_storage = local.s3_enabled ? {
     "minio.enabled" = "false"
     "s3.enabled"    = "true"

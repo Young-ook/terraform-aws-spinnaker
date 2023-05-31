@@ -10,7 +10,7 @@ locals {
   spinnaker_storage = local.s3_enabled ? {
     "minio.enabled" = "false"
     "s3.enabled"    = "true"
-    "s3.bucket"     = module.s3.bucket.id
+    "s3.bucket"     = module.s3["enabled"].bucket.id
     "s3.region"     = module.aws.region.name
   } : {}
 }

@@ -139,8 +139,7 @@ resource "aws_iam_policy" "spin-assume" {
   })
 }
 
-### helming!!!
-
+### kubernetes-addons
 provider "helm" {
   alias = "spinnaker"
   kubernetes {
@@ -150,9 +149,9 @@ provider "helm" {
   }
 }
 
-### helm-addons
 module "helm" {
   depends_on = [module.eks]
+  providers  = { helm = helm.spinnaker }
   source     = "Young-ook/eks/aws//modules/helm-addons"
   version    = "2.0.4"
   tags       = merge(var.tags, local.default-tags)
@@ -167,7 +166,15 @@ module "helm" {
       dependency_update = local.default_helm["dependency_update"]
       cleanup_on_fail   = local.default_helm["cleanup_on_fail"]
       create_namespace  = true
-      values            = local.spinnaker_storage
+      values = merge(
+        local.spinnaker_storage,
+        {
+          "spinnaker.version"  = "1.30.0"
+          "halyard.image.tag"  = "1.44.0"
+          "minio.enabled"      = local.s3_enabled ? "false" : "true"
+          "minio.rootUser"     = "spinnakeradmin"
+          "minio.rootPassword" = "spinnakeradmin"
+      })
     },
   ]
 }

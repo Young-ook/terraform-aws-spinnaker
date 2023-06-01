@@ -2,7 +2,7 @@
 
 output "role" {
   description = "The IAM role for Spinnaker"
-  value       = module.eks.role
+  value       = module.eks.role.managed_node_groups
 }
 
 locals {

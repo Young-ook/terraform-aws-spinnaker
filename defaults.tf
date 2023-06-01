@@ -28,6 +28,7 @@ locals {
   }
   default_aurora_cluster = {
     engine            = "aurora-mysql"
+    family            = "aurora-mysql8.0"
     version           = "8.0.mysql_aurora.3.01.0"
     port              = "3306"
     apply_immediately = "true"

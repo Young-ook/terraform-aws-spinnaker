@@ -18,9 +18,9 @@ locals {
 ### application/kubernetes
 module "eks" {
   source              = "Young-ook/eks/aws"
-  version             = "1.7.5"
+  version             = "2.0.4"
   name                = local.name
-  tags                = var.tags
+  tags                = merge(var.tags, local.default-tags)
   subnets             = try(var.subnets, null)
   enable_ssm          = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
   kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
@@ -144,9 +144,9 @@ resource "aws_iam_policy" "spin-assume" {
 provider "helm" {
   alias = "spinnaker"
   kubernetes {
-    host                   = module.eks.helmconfig.host
-    token                  = module.eks.helmconfig.token
-    cluster_ca_certificate = base64decode(module.eks.helmconfig.ca)
+    host                   = module.eks.kubeauth.host
+    token                  = module.eks.kubeauth.token
+    cluster_ca_certificate = module.eks.kubeauth.ca
   }
 }
 

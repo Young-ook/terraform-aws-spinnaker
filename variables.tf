@@ -34,12 +34,6 @@ variable "cidrs" {
   type        = list(string)
 }
 
-### helm
-variable "helm" {
-  description = "The helm chart configuration"
-  default     = {}
-}
-
 variable "kubernetes_policy_arns" {
   description = "A list of policy ARNs to attach the node groups role"
   type        = list(string)

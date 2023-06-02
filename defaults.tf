@@ -1,6 +1,16 @@
 ### default values
 
 locals {
+  default_helm = {
+    name              = "spinnaker"
+    repository        = join("/", [path.module, "charts"])
+    chart_name        = "spinnaker"
+    chart_version     = null
+    namespace         = "spinnaker"
+    timeout           = "500"
+    cleanup_on_fail   = true
+    dependency_update = true
+  }
   default_eks_cluster = {
     version     = "1.24"
     ssm_enabled = false
@@ -11,15 +21,6 @@ locals {
     min_size      = "1"
     max_size      = "3"
     desired_size  = "1"
-  }
-  default_helm_config = {
-    name              = "cd"
-    repository        = join("/", [path.module, "charts"])
-    chart             = "spinnaker"
-    namespace         = "spinnaker"
-    timeout           = "500"
-    cleanup_on_fail   = true
-    dependency_update = true
   }
   default_s3_bucket = {
     force_destroy = false

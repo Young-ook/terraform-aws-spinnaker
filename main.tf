@@ -10,7 +10,7 @@ locals {
   spinnaker_storage = local.s3_enabled ? {
     "minio.enabled" = "false"
     "s3.enabled"    = "true"
-    "s3.bucket"     = module.s3.bucket.id
+    "s3.bucket"     = module.s3["enabled"].bucket.id
     "s3.region"     = module.aws.region.name
   } : {}
 }
@@ -139,8 +139,7 @@ resource "aws_iam_policy" "spin-assume" {
   })
 }
 
-### helming!!!
-
+### kubernetes-addons
 provider "helm" {
   alias = "spinnaker"
   kubernetes {
@@ -150,25 +149,32 @@ provider "helm" {
   }
 }
 
-resource "helm_release" "spinnaker" {
-  depends_on        = [module.eks]
-  provider          = helm.spinnaker
-  name              = lookup(var.helm, "name", local.default_helm_config["name"])
-  chart             = lookup(var.helm, "chart", local.default_helm_config["chart"])
-  repository        = lookup(var.helm, "repository", local.default_helm_config["repository"])
-  namespace         = lookup(var.helm, "namespace", local.default_helm_config["namespace"])
-  timeout           = lookup(var.helm, "timeout", local.default_helm_config["timeout"])
-  version           = lookup(var.helm, "version", null)
-  dependency_update = lookup(var.helm, "dependency_update", local.default_helm_config["dependency_update"])
-  cleanup_on_fail   = lookup(var.helm, "cleanup_on_fail", local.default_helm_config["cleanup_on_fail"])
-  create_namespace  = true
-
-  # value block with custom values to be merged with the values yaml
-  dynamic "set" {
-    for_each = merge(local.spinnaker_storage, lookup(var.helm, "vars", {}))
-    content {
-      name  = set.key
-      value = set.value
-    }
-  }
+module "helm" {
+  depends_on = [module.eks]
+  providers  = { helm = helm.spinnaker }
+  source     = "Young-ook/eks/aws//modules/helm-addons"
+  version    = "2.0.4"
+  tags       = merge(var.tags, local.default-tags)
+  addons = [
+    {
+      repository        = local.default_helm["repository"]
+      name              = local.default_helm["name"]
+      chart_name        = local.default_helm["chart_name"]
+      chart_version     = local.default_helm["chart_version"]
+      namespace         = local.default_helm["namespace"]
+      timeout           = local.default_helm["timeout"]
+      dependency_update = local.default_helm["dependency_update"]
+      cleanup_on_fail   = local.default_helm["cleanup_on_fail"]
+      create_namespace  = true
+      values = merge(
+        local.spinnaker_storage,
+        {
+          "spinnaker.version"  = "1.30.0"
+          "halyard.image.tag"  = "1.44.0"
+          "minio.enabled"      = local.s3_enabled ? "false" : "true"
+          "minio.rootUser"     = "spinnakeradmin"
+          "minio.rootPassword" = "spinnakeradmin"
+      })
+    },
+  ]
 }

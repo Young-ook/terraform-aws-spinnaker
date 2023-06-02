@@ -63,19 +63,7 @@ variable "assume_role_arn" {
 variable "name" {
   description = "The logical name of the module instance"
   type        = string
-  default     = "spinnaker"
-}
-
-variable "stack" {
-  description = "Text used to identify stack of infrastructure components"
-  type        = string
-  default     = ""
-}
-
-variable "detail" {
-  description = "The extra description of module instance"
-  type        = string
-  default     = ""
+  default     = null
 }
 
 ### tags

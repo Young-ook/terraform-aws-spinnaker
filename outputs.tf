@@ -2,12 +2,12 @@
 
 output "role" {
   description = "The IAM role for Spinnaker"
-  value       = module.eks.role
+  value       = module.eks.role.managed_node_groups
 }
 
 locals {
-  helm_chart_name   = helm_release.spinnaker.chart
-  helm_release_name = helm_release.spinnaker.name
+  helm_chart_name   = nonsensitive(module.helm.addons.chart["spinnaker"].chart)
+  helm_release_name = nonsensitive(module.helm.addons.chart["spinnaker"].name)
   halyard_pod = (
     local.helm_chart_name == local.helm_release_name ? (
       join("-", [local.helm_chart_name, "halyard-0"])

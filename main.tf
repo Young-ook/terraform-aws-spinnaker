@@ -17,12 +17,14 @@ locals {
 
 ### application/kubernetes
 module "eks" {
-  source              = "Young-ook/eks/aws"
-  version             = "2.0.4"
-  name                = local.name
-  tags                = merge(var.tags, local.default-tags)
-  subnets             = try(var.subnets, null)
-  enable_ssm          = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  source                    = "Young-ook/eks/aws"
+  version                   = "2.0.4"
+  name                      = local.name
+  tags                      = merge(var.tags, local.default-tags)
+  subnets                   = try(var.subnets, null)
+  enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
+
   kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
   managed_node_groups = [local.default_eks_node_group]
   policy_arns = flatten(concat([

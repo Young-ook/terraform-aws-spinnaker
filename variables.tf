@@ -9,8 +9,9 @@ variable "features" {
       enabled = false
     }
     eks = {
-      version     = "1.24"
-      ssm_enabled = false
+      version      = "1.24"
+      ssm_enabled  = false
+      cluster_logs = []
     }
     s3 = {
       enabled       = false
@@ -34,12 +35,6 @@ variable "subnets" {
 variable "cidrs" {
   description = "The CIDR block to allow database traffic (e.g. 10.0.0.0/16)"
   type        = list(string)
-}
-
-variable "enabled_cluster_log_types" {
-  description = "A list of the desired control plane logging to enable"
-  type        = list(string)
-  default     = []
 }
 
 ### security

@@ -1,3 +1,5 @@
+### input variables
+
 ### features
 variable "features" {
   description = "Feature toggles for spinnaker configuration"
@@ -32,12 +34,6 @@ variable "subnets" {
 variable "cidrs" {
   description = "The CIDR block to allow database traffic (e.g. 10.0.0.0/16)"
   type        = list(string)
-}
-
-variable "kubernetes_policy_arns" {
-  description = "A list of policy ARNs to attach the node groups role"
-  type        = list(string)
-  default     = []
 }
 
 variable "enabled_cluster_log_types" {

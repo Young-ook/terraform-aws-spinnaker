@@ -29,7 +29,6 @@ module "eks" {
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,
     aws_iam_policy.spin-assume.*.arn,
-    var.kubernetes_policy_arns,
     ],
     local.s3_enabled ? [
       module.s3["enabled"].policy_arns.read,

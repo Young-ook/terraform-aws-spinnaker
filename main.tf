@@ -170,8 +170,6 @@ module "helm" {
       values = merge(
         local.spinnaker_storage,
         {
-          "spinnaker.version"  = "1.30.0"
-          "halyard.image.tag"  = "1.44.0"
           "minio.enabled"      = local.s3_enabled ? "false" : "true"
           "minio.rootUser"     = "spinnakeradmin"
           "minio.rootPassword" = "spinnakeradmin"

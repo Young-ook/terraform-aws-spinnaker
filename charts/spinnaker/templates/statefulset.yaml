@@ -22,9 +22,9 @@ spec:
         component: halyard
     spec:
       {{- if .Values.serviceAccount.halyardName }}
-      serviceAccountName: {{ .Values.serviceAccount.halyardName }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       {{- else }}
-      serviceAccountName: {{ template "spinnaker.fullname" . }}-halyard
+      serviceAccountName: {{ template "spinnaker.fullname" . }}
       {{- end }}
       securityContext:
         runAsUser: {{ .Values.securityContext.runAsUser }}

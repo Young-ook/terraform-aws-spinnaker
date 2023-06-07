@@ -10,26 +10,26 @@ locals {
   spinnaker_storage = local.s3_enabled ? {
     "minio.enabled" = "false"
     "s3.enabled"    = "true"
-    "s3.bucket"     = module.s3.bucket.id
+    "s3.bucket"     = module.s3["enabled"].bucket.id
     "s3.region"     = module.aws.region.name
   } : {}
 }
 
 ### application/kubernetes
 module "eks" {
-  source              = "Young-ook/eks/aws"
-  version             = "1.7.5"
-  name                = local.name
-  tags                = var.tags
-  subnets             = try(var.subnets, null)
-  enable_ssm          = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  source                    = "Young-ook/eks/aws"
+  version                   = "2.0.4"
+  name                      = local.name
+  tags                      = merge(var.tags, local.default-tags)
+  subnets                   = try(var.features.vpc.subnets, [])
+  enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
   kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
   managed_node_groups = [local.default_eks_node_group]
   policy_arns = flatten(concat([
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,
     aws_iam_policy.spin-assume.*.arn,
-    var.kubernetes_policy_arns,
     ],
     local.s3_enabled ? [
       module.s3["enabled"].policy_arns.read,
@@ -44,9 +44,9 @@ module "rds" {
   source           = "Young-ook/aurora/aws"
   version          = "2.0.0"
   name             = local.name
-  vpc              = try(var.vpc, null)
-  subnets          = try(var.subnets, null)
-  cidrs            = try(var.cidrs, [])
+  vpc              = try(var.features.vpc.id, null)
+  subnets          = try(var.features.vpc.subnets, [])
+  cidrs            = try(var.features.vpc.cidrs, [])
   aurora_cluster   = local.default_aurora_cluster
   aurora_instances = [local.default_aurora_instance]
 }
@@ -139,36 +139,40 @@ resource "aws_iam_policy" "spin-assume" {
   })
 }
 
-### helming!!!
-
+### kubernetes-addons
 provider "helm" {
   alias = "spinnaker"
   kubernetes {
-    host                   = module.eks.helmconfig.host
-    token                  = module.eks.helmconfig.token
-    cluster_ca_certificate = base64decode(module.eks.helmconfig.ca)
+    host                   = module.eks.kubeauth.host
+    token                  = module.eks.kubeauth.token
+    cluster_ca_certificate = module.eks.kubeauth.ca
   }
 }
 
-resource "helm_release" "spinnaker" {
-  depends_on        = [module.eks]
-  provider          = helm.spinnaker
-  name              = lookup(var.helm, "name", local.default_helm_config["name"])
-  chart             = lookup(var.helm, "chart", local.default_helm_config["chart"])
-  repository        = lookup(var.helm, "repository", local.default_helm_config["repository"])
-  namespace         = lookup(var.helm, "namespace", local.default_helm_config["namespace"])
-  timeout           = lookup(var.helm, "timeout", local.default_helm_config["timeout"])
-  version           = lookup(var.helm, "version", null)
-  dependency_update = lookup(var.helm, "dependency_update", local.default_helm_config["dependency_update"])
-  cleanup_on_fail   = lookup(var.helm, "cleanup_on_fail", local.default_helm_config["cleanup_on_fail"])
-  create_namespace  = true
-
-  # value block with custom values to be merged with the values yaml
-  dynamic "set" {
-    for_each = merge(local.spinnaker_storage, lookup(var.helm, "vars", {}))
-    content {
-      name  = set.key
-      value = set.value
-    }
-  }
+module "helm" {
+  depends_on = [module.eks]
+  providers  = { helm = helm.spinnaker }
+  source     = "Young-ook/eks/aws//modules/helm-addons"
+  version    = "2.0.4"
+  tags       = merge(var.tags, local.default-tags)
+  addons = [
+    {
+      repository        = local.default_helm["repository"]
+      name              = local.default_helm["name"]
+      chart_name        = local.default_helm["chart_name"]
+      chart_version     = local.default_helm["chart_version"]
+      namespace         = local.default_helm["namespace"]
+      timeout           = local.default_helm["timeout"]
+      dependency_update = local.default_helm["dependency_update"]
+      cleanup_on_fail   = local.default_helm["cleanup_on_fail"]
+      create_namespace  = true
+      values = merge(
+        local.spinnaker_storage,
+        {
+          "minio.enabled"      = local.s3_enabled ? "false" : "true"
+          "minio.rootUser"     = "spinnakeradmin"
+          "minio.rootPassword" = "spinnakeradmin"
+      })
+    },
+  ]
 }

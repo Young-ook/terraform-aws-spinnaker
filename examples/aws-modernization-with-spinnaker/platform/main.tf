@@ -51,7 +51,7 @@ module "ci" {
 # artifact bucket
 module "artifact" {
   source        = "Young-ook/sagemaker/aws//modules/s3"
-  version       = "0.0.8"
+  version       = "0.3.4"
   name          = join("-", ["artifact", var.name])
   tags          = var.tags
   force_destroy = true

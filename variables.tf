@@ -18,23 +18,12 @@ variable "features" {
       force_destroy = false
       versioning    = false
     }
+    vpc = {
+      id      = null
+      cidrs   = []
+      subnets = []
+    }
   }
-}
-
-### network
-variable "vpc" {
-  description = "A VPC Id. for spinnaker"
-  type        = string
-}
-
-variable "subnets" {
-  description = "A list of subnet IDs for spinnaker"
-  type        = list(string)
-}
-
-variable "cidrs" {
-  description = "The CIDR block to allow database traffic (e.g. 10.0.0.0/16)"
-  type        = list(string)
 }
 
 ### security

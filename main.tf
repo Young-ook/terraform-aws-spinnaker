@@ -21,10 +21,9 @@ module "eks" {
   version                   = "2.0.4"
   name                      = local.name
   tags                      = merge(var.tags, local.default-tags)
-  subnets                   = try(var.subnets, null)
+  subnets                   = try(var.features.vpc.subnets, [])
   enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
   enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
-
   kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
   managed_node_groups = [local.default_eks_node_group]
   policy_arns = flatten(concat([
@@ -45,9 +44,9 @@ module "rds" {
   source           = "Young-ook/aurora/aws"
   version          = "2.0.0"
   name             = local.name
-  vpc              = try(var.vpc, null)
-  subnets          = try(var.subnets, null)
-  cidrs            = try(var.cidrs, [])
+  vpc              = try(var.features.vpc.id, null)
+  subnets          = try(var.features.vpc.subnets, [])
+  cidrs            = try(var.features.vpc.cidrs, [])
   aurora_cluster   = local.default_aurora_cluster
   aurora_instances = [local.default_aurora_instance]
 }

@@ -12,8 +12,9 @@ locals {
     dependency_update = true
   }
   default_eks_cluster = {
-    version     = "1.24"
-    ssm_enabled = false
+    version      = "1.24"
+    ssm_enabled  = false
+    cluster_logs = []
   }
   default_eks_node_group = {
     name          = "cd"

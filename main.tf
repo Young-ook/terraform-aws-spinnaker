@@ -17,19 +17,19 @@ locals {
 
 ### application/kubernetes
 module "eks" {
-  source              = "Young-ook/eks/aws"
-  version             = "2.0.4"
-  name                = local.name
-  tags                = merge(var.tags, local.default-tags)
-  subnets             = try(var.features.vpc.subnets, [])
-  enable_ssm          = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  source                    = "Young-ook/eks/aws"
+  version                   = "2.0.4"
+  name                      = local.name
+  tags                      = merge(var.tags, local.default-tags)
+  subnets                   = try(var.features.vpc.subnets, [])
+  enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
   kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
   managed_node_groups = [local.default_eks_node_group]
   policy_arns = flatten(concat([
     aws_iam_policy.ec2-read.arn,
     aws_iam_policy.rosco-bake.arn,
     aws_iam_policy.spin-assume.*.arn,
-    var.kubernetes_policy_arns,
     ],
     local.s3_enabled ? [
       module.s3["enabled"].policy_arns.read,
@@ -169,8 +169,6 @@ module "helm" {
       values = merge(
         local.spinnaker_storage,
         {
-          "spinnaker.version"  = "1.30.0"
-          "halyard.image.tag"  = "1.44.0"
           "minio.enabled"      = local.s3_enabled ? "false" : "true"
           "minio.rootUser"     = "spinnakeradmin"
           "minio.rootPassword" = "spinnakeradmin"

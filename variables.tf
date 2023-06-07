@@ -1,3 +1,5 @@
+### input variables
+
 ### features
 variable "features" {
   description = "Feature toggles for spinnaker configuration"
@@ -7,8 +9,9 @@ variable "features" {
       enabled = false
     }
     eks = {
-      version     = "1.24"
-      ssm_enabled = false
+      version      = "1.24"
+      ssm_enabled  = false
+      cluster_logs = []
     }
     s3 = {
       enabled       = false
@@ -23,24 +26,6 @@ variable "features" {
   }
 }
 
-### helm
-variable "helm" {
-  description = "The helm chart configuration"
-  default     = {}
-}
-
-variable "kubernetes_policy_arns" {
-  description = "A list of policy ARNs to attach the node groups role"
-  type        = list(string)
-  default     = []
-}
-
-variable "enabled_cluster_log_types" {
-  description = "A list of the desired control plane logging to enable"
-  type        = list(string)
-  default     = []
-}
-
 ### security
 variable "assume_role_arn" {
   description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
@@ -52,19 +37,7 @@ variable "assume_role_arn" {
 variable "name" {
   description = "The logical name of the module instance"
   type        = string
-  default     = "spinnaker"
-}
-
-variable "stack" {
-  description = "Text used to identify stack of infrastructure components"
-  type        = string
-  default     = ""
-}
-
-variable "detail" {
-  description = "The extra description of module instance"
-  type        = string
-  default     = ""
+  default     = null
 }
 
 ### tags

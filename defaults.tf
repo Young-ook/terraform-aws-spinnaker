@@ -22,6 +22,9 @@ locals {
     min_size      = "1"
     max_size      = "3"
     desired_size  = "1"
+    ### A list of ARNs of spinnaker-managed IAM role
+    ### This is an example: (arn:aws:iam::12345678987:role/spinnakerManaged)
+    role_arns = []
   }
   default_s3_bucket = {
     force_destroy = false

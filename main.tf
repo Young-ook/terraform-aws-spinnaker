@@ -15,53 +15,6 @@ locals {
   } : {}
 }
 
-### application/kubernetes
-module "eks" {
-  source                    = "Young-ook/eks/aws"
-  version                   = "2.0.4"
-  name                      = local.name
-  tags                      = merge(var.tags, local.default-tags)
-  subnets                   = try(var.features.vpc.subnets, [])
-  enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
-  enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
-  kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
-  managed_node_groups = [local.default_eks_node_group]
-  policy_arns = flatten(concat([
-    aws_iam_policy.ec2-read.arn,
-    aws_iam_policy.rosco-bake.arn,
-    aws_iam_policy.spin-assume.*.arn,
-    ],
-    local.s3_enabled ? [
-      module.s3["enabled"].policy_arns.read,
-      module.s3["enabled"].policy_arns.write,
-    ] : []
-  ))
-}
-
-### database/aurora
-module "rds" {
-  for_each         = local.aurora_enabled ? toset(["enabled"]) : []
-  source           = "Young-ook/aurora/aws"
-  version          = "2.0.0"
-  name             = local.name
-  vpc              = try(var.features.vpc.id, null)
-  subnets          = try(var.features.vpc.subnets, [])
-  cidrs            = try(var.features.vpc.cidrs, [])
-  aurora_cluster   = local.default_aurora_cluster
-  aurora_instances = [local.default_aurora_instance]
-}
-
-### staoge/s3
-module "s3" {
-  for_each      = local.s3_enabled ? toset(["enabled"]) : []
-  source        = "Young-ook/sagemaker/aws//modules/s3"
-  version       = "0.3.4"
-  name          = local.name
-  tags          = var.tags
-  force_destroy = try(var.features.s3.force_destroy, local.default_s3_bucket["force_destroy"])
-  versioning    = try(var.features.s3.versioning, local.default_s3_bucket["versioning"])
-}
-
 ### security/policy
 resource "aws_iam_policy" "rosco-bake" {
   name = format("%s-bake", local.name)
@@ -113,6 +66,7 @@ resource "aws_iam_policy" "rosco-bake" {
   })
 }
 
+### security/policy
 resource "aws_iam_policy" "ec2-read" {
   name = format("%s-ec2-read", local.name)
   policy = jsonencode({
@@ -125,18 +79,68 @@ resource "aws_iam_policy" "ec2-read" {
   })
 }
 
-# assume to cross account spinnaker-managed role
+### security/policy
+### Allow spinnaker to assume cross AWS account iam roles
 resource "aws_iam_policy" "spin-assume" {
-  count = var.assume_role_arn != null ? ((length(var.assume_role_arn) > 0) ? 1 : 0) : 0
-  name  = format("%s-assume", local.name)
+  name = join("-", [local.name, "assume"])
   policy = jsonencode({
-    Statement = [{
-      Action   = "sts:AssumeRole"
-      Effect   = "Allow"
-      Resource = var.assume_role_arn
-    }]
     Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Resource = flatten([
+        module.aws.caller.account_id,
+        try(var.features.eks.role_arns, []),
+      ])
+    }]
   })
+}
+
+### application/kubernetes
+module "eks" {
+  source                    = "Young-ook/eks/aws"
+  version                   = "2.0.4"
+  name                      = local.name
+  tags                      = merge(var.tags, local.default-tags)
+  subnets                   = try(var.features.vpc.subnets, [])
+  enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
+  enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
+  kubernetes_version        = try(var.features.eks.version, local.default_eks_cluster["version"])
+  managed_node_groups       = [local.default_eks_node_group]
+  policy_arns = flatten(concat([
+    aws_iam_policy.ec2-read.arn,
+    aws_iam_policy.rosco-bake.arn,
+    aws_iam_policy.spin-assume.arn,
+    ],
+    local.s3_enabled ? [
+      module.s3["enabled"].policy_arns.read,
+      module.s3["enabled"].policy_arns.write,
+    ] : []
+  ))
+}
+
+### database/aurora
+module "rds" {
+  for_each         = local.aurora_enabled ? toset(["enabled"]) : []
+  source           = "Young-ook/aurora/aws"
+  version          = "2.0.0"
+  name             = local.name
+  vpc              = try(var.features.vpc.id, null)
+  subnets          = try(var.features.vpc.subnets, [])
+  cidrs            = try(var.features.vpc.cidrs, [])
+  aurora_cluster   = local.default_aurora_cluster
+  aurora_instances = [local.default_aurora_instance]
+}
+
+### staoge/s3
+module "s3" {
+  for_each      = local.s3_enabled ? toset(["enabled"]) : []
+  source        = "Young-ook/sagemaker/aws//modules/s3"
+  version       = "0.3.4"
+  name          = local.name
+  tags          = var.tags
+  force_destroy = try(var.features.s3.force_destroy, local.default_s3_bucket["force_destroy"])
+  versioning    = try(var.features.s3.versioning, local.default_s3_bucket["versioning"])
 }
 
 ### kubernetes-addons

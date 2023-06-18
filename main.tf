@@ -16,9 +16,10 @@ locals {
 }
 
 ### security/policy
-resource "aws_iam_policy" "rosco-bake" {
-  name = format("%s-bake", local.name)
+resource "aws_iam_policy" "bake-ami" {
+  name = join("-", [local.name, "bake-ami"])
   policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [{
       Action = [
         "iam:PassRole",
@@ -62,7 +63,6 @@ resource "aws_iam_policy" "rosco-bake" {
       Effect   = "Allow"
       Resource = ["*"]
     }]
-    Version = "2012-10-17"
   })
 }
 
@@ -81,7 +81,7 @@ resource "aws_iam_policy" "ec2-read" {
 
 ### security/policy
 ### Allow spinnaker to assume cross AWS account iam roles
-resource "aws_iam_policy" "spin-assume" {
+resource "aws_iam_policy" "assume-roles" {
   name = join("-", [local.name, "assume"])
   policy = jsonencode({
     Version = "2012-10-17"
@@ -89,11 +89,28 @@ resource "aws_iam_policy" "spin-assume" {
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Resource = flatten([
-        module.aws.caller.account_id,
+        can(var.features.eks.role_arns) ? (length(var.features.eks.role_arns) == 0 ? [module.aws.caller.account_id] : []) : [],
         try(var.features.eks.role_arns, []),
       ])
     }]
   })
+}
+
+### security/policy
+module "irsa" {
+  source         = "Young-ook/eks/aws//modules/irsa"
+  version        = "2.0.4"
+  tags           = merge(var.tags, local.default-tags)
+  name           = "spinnaker"
+  namespace      = "spinnaker"
+  serviceaccount = "default"
+  oidc_url       = module.eks.oidc.url
+  oidc_arn       = module.eks.oidc.arn
+  policy_arns = flatten(concat([
+    aws_iam_policy.bake-ami.arn,
+    aws_iam_policy.assume-roles.arn,
+    ],
+  ))
 }
 
 ### application/kubernetes
@@ -109,8 +126,6 @@ module "eks" {
   managed_node_groups       = [local.default_eks_node_group]
   policy_arns = flatten(concat([
     aws_iam_policy.ec2-read.arn,
-    aws_iam_policy.rosco-bake.arn,
-    aws_iam_policy.spin-assume.arn,
     ],
     local.s3_enabled ? [
       module.s3["enabled"].policy_arns.read,

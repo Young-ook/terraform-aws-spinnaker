@@ -29,6 +29,11 @@ output "halconfig" {
   ])
 }
 
+output "irsaconfig" {
+  description = "Bash command to apply irsa annotations"
+  value       = module.irsa.kubecli
+}
+
 output "features" {
   description = "Feature configurations of spinnaker"
   value = {

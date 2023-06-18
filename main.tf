@@ -107,9 +107,14 @@ module "irsa" {
   oidc_url       = module.eks.oidc.url
   oidc_arn       = module.eks.oidc.arn
   policy_arns = flatten(concat([
+    aws_iam_policy.ec2-read.arn,
     aws_iam_policy.bake-ami.arn,
     aws_iam_policy.assume-roles.arn,
     ],
+    local.s3_enabled ? [
+      module.s3["enabled"].policy_arns.read,
+      module.s3["enabled"].policy_arns.write,
+    ] : []
   ))
 }
 
@@ -124,14 +129,6 @@ module "eks" {
   enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
   kubernetes_version        = try(var.features.eks.version, local.default_eks_cluster["version"])
   managed_node_groups       = [local.default_eks_node_group]
-  policy_arns = flatten(concat([
-    aws_iam_policy.ec2-read.arn,
-    ],
-    local.s3_enabled ? [
-      module.s3["enabled"].policy_arns.read,
-      module.s3["enabled"].policy_arns.write,
-    ] : []
-  ))
 }
 
 ### database/aurora

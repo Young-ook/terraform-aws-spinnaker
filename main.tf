@@ -37,15 +37,7 @@ resource "aws_iam_policy" "bake-ami" {
         "ec2:DeleteSnapshot",
         "ec2:DeleteVolume",
         "ec2:DeregisterImage",
-        "ec2:DescribeImageAttribute",
-        "ec2:DescribeImages",
-        "ec2:DescribeInstances",
-        "ec2:DescribeRegions",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeSnapshots",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeTags",
-        "ec2:DescribeVolumes",
+        "ec2:Describe*",
         "ec2:DetachVolume",
         "ec2:GetPasswordData",
         "ec2:ModifyImageAttribute",
@@ -63,19 +55,6 @@ resource "aws_iam_policy" "bake-ami" {
       Effect   = "Allow"
       Resource = ["*"]
     }]
-  })
-}
-
-### security/policy
-resource "aws_iam_policy" "ec2-read" {
-  name = format("%s-ec2-read", local.name)
-  policy = jsonencode({
-    Statement = [{
-      Action   = "ec2:Describe*"
-      Effect   = "Allow"
-      Resource = ["*"]
-    }]
-    Version = "2012-10-17"
   })
 }
 
@@ -107,7 +86,6 @@ module "irsa" {
   oidc_url       = module.eks.oidc.url
   oidc_arn       = module.eks.oidc.arn
   policy_arns = flatten(concat([
-    aws_iam_policy.ec2-read.arn,
     aws_iam_policy.bake-ami.arn,
     aws_iam_policy.assume-roles.arn,
     ],

@@ -2,7 +2,7 @@
 
 locals {
   default_helm = {
-    name              = "spinnaker"
+    name              = "spin"
     repository        = join("/", [path.module, "charts"])
     chart_name        = "spinnaker"
     chart_version     = null

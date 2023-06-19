@@ -157,6 +157,27 @@ module "helm" {
   tags       = merge(var.tags, local.default-tags)
   addons = [
     {
+      repository     = "https://kubernetes-sigs.github.io/metrics-server/"
+      name           = "metrics-server"
+      chart_name     = "metrics-server"
+      namespace      = "kube-system"
+      serviceaccount = "metrics-server"
+      values = {
+        "args[0]" = "--kubelet-preferred-address-types=InternalIP"
+      }
+    },
+    {
+      repository     = "https://prometheus-community.github.io/helm-charts"
+      name           = "prometheus"
+      chart_name     = "prometheus"
+      namespace      = "prometheus"
+      serviceaccount = "prometheus"
+      values = {
+        "alertmanager.persistentVolume.storageClass" = "gp2"
+        "server.persistentVolume.storageClass"       = "gp2"
+      }
+    },
+    {
       repository        = local.default_helm["repository"]
       name              = local.default_helm["name"]
       chart_name        = local.default_helm["chart_name"]

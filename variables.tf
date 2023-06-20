@@ -12,6 +12,7 @@ variable "features" {
       version      = "1.24"
       ssm_enabled  = false
       cluster_logs = []
+      role_arns    = []
     }
     s3 = {
       enabled       = false
@@ -24,13 +25,6 @@ variable "features" {
       subnets = []
     }
   }
-}
-
-### security
-variable "assume_role_arn" {
-  description = "The list of ARNs of target AWS role that you want to manage with spinnaker. e.g.,) arn:aws:iam::12345678987:role/spinnakerManaged"
-  type        = list(string)
-  default     = []
 }
 
 ### description

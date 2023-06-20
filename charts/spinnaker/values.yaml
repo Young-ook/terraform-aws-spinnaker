@@ -16,16 +16,15 @@ halyard:
   ## Define custom settings for Spinnaker services. Read more for details:
   ## https://www.spinnaker.io/reference/halyard/custom/#custom-service-settings
   ## You can use it to add annotations for pods, override the image, etc.
-  additionalServiceSettings: {}
+  additionalServiceSettings:
     # deck.yml:
     #   artifactId: gcr.io/spinnaker-marketplace/deck:2.9.0-20190412012808
     #   kubernetes:
     #     podAnnotations:
     #       iam.amazonaws.com/role: <role_arn>
-    # clouddriver.yml:
-    #   kubernetes:
-    #     podAnnotations:
-    #       iam.amazonaws.com/role: <role_arn>
+    #clouddriver.yml:
+    #  kubernetes:
+    #    serviceAccountName: spinnaker
 
   ## Define local configuration for Spinnaker services.
   ## The contents of these files would be copies of the configuration normally retrieved from
@@ -73,7 +72,7 @@ rbac:
 
 serviceAccount:
   create: true
-  name: spinnaker
+  name: spinnaker-sa
   annotations: {}
 
 securityContext:

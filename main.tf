@@ -15,6 +15,87 @@ locals {
   } : {}
 }
 
+### security/policy
+resource "aws_iam_policy" "bake-ami" {
+  name = join("-", [local.name, "bake-ami"])
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+        "iam:PassRole",
+        "ec2:AttachVolume",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CopyImage",
+        "ec2:CreateImage",
+        "ec2:CreateKeypair",
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateSnapshot",
+        "ec2:CreateTags",
+        "ec2:CreateVolume",
+        "ec2:DeleteKeyPair",
+        "ec2:DeleteSecurityGroup",
+        "ec2:DeleteSnapshot",
+        "ec2:DeleteVolume",
+        "ec2:DeregisterImage",
+        "ec2:Describe*",
+        "ec2:DetachVolume",
+        "ec2:GetPasswordData",
+        "ec2:ModifyImageAttribute",
+        "ec2:ModifyInstanceAttribute",
+        "ec2:ModifySnapshotAttribute",
+        "ec2:RegisterImage",
+        "ec2:RunInstances",
+        "ec2:StopInstances",
+        "ec2:TerminateInstances",
+        "ec2:RequestSpotInstances",
+        "ec2:CancelSpotInstanceRequests",
+        "ec2:DescribeSpotInstanceRequests",
+        "ec2:DescribeSpotPriceHistory",
+      ]
+      Effect   = "Allow"
+      Resource = ["*"]
+    }]
+  })
+}
+
+### security/policy
+### Allow spinnaker to assume cross AWS account iam roles
+resource "aws_iam_policy" "assume-roles" {
+  name = join("-", [local.name, "assume"])
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Resource = flatten([
+        can(var.features.eks.role_arns) ? (length(var.features.eks.role_arns) == 0 ? [module.aws.caller.account_id] : []) : [],
+        try(var.features.eks.role_arns, []),
+      ])
+    }]
+  })
+}
+
+### security/policy
+module "irsa" {
+  source         = "Young-ook/eks/aws//modules/irsa"
+  version        = "2.0.4"
+  tags           = merge(var.tags, local.default-tags)
+  name           = "spinnaker"
+  namespace      = "spinnaker"
+  serviceaccount = "default"
+  oidc_url       = module.eks.oidc.url
+  oidc_arn       = module.eks.oidc.arn
+  policy_arns = flatten(concat([
+    aws_iam_policy.bake-ami.arn,
+    aws_iam_policy.assume-roles.arn,
+    ],
+    local.s3_enabled ? [
+      module.s3["enabled"].policy_arns.read,
+      module.s3["enabled"].policy_arns.write,
+    ] : []
+  ))
+}
+
 ### application/kubernetes
 module "eks" {
   source                    = "Young-ook/eks/aws"
@@ -24,18 +105,8 @@ module "eks" {
   subnets                   = try(var.features.vpc.subnets, [])
   enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
   enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
-  kubernetes_version  = try(var.features.eks.version, local.default_eks_cluster["version"])
-  managed_node_groups = [local.default_eks_node_group]
-  policy_arns = flatten(concat([
-    aws_iam_policy.ec2-read.arn,
-    aws_iam_policy.rosco-bake.arn,
-    aws_iam_policy.spin-assume.*.arn,
-    ],
-    local.s3_enabled ? [
-      module.s3["enabled"].policy_arns.read,
-      module.s3["enabled"].policy_arns.write,
-    ] : []
-  ))
+  kubernetes_version        = try(var.features.eks.version, local.default_eks_cluster["version"])
+  managed_node_groups       = [local.default_eks_node_group]
 }
 
 ### database/aurora
@@ -60,83 +131,6 @@ module "s3" {
   tags          = var.tags
   force_destroy = try(var.features.s3.force_destroy, local.default_s3_bucket["force_destroy"])
   versioning    = try(var.features.s3.versioning, local.default_s3_bucket["versioning"])
-}
-
-### security/policy
-resource "aws_iam_policy" "rosco-bake" {
-  name = format("%s-bake", local.name)
-  policy = jsonencode({
-    Statement = [{
-      Action = [
-        "iam:PassRole",
-        "ec2:AttachVolume",
-        "ec2:AuthorizeSecurityGroupIngress",
-        "ec2:CopyImage",
-        "ec2:CreateImage",
-        "ec2:CreateKeypair",
-        "ec2:CreateSecurityGroup",
-        "ec2:CreateSnapshot",
-        "ec2:CreateTags",
-        "ec2:CreateVolume",
-        "ec2:DeleteKeyPair",
-        "ec2:DeleteSecurityGroup",
-        "ec2:DeleteSnapshot",
-        "ec2:DeleteVolume",
-        "ec2:DeregisterImage",
-        "ec2:DescribeImageAttribute",
-        "ec2:DescribeImages",
-        "ec2:DescribeInstances",
-        "ec2:DescribeRegions",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeSnapshots",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeTags",
-        "ec2:DescribeVolumes",
-        "ec2:DetachVolume",
-        "ec2:GetPasswordData",
-        "ec2:ModifyImageAttribute",
-        "ec2:ModifyInstanceAttribute",
-        "ec2:ModifySnapshotAttribute",
-        "ec2:RegisterImage",
-        "ec2:RunInstances",
-        "ec2:StopInstances",
-        "ec2:TerminateInstances",
-        "ec2:RequestSpotInstances",
-        "ec2:CancelSpotInstanceRequests",
-        "ec2:DescribeSpotInstanceRequests",
-        "ec2:DescribeSpotPriceHistory",
-      ]
-      Effect   = "Allow"
-      Resource = ["*"]
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_policy" "ec2-read" {
-  name = format("%s-ec2-read", local.name)
-  policy = jsonencode({
-    Statement = [{
-      Action   = "ec2:Describe*"
-      Effect   = "Allow"
-      Resource = ["*"]
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-# assume to cross account spinnaker-managed role
-resource "aws_iam_policy" "spin-assume" {
-  count = var.assume_role_arn != null ? ((length(var.assume_role_arn) > 0) ? 1 : 0) : 0
-  name  = format("%s-assume", local.name)
-  policy = jsonencode({
-    Statement = [{
-      Action   = "sts:AssumeRole"
-      Effect   = "Allow"
-      Resource = var.assume_role_arn
-    }]
-    Version = "2012-10-17"
-  })
 }
 
 ### kubernetes-addons

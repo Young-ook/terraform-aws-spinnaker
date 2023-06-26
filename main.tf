@@ -143,8 +143,27 @@ provider "helm" {
   }
 }
 
-module "helm" {
+module "ctl" {
   depends_on = [module.eks]
+  source     = "Young-ook/eks/aws//modules/eks-addons"
+  version    = "2.0.4"
+  tags       = merge(var.tags, local.default-tags)
+  addons = [
+    {
+      name           = "aws-ebs-csi-driver"
+      namespace      = "kube-system"
+      serviceaccount = "ebs-csi-controller-sa"
+      eks_name       = module.eks.cluster.name
+      oidc           = module.eks.oidc
+      policy_arns = [
+        format("arn:%s:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy", module.aws.partition.partition),
+      ]
+    },
+  ]
+}
+
+module "helm" {
+  depends_on = [module.ctl]
   providers  = { helm = helm.spinnaker }
   source     = "Young-ook/eks/aws//modules/helm-addons"
   version    = "2.0.4"

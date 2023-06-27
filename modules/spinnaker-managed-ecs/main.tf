@@ -1,10 +1,14 @@
-## managed container cluster
+### aws partitions
+module "aws" {
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
+}
 
 ## features
 locals {
   node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
 }
 
+### cluster
 resource "aws_ecs_cluster" "cp" {
   name = local.name
   tags = merge(local.default-tags, var.tags)
@@ -24,8 +28,8 @@ resource "aws_ecs_cluster" "cp" {
   ]
 }
 
-## node groups (ng)
-# security/policy
+### node groups (ng)
+### security/policy
 resource "aws_iam_role" "ng" {
   count = local.node_groups_enabled ? 1 : 0
   name  = format("%s-ng", local.name)
@@ -35,7 +39,7 @@ resource "aws_iam_role" "ng" {
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
-        Service = [format("ec2.%s", data.aws_partition.current.dns_suffix)]
+        Service = [format("ec2.%s", module.aws.partition.dns_suffix)]
       }
     }]
     Version = "2012-10-17"
@@ -50,17 +54,17 @@ resource "aws_iam_instance_profile" "ng" {
 
 resource "aws_iam_role_policy_attachment" "ecs-ng" {
   count      = local.node_groups_enabled ? 1 : 0
-  policy_arn = format("arn:%s:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role", data.aws_partition.current.partition)
+  policy_arn = format("arn:%s:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role", module.aws.partition.partition)
   role       = aws_iam_role.ng.0.name
 }
 
 resource "aws_iam_role_policy_attachment" "ecr-read" {
   count      = local.node_groups_enabled ? 1 : 0
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", data.aws_partition.current.partition)
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", module.aws.partition.partition)
   role       = aws_iam_role.ng.0.name
 }
 
-# ecs-optimized linux
+### ecs-optimized linux
 data "aws_ami" "ecs" {
   for_each    = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   owners      = ["amazon"]
@@ -195,7 +199,7 @@ resource "aws_autoscaling_group" "ng" {
   ]
 }
 
-## capacity providers (node groups)
+#### cluster/capacity
 resource "aws_ecs_capacity_provider" "ng" {
   for_each = { for ng in var.node_groups : ng.name => ng if local.node_groups_enabled }
   name     = each.key

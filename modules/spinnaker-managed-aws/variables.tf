@@ -16,13 +16,13 @@ variable "trusted_role_arn" {
 variable "name" {
   description = "The logical name of the module instance"
   type        = string
-  default     = "spin"
+  default     = "spinnaker-managed"
 }
 
 variable "stack" {
   description = "Text used to identify stack of infrastructure components"
   type        = string
-  default     = "default"
+  default     = ""
 }
 
 variable "detail" {

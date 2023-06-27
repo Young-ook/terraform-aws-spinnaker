@@ -4,6 +4,7 @@ module "aws" {
 }
 
 locals {
+  aws_enabled    = can(var.features.eks.role_arns) ? ((length(var.features.eks.role_arns) > 0) ? true : false) : false
   aurora_enabled = try(var.features.aurora.enabled, false) ? true : false
   s3_enabled     = try(var.features.s3.enabled, false) ? true : false
   ssm_enabled    = try(var.features.eks.ssm_enabled, false) ? true : false
@@ -61,16 +62,14 @@ resource "aws_iam_policy" "bake-ami" {
 ### security/policy
 ### Allow spinnaker to assume cross AWS account iam roles
 resource "aws_iam_policy" "assume-roles" {
-  name = join("-", [local.name, "assume"])
+  for_each = local.aws_enabled ? toset(["enabled"]) : []
+  name     = join("-", [local.name, "assume"])
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Resource = flatten([
-        can(var.features.eks.role_arns) ? (length(var.features.eks.role_arns) == 0 ? [module.aws.caller.account_id] : []) : [],
-        try(var.features.eks.role_arns, []),
-      ])
+      Action   = "sts:AssumeRole"
+      Effect   = "Allow"
+      Resource = flatten([try(var.features.eks.role_arns, [])])
     }]
   })
 }
@@ -87,12 +86,14 @@ module "irsa" {
   oidc_arn       = module.eks.oidc.arn
   policy_arns = flatten(concat([
     aws_iam_policy.bake-ami.arn,
-    aws_iam_policy.assume-roles.arn,
     ],
+    local.aws_enabled ? [
+      aws_iam_policy.assume-roles["enabled"].arn,
+    ] : [],
     local.s3_enabled ? [
       module.s3["enabled"].policy_arns.read,
       module.s3["enabled"].policy_arns.write,
-    ] : []
+    ] : [],
   ))
 }
 

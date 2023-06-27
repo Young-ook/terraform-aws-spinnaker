@@ -5,6 +5,7 @@ module "frigga" {
   name    = var.name
   stack   = var.stack
   detail  = var.detail
+  petname = false
 }
 
 locals {

@@ -1,4 +1,9 @@
-# spinnaker managed
+### aws partitions
+module "aws" {
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
+}
+
+### security/policy
 resource "aws_iam_role" "spinnaker-managed" {
   name = local.name
   path = "/"
@@ -9,12 +14,12 @@ resource "aws_iam_role" "spinnaker-managed" {
       Effect = "Allow"
       Principal = {
         Service = [
-          format("ecs.%s", data.aws_partition.current.dns_suffix),
-          format("ecs-tasks.%s", data.aws_partition.current.dns_suffix),
-          format("application-autoscaling.%s", data.aws_partition.current.dns_suffix)
+          format("ecs.%s", module.aws.partition.dns_suffix),
+          format("ecs-tasks.%s", module.aws.partition.dns_suffix),
+          format("application-autoscaling.%s", module.aws.partition.dns_suffix)
         ],
         AWS = flatten([
-          data.aws_caller_identity.current.account_id,
+          module.aws.caller.account_id,
           var.trusted_role_arn,
         ])
       }
@@ -23,11 +28,12 @@ resource "aws_iam_role" "spinnaker-managed" {
   })
 }
 
-resource "aws_iam_policy" "poweruser-access" {
+resource "aws_iam_policy" "poweruser" {
   name        = format("%s-poweruser", local.name)
   description = "Poweruser Access permission for Spinnaker-Managed-Role"
   path        = "/"
   policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [
       {
         "Effect" : "Allow",
@@ -51,12 +57,11 @@ resource "aws_iam_policy" "poweruser-access" {
         "Resource" : "*"
       }
     ]
-    Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "poweruser-accs" {
-  policy_arn = aws_iam_policy.poweruser-access.arn
+resource "aws_iam_role_policy_attachment" "poweruser" {
+  policy_arn = aws_iam_policy.poweruser.arn
   role       = aws_iam_role.spinnaker-managed.id
 }
 
@@ -67,17 +72,17 @@ resource "aws_iam_role" "base-iam" {
   path  = "/"
   tags  = local.default-tags
   assume_role_policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
         Service = [
-          format("ec2.%s", data.aws_partition.current.dns_suffix),
-          format("ecs-tasks.%s", data.aws_partition.current.dns_suffix)
+          format("ec2.%s", module.aws.partition.dns_suffix),
+          format("ecs-tasks.%s", module.aws.partition.dns_suffix)
         ]
       }
     }]
-    Version = "2012-10-17"
   })
 }
 

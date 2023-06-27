@@ -1,8 +1,8 @@
 ### output variables
 
 output "role" {
-  description = "The IAM role for Spinnaker"
-  value       = module.eks.role.managed_node_groups
+  description = "IAM role for Spinnaker"
+  value       = module.irsa.arn
 }
 
 locals {

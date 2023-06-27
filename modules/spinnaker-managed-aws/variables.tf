@@ -30,3 +30,10 @@ variable "detail" {
   type        = string
   default     = ""
 }
+
+### tags
+variable "tags" {
+  description = "The key-value maps for tagging"
+  type        = map(string)
+  default     = {}
+}

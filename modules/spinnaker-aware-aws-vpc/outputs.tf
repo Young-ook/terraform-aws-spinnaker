@@ -1,4 +1,4 @@
-# output variables 
+### output variables
 
 output "vpc" {
   description = "The attributes of the secure vpc"

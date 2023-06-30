@@ -1,3 +1,5 @@
+### input variables
+
 ### network
 variable "cidr" {
   description = "The vpc CIDR (e.g. 10.0.0.0/16)"

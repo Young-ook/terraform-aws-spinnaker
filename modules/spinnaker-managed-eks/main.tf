@@ -2,7 +2,7 @@ module "eks" {
   source                    = "Young-ook/eks/aws"
   version                   = "2.0.3"
   name                      = local.name
-  tags                      = var.tags
+  tags                      = merge(local.default-tags, var.tags)
   subnets                   = var.subnets
   kubernetes_version        = var.kubernetes_version
   enabled_cluster_log_types = var.enabled_cluster_log_types

@@ -1,4 +1,4 @@
-# output variables 
+### output variables
 
 output "cluster" {
   description = "The ECS cluster attributes"

@@ -167,7 +167,7 @@ module "helm" {
   depends_on = [module.ctl]
   providers  = { helm = helm.spinnaker }
   source     = "Young-ook/eks/aws//modules/helm-addons"
-  version    = "2.0.4"
+  version    = "2.0.6"
   tags       = merge(var.tags, local.default-tags)
   addons = [
     {

@@ -78,7 +78,7 @@ resource "aws_iam_policy" "assume-roles" {
 module "irsa" {
   source         = "Young-ook/eks/aws//modules/irsa"
   version        = "2.0.4"
-  tags           = merge(var.tags, local.default-tags)
+  tags           = merge(local.default-tags, var.tags)
   name           = "spinnaker"
   namespace      = "spinnaker"
   serviceaccount = "default"
@@ -102,7 +102,7 @@ module "eks" {
   source                    = "Young-ook/eks/aws"
   version                   = "2.0.4"
   name                      = local.name
-  tags                      = merge(var.tags, local.default-tags)
+  tags                      = merge(local.default-tags, var.tags)
   subnets                   = try(var.features.vpc.subnets, [])
   enable_ssm                = try(var.features.eks.ssm_enabled, local.default_eks_cluster["ssm_enabled"])
   enabled_cluster_log_types = try(var.features.eks.cluster_logs, local.default_eks_cluster["cluster_logs"])
@@ -148,7 +148,7 @@ module "ctl" {
   depends_on = [module.eks]
   source     = "Young-ook/eks/aws//modules/eks-addons"
   version    = "2.0.4"
-  tags       = merge(var.tags, local.default-tags)
+  tags       = merge(local.default-tags, var.tags)
   addons = [
     {
       name           = "aws-ebs-csi-driver"
@@ -168,7 +168,7 @@ module "helm" {
   providers  = { helm = helm.spinnaker }
   source     = "Young-ook/eks/aws//modules/helm-addons"
   version    = "2.0.6"
-  tags       = merge(var.tags, local.default-tags)
+  tags       = merge(local.default-tags, var.tags)
   addons = [
     {
       repository     = "https://kubernetes-sigs.github.io/metrics-server/"

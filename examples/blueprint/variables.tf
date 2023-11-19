@@ -23,7 +23,7 @@ variable "cidr" {
 variable "kubernetes_version" {
   description = "The target version of kubernetes"
   type        = string
-  default     = "1.24"
+  default     = "1.28"
 }
 
 variable "kubernetes_node_groups" {

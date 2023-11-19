@@ -50,7 +50,7 @@ terraform init
 terraform apply
 ```
 
-테라폼 백엔드를 만드는 작업을 완료하면 같은 디렉토리에 테라폼 백엔드를 지정하는 코드가 생성됩니다. 파일을 열어서 보면 아래와 비슷한 형식으로 되어 있으며, 테라폼 작업 상태를 보관할 S3 버켓 정보가 있습니다. 자세한 내용은 [terraform-aws-tfstate-backend](https://github.com/Young-ook/terraform-aws-tfstate-backend) 저장소에 있습니다.
+테라폼 백엔드를 만드는 작업을 완료하면 같은 디렉토리에 테라폼 백엔드를 지정하는 코드가 생성됩니다. 파일을 열어서 보면 아래와 비슷한 형식으로 되어 있으며, 테라폼 작업 상태를 보관할 S3 버켓 정보가 있습니다. 자세한 내용은 [terraform-aws-tfstate](https://github.com/Young-ook/terraform-aws-tfstate) 저장소에 있습니다.
 ```sh
 terraform {
   backend "s3" {

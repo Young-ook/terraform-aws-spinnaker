@@ -50,7 +50,7 @@ terraform init
 terraform apply
 ```
 
-When you finish creating the Terraform backend, it will generate configuration file specifying the Terraform backend in the same directory. When you open the file, the content is similar as below. You will see The name of the S3 bucket to store the Terraform state in the generated configuration file. More information is in the [terraform-aws-tfstate-backend](https://github.com/Young-ook/terraform-aws-tfstate-backend) repository.
+When you finish creating the Terraform backend, it will generate configuration file specifying the Terraform backend in the same directory. When you open the file, the content is similar as below. You will see The name of the S3 bucket to store the Terraform state in the generated configuration file. More information is in the [terraform-aws-tfstate](https://github.com/Young-ook/terraform-aws-tfstate) repository.
 ```sh
 terraform {
   backend "s3" {

@@ -4,6 +4,16 @@ provider "aws" {
   region = var.aws_region
 }
 
+### remote terraform state
+module "tfstate" {
+  source               = "Young-ook/tfstate/aws"
+  version              = "2.0.1"
+  name                 = var.name
+  tags                 = var.tags
+  force_destroy        = true
+  generate_config_file = true
+}
+
 ### network
 module "spinnaker-aware-aws-vpc" {
   source     = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"

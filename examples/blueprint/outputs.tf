@@ -2,11 +2,7 @@ output "spinnaker" {
   description = "Attributes of generated spinnaker"
   value = {
     artifact_bucket = module.artifact.bucket.id
-    kubeconfig      = module.spinnaker.kubeconfig
+    halconfig       = module.spinnaker.halconfig
+    irsaconfig      = module.spinnaker.irsaconfig
   }
-}
-
-output "account" {
-  description = "Spinnaker managed role has PowerUser policy in your AWS account that you want manage by spinnaker"
-  value       = module.spinnaker-managed.role_arn
 }

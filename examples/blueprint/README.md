@@ -2,6 +2,9 @@
 This is Spinnaker Blueprint example helps you compose complete Spinnaker clusters that are fully bootstrapped with utilities that is needed to deploy and operate workloads. With this Spinnaker Blueprint example, you describe the configuration for the desired state of your continuous delivery platform for your application, as an Infrastructure as Code (IaC) template/blueprint. Once a blueprint is configured, you can use it to stamp out consistent environments across multiple AWS accounts and Regions using your automation workflow tool, such as Jenkins, CodePipeline. Spinnaker Blueprints also helps you implement relevant security controls needed to operate workloads from multiple teams in the same cluster.
 
 ## Setup
+### Prerequisites
+This module requires kubectl, kuberentes command line tool. If you don't have the terraform and kubernetes tools in your environment, go to the main [page](https://github.com/Young-ook/terraform-aws-spinnaker) of this repository and follow the installation instructions.
+
 ### Download
 Download this example on your workspace
 ```
@@ -24,7 +27,34 @@ terraform apply -var-file fixture.tc1.tfvars
 
 Spinnaker utilizes cross-account IAM role assuming mechanism to manage multiple AWS accounts. For more information about chained roles using AWS IAM and Security Token Service (STS), please visit the [Cloud Providers](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#cloud-providers) configuration. And follow the instructions if you wnat to enable multiple cloud providers.
 
-## Utilities
+### Access Halyard
+Halyard is a command-line tool for spinnaker setup and management.
+To access Halyard on your Spinnaker, copy and run the command **halconfig** from the terraform output. This is an example of the output for halyard access script you might see in your terminal after the terraform job is complete. You can access the halyard by copying and running the following command below *bash*.
+```
+halconfig = bash -e .terraform/module/spinnaker/scripts/halconfig.sh -r ap-northeast-2 -n spinnaker-xxxx -p spin-spinnaker-halyard-0 -k kubeconfig
+```
+
+### Access Spinnaker
+```
+export KUBECONFIG=kubeconfig
+kubectl -n spinnaker port-forward svc/spin-deck 9000:9000
+```
+![Spinnaker](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/images/cluster-management.png)
+
+## Cloud Providers
+### AWS
+Users can add AWS account to spinnaker using halyard which is the command-line tool for spinnaker management. To enable AWS account in the spinnaker, please follow the instructions in the [Spinnaker Managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-aws) example.
+
+### Amazon ECS
+And users can enable ECS account in the spinnaker using halyard. Please follow the instructions in the [Spinnaker Managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-ecs) example.
+
+### Amazon EKS
+And users can enable Kubernetes account in the spinnaker using halyard. Please follow the instructions in the [Spinnaker Managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-eks) example.
+
+## Pipelines
+### CodeBuild
+Users can set up AWS CodeBuild as a Continuous Integration (CI) system within spinnaker for cloud backed build system. For more details about codebuild project registration with spinnaker, please visit the [Enable AWS CodeBuild account](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/codebuild).
+
 ### Chaos Monkey
 [Chaos Monkey](https://netflix.github.io/chaosmonkey/) is responsible for randomly terminating instances in production to ensure that engineers implement their services to be resilient to instance failures.
 
@@ -185,6 +215,19 @@ terraform destroy --auto-approve
 ```
 terraform destroy -var-file fixture.tc1.tfvars
 ```
+
+# Known Issues
+## Requires default VPC
+You will see error message followings when attempting to run terraform apply in the spinnaker example if you deleted the default vpc on your account:
+```
+╷
+│ Error: no matching VPC found
+│
+│ with module.spinnaker.module.eks.data.aws_vpc.default,
+│ on .terraform/modules/spinnaker.eks/network.tf line 4, in data "aws_vpc" "default":
+│ 4: data "aws_vpc" "default"
+```
+This module uses eks module inside that requires default vpc on your aws account. This is the related [issue](https://github.com/Young-ook/terraform-aws-eks/issues/44). For more details, please refer to the [source](https://github.com/Young-ook/terraform-aws-eks/).
 
 # Additional Resources
 - [Spinnaker aware Amazon VPC](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-aware-aws-vpc)

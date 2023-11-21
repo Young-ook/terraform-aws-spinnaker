@@ -14,6 +14,25 @@ cd terraform-aws-spinnaker/examples/blueprint
 
 Then you are in **blueprint** directory under your current workspace. There is an exmaple that shows how to use terraform configurations to create and manage AWS resources and additional utilities, such as Amazon EKS, S3, RDS on your AWS account. Check out and apply it using terraform command. If you don't have the terraform tools in your environment, go to the main [page](https://github.com/Young-ook/terraform-aws-spinnaker) of this repository and follow the installation instructions before you move to the next step.
 
+### Terraform Backend
+Terraform backend stores and manages the state of resources created using Terraform. By defaut, without additional user configuration, it exists as a file in the local workspace that performs terraform run. This is called a local backend. This local backend is currently inconvenient to manage and share the up-to-date state of resources. So, you can use S3 and DynamoDB to support collaboration, and have a backend that keeps the state of the created resource in a storage with stability.
+```
+terraform init
+terraform apply -target module.tfstate
+```
+
+When you finish creating the Terraform backend, it will generate configuration file specifying the Terraform backend in the same directory. When you open the file, the content is similar as below. You will see The name of the S3 bucket to store the Terraform state in the generated configuration file. More information is in the [terraform-aws-tfstate](https://github.com/Young-ook/terraform-aws-tfstate) repository.
+```
+terraform {
+  backend "s3" {
+    region = "ap-northeast-2"
+    bucket = "tfstate-gyyqc"
+    key    = "state"
+  }
+}
+```
+As a new terraform remote backend has been configured for blueprint example, you need to initialize terraform environment again to store terraform state on the remote backend (Amazon S3, Amazon DynamoDB).
+
 Run terraform:
 ```
 terraform init
@@ -28,10 +47,9 @@ terraform apply -var-file fixture.tc1.tfvars
 Spinnaker utilizes cross-account IAM role assuming mechanism to manage multiple AWS accounts. For more information about chained roles using AWS IAM and Security Token Service (STS), please visit the [Cloud Providers](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/README.md#cloud-providers) configuration. And follow the instructions if you wnat to enable multiple cloud providers.
 
 ### Access Halyard
-Halyard is a command-line tool for spinnaker setup and management.
-To access Halyard on your Spinnaker, copy and run the command **halconfig** from the terraform output. This is an example of the output for halyard access script you might see in your terminal after the terraform job is complete. You can access the halyard by copying and running the following command below *bash*.
+[Spinnaker Halyard](https://github.com/spinnaker/halyard) is a command-line tool for spinnaker setup and management. To access Halyard on your Spinnaker, copy and run the command **halconfig** from the terraform output. This is an example of the output for halyard access script you might see in your terminal after the terraform job is complete. You can access the halyard by copying and running the following command below *bash*.
 ```
-halconfig = bash -e .terraform/module/spinnaker/scripts/halconfig.sh -r ap-northeast-2 -n spinnaker-xxxx -p spin-spinnaker-halyard-0 -k kubeconfig
+halconfig = bash -e .terraform/modules/spinnaker/scripts/halconfig.sh -r ap-northeast-2 -n spinnaker-xxxx -p spin-spinnaker-halyard-0 -k kubeconfig
 ```
 
 ### Access Spinnaker
@@ -208,6 +226,12 @@ terraform destroy
 
 If you don't want to see a confirmation question, you can use quite option for terraform destroy command
 ```
+terraform destroy --auto-approve
+```
+
+It may take servral menuites until delete whole Kubernetes resources including namespace from your cluster. Then, delete terraform (state) backend. Delete the **backend.tf** from your workspace and rerun terraform destroy command to delete terraform backend resources where recorded on the local terraform state file:
+```
+rm backend.tf
 terraform destroy --auto-approve
 ```
 

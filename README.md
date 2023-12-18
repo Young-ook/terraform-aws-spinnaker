@@ -69,4 +69,7 @@ terraform apply
 
 # Additional Resources
 ## Case Study
+- [Netflix](https://cd.foundation/case-studies/spinnaker-case-studies/spinnaker-case-study-netflix/)
+- [How Netflix Built Spinnaker, a High Velocity Continuous Delivery Platform](https://thenewstack.io/netflix-built-spinnaker-high-velocity-continuous-delivery-platform/)
+- [Simplifying delivery as code with Spinnaker and Kubernetes](https://aws.amazon.com/solutions/case-studies/netflix-kubernetes-reinvent2020-video/)
 - [Google Waze SRE](https://sre.google/workbook/organizational-change/)

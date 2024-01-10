@@ -1,8 +1,3 @@
-### aws partitions
-module "aws" {
-  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
-}
-
 locals {
   aws_enabled    = can(var.features.eks.role_arns) ? ((length(var.features.eks.role_arns) > 0) ? true : false) : false
   aurora_enabled = try(var.features.aurora.enabled, false) ? true : false

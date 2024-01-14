@@ -1,7 +1,4 @@
-### aws partitions
-module "aws" {
-  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
-}
+### spinnaker managed AWS
 
 ### security/policy
 resource "aws_iam_role" "spinnaker-managed" {
@@ -9,22 +6,22 @@ resource "aws_iam_role" "spinnaker-managed" {
   path = "/"
   tags = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
         Service = [
-          format("ecs.%s", module.aws.partition.dns_suffix),
-          format("ecs-tasks.%s", module.aws.partition.dns_suffix),
-          format("application-autoscaling.%s", module.aws.partition.dns_suffix)
+          format("ecs.%s", local.aws.dns),
+          format("ecs-tasks.%s", local.aws.dns),
+          format("application-autoscaling.%s", local.aws.dns)
         ],
         AWS = flatten([
-          module.aws.caller.account_id,
+          local.aws.id,
           var.trusted_role_arn,
         ])
       }
     }]
-    Version = "2012-10-17"
   })
 }
 

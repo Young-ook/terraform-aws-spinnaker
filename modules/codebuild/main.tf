@@ -1,9 +1,5 @@
 ## managed continuous integration service
 
-module "aws" {
-  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
-}
-
 locals {
   artifact    = lookup(var.project, "artifact", local.default_artifact)
   environment = lookup(var.project, "environment", local.default_environment)

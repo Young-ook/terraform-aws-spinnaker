@@ -71,8 +71,8 @@ rbac:
   pspEnabled: false
 
 serviceAccount:
-  create: true
-  name: spinnaker-sa
+  create: false
+  name: default
   annotations: {}
 
 securityContext:

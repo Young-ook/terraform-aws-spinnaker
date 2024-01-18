@@ -1,3 +1,52 @@
+### Spinnaker Halyard
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: halyard-sa
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "spinnaker.standard-labels" . | indent 4 }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "spinnaker.fullname" . }}
+  labels:
+{{ include "spinnaker.standard-labels" . | indent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+- namespace: {{ .Release.Namespace }}
+  kind: ServiceAccount
+  name: halyard-sa
+
+### Spinnaker
+#
+# Currently, the halyard does not support to deploy spinnaker microservices
+# with custom kubernetes service account.
+{{- if .Values.serviceAccount.create }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  {{- if .Values.serviceAccount.name }}
+  name: {{ .Values.serviceAccount.name }}
+  {{- else }}
+  name: {{ template "spinnaker.fullname" . }}
+  {{- end }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "spinnaker.standard-labels" . | indent 4 }}
+  {{- if .Values.serviceAccount.annotations }}
+  annotations:
+{{ toYaml .Values.serviceAccount.annotations | indent 4 }}
+  {{- end }}
+{{- end }}
+
 # In the case of a local cluster Spinnaker needs
 # to be able to deploy to all namespaces in the cluster.
 {{- if not .Values.kubeConfig.enabled }}
@@ -20,27 +69,7 @@ roleRef:
 subjects:
 - namespace: {{ .Release.Namespace }}
   kind: ServiceAccount
-  # Clouddriver does not currently allow config of its
-  # service account.
+  # Clouddriver does not currently allow config of its service account.
   name: default
 {{- end }}
 {{- end }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: {{ template "spinnaker.fullname" . }}
-  labels:
-{{ include "spinnaker.standard-labels" . | indent 4 }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: edit
-subjects:
-- namespace: {{ .Release.Namespace }}
-  kind: ServiceAccount
-  {{- if .Values.serviceAccount.name }}
-  name: {{ .Values.serviceAccount.name }}
-  {{- else }}
-  name: {{ template "spinnaker.fullname" . }}
-  {{- end }}

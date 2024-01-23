@@ -329,3 +329,8 @@ This module uses eks module inside that requires default vpc on your aws account
 - [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-aws)
 - [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-ecs)
 - [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-eks)
+- [Sailing with Spinnaker on AWS](https://aws.amazon.com/blogs/opensource/spinnaker-on-aws/)
+- [Build a Deployment Pipeline with Spinnaker on Kubernetes](https://aws.amazon.com/blogs/opensource/deployment-pipeline-spinnaker-kubernetes/)
+- [Continuous Delivery using Spinnaker on Amazon EKS](https://aws.amazon.com/blogs/opensource/continuous-delivery-spinnaker-amazon-eks/)
+- [How to integrate AWS Lambda with Spinnaker](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/)
+- [Managing Spinnaker using Spinnaker Operator in Amazon EKS](https://aws.amazon.com/blogs/opensource/managing-spinnaker-using-spinnaker-operator-in-amazon-eks/)

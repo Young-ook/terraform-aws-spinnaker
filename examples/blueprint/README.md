@@ -49,10 +49,53 @@ Spinnaker utilizes cross-account IAM role assuming mechanism to manage multiple 
 ### Access Halyard
 [Spinnaker Halyard](https://github.com/spinnaker/halyard) is a command-line tool for spinnaker setup and management. To access Halyard on your Spinnaker, copy and run the command **halconfig** from the terraform output. This is an example of the output for halyard access script you might see in your terminal after the terraform job is complete. You can access the halyard by copying and running the following command below *bash*.
 ```
-halconfig = bash -e .terraform/modules/spinnaker/scripts/halconfig.sh -r ap-northeast-2 -n spinnaker-xxxx -p spin-spinnaker-halyard-0 -k kubeconfig
+halconfig = bash -e .terraform/modules/spinnaker/scripts/halconfig.sh -r ap-northeast-2 -n spinnaker-xxxx -p spinnaker-halyard-0 -k kubeconfig
+```
+
+### Install Spinnaker
+Spinnaker version:
+```
+hal config version edit --version 1.33.0
+```
+
+Persistent storage:
+```
+echo spinnakeradmin | hal config storage s3 edit \
+    --endpoint http://spinnaker-minio:9000 \
+    --access-key-id spinnakeradmin \
+    --secret-access-key --bucket spinnaker \
+    --path-style-access true
+hal config storage edit --type s3
+```
+
+Use deck (UI) as proxy to route to gate (API):
+```
+hal config security api edit --no-validate --override-base-url /gate
+```
+
+Kubernetes providers:
+```
+hal config provider kubernetes enable
+hal config provider kubernetes account add default \
+    --context default --service-account true \
+    --omit-namespaces=kube-system,kube-public,spinnaker \
+    --provider-version v2
+```
+
+Spinnaker deployment type:
+```
+hal config deploy edit --account-name default --type distributed \
+    --location spinnaker
+```
+
+Deploy:
+```
+hal deploy apply
 ```
 
 ### Access Spinnaker
+Exit halyard interactive prompt, and run the kubectl port-forward command to establish private connection between local machine and the remote spinnaker cluster.
+
 ```
 export KUBECONFIG=kubeconfig
 kubectl -n spinnaker port-forward svc/spin-deck 9000:9000
@@ -72,6 +115,28 @@ And users can enable Kubernetes account in the spinnaker using halyard. Please f
 ## Pipelines
 ### CodeBuild
 Users can set up AWS CodeBuild as a Continuous Integration (CI) system within spinnaker for cloud backed build system. For more details about codebuild project registration with spinnaker, please visit the [Enable AWS CodeBuild account](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/codebuild).
+
+First of all, you have to enable halyard interactive mode as described in the previous step.
+Then, run halyard command for AWS CodeBuild integration:
+```
+hal config ci codebuild account add platform \
+    --region {{ AWS_REGION }} \
+    --account-id {{ AWS_ACCOUNT_ID }} \
+    --assume-role {{ SPINNAKER_ASSUMABLE_ROLE }}
+hal config ci codebuild enable
+```
+
+Also, you can enable an artifact repository:
+```
+hal config features edit --artifacts true
+hal config artifact s3 account add platform --region {{ AWS_REGION }}
+hal config artifact s3 enable
+```
+
+After configuration change, you must redeploy your spinnaker to apply the changes:
+```
+hal deploy apply
+```
 
 ### Chaos Monkey
 [Chaos Monkey](https://netflix.github.io/chaosmonkey/) is responsible for randomly terminating instances in production to ensure that engineers implement their services to be resilient to instance failures.
@@ -217,9 +282,15 @@ spec:
 ```
 ![chaosmonkey-termination](../../images/chaosmonkey-termination.png)
 
-
 ## Clean up
-Before you using terraform command to delete all resources, please check the [known issues](https://github.com/Young-ook/terraform-aws-spinnaker/tree/main#hangs-at-destroying) about uninstall. To destroy all infrastrcuture, run terraform:
+Before you using terraform command to delete all resources, please check the [known issues](https://github.com/Young-ook/terraform-aws-spinnaker/tree/main#hangs-at-destroying) about uninstall.
+
+Run halyard comment to destroy all spinnaker microservices:
+```
+hal deploy clean
+```
+
+To destroy all infrastrcuture, run terraform:
 ```
 terraform destroy
 ```

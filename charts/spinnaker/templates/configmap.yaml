@@ -21,7 +21,7 @@ data:
     rm -rf /tmp/spinnaker/.hal/default/profiles
     mkdir -p /tmp/spinnaker/.hal/default/profiles
 
-    {{- if .Values.halyard.serviceConfigs }}
+    {{- if .Values.serviceConfigs }}
     for filename in /tmp/service-configs/*; do
       basename=$(basename -- "$filename")
       fname="${basename#*_}"
@@ -41,7 +41,7 @@ metadata:
 
 {{/*
 Render settings for each service by merging predefined defaults with values passed by
-.Values.halyard.additionalServiceSettings
+.Values.additionalServiceSettings
 */}}
 {{- $settings := dict -}}
 
@@ -61,8 +61,8 @@ Render settings for each service by merging predefined defaults with values pass
 {{- $_ := set $settings "deck.yml" $deckDefaults -}}
 
 {{- /* Merge dictionaries with passed values */}}
-{{- if .Values.halyard.additionalServiceSettings -}}
-{{- $_ := mergeOverwrite $settings .Values.halyard.additionalServiceSettings -}}
+{{- if .Values.additionalServiceSettings -}}
+{{- $_ := mergeOverwrite $settings .Values.additionalServiceSettings -}}
 {{- end -}}
 
 {{- /* Convert the content of settings key to YAML string */}}
@@ -75,7 +75,7 @@ Render settings for each service by merging predefined defaults with values pass
 data:
 {{ $settings | toYaml | indent 2 }}
 
-{{ if .Values.halyard.serviceConfigs -}}
+{{ if .Values.serviceConfigs -}}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -86,12 +86,12 @@ metadata:
 
 {{/*
 Render local configuration for each service with values passed by
-.Values.halyard.serviceConfigs
+.Values.serviceConfigs
 */}}
 {{- $settings := dict -}}
 
-{{- if .Values.halyard.serviceConfigs -}}
-{{- $_ := mergeOverwrite $settings .Values.halyard.serviceConfigs -}}
+{{- if .Values.serviceConfigs -}}
+{{- $_ := mergeOverwrite $settings .Values.serviceConfigs -}}
 {{- end -}}
 
 {{- /* Convert the content of settings key to YAML string */}}

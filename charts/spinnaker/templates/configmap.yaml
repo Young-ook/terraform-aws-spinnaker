@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: halyard-init-script
+  name: {{ .Release.Name }}-halyard
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
 data:
@@ -35,7 +35,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: service-settings
+  name: {{ .Release.Name }}-halyard-service-settings
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
 
@@ -80,7 +80,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: service-configs
+  name: {{ .Release.Name }}-halyard-service-configs
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
 

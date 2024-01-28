@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: spin-halyard
+  name: {{ .Release.Name }}-halyard
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
     component: halyard
@@ -17,11 +17,11 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: spin-halyard
+  name: {{ .Release.Name }}-halyard
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
 spec:
-  serviceName: spin-halyard
+  serviceName: {{ .Release.Name }}-halyard
   replicas: 1
   selector:
     matchLabels:
@@ -107,19 +107,19 @@ spec:
       {{- if and .Values.s3.enabled .Values.s3.accessKey .Values.s3.secretKey }}
       - name: s3-secrets
         secret:
-          secretName: {{ template "spinnaker.fullname" . }}-s3
+          secretName: {{ .Release.Name }}-s3
       {{- end }}
       - name: service-settings
         configMap:
-          name: service-settings
+          name: {{ .Release.Name }}-halyard-service-settings
       {{- if .Values.serviceConfigs }}
       - name: service-configs
         configMap:
-          name: service-configs
+          name: {{ .Release.Name }}-halyard-service-configs
       {{- end }}
       - name: halyard-initscript
         configMap:
-          name: halyard-init-script
+          name: {{ .Release.Name }}-halyard
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
         {{- range .Values.image.pullSecrets }}

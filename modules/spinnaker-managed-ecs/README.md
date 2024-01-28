@@ -27,5 +27,5 @@ bash $ hal deploy apply
 For more information, please refer to [this](https://spinnaker.io/setup/install/providers/aws/aws-ecs/).
 
 # Additional Resources
-## Amazon ECS (Elastic Container Service)
 - [Amazon ECS Workshop](https://ecsworkshop.com/)
+- [Amazon ECS Scalability Best Practices](https://nathanpeck.com/amazon-ecs-scaling-best-practices/)

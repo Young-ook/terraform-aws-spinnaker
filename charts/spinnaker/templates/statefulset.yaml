@@ -1,11 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spin-halyard
+  labels:
+{{ include "spinnaker.standard-labels" . | indent 4 }}
+    component: halyard
+spec:
+  ports:
+  - port: 8064
+    name: daemon
+  clusterIP: None
+  selector:
+    app: halyard
+    component: halyard
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "spinnaker.fullname" . }}-halyard
+  name: spin-halyard
   labels:
 {{ include "spinnaker.standard-labels" . | indent 4 }}
 spec:
-  serviceName: {{ template "spinnaker.fullname" . }}-halyard
+  serviceName: spin-halyard
   replicas: 1
   selector:
     matchLabels:
@@ -14,14 +30,13 @@ spec:
   template:
     metadata:
       annotations:
-      {{- if .Values.halyard.annotations }}
-{{ toYaml .Values.halyard.annotations | indent 8 }}
+      {{- if .Values.annotations }}
+{{ toYaml .Values.annotations | indent 8 }}
       {{- end }}
       labels:
 {{ include "spinnaker.standard-labels" . | indent 8 }}
         component: halyard
     spec:
-      serviceAccountName: halyard-sa
       securityContext:
         runAsUser: {{ .Values.securityContext.runAsUser }}
         fsGroup: {{ .Values.securityContext.fsGroup }}
@@ -35,7 +50,7 @@ spec:
     {{- end }}
       initContainers:
       - name: create-halyard-local
-        image: {{ .Values.halyard.image.repository }}:{{ .Values.halyard.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         command:
         - bash
         - /tmp/initscript/init.sh
@@ -46,23 +61,23 @@ spec:
           mountPath: /tmp/spinnaker
         - name: service-settings
           mountPath: /tmp/service-settings
-        {{- if .Values.halyard.serviceConfigs }}
+        {{- if .Values.serviceConfigs }}
         - name: service-configs
           mountPath: /tmp/service-configs
         {{- end }}
-        {{- if .Values.halyard.env }}
+        {{- if .Values.env }}
         env:
-{{ toYaml .Values.halyard.env | indent 8 }}
+{{ toYaml .Values.env | indent 8 }}
         {{- end }}
       containers:
       - name: halyard
-        image: {{ .Values.halyard.image.repository }}:{{ .Values.halyard.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         ports:
         - containerPort: 8064
           name: daemon
-        {{- if .Values.halyard.resources }}
+        {{- if .Values.resources }}
         resources:
-{{ toYaml .Values.halyard.resources | indent 10 }}
+{{ toYaml .Values.resources | indent 10 }}
         {{- end }}
         volumeMounts:
         - name: halyard-home
@@ -75,12 +90,12 @@ spec:
         - name: kube-config
           mountPath: /opt/kube
         {{- end }}
-        {{- if .Values.halyard.env }}
+        {{- if .Values.env }}
         env:
-{{ toYaml .Values.halyard.env | indent 8 }}
+{{ toYaml .Values.env | indent 8 }}
         {{- end }}
       volumes:
-      {{- if not .Values.halyard.persistence.enabled }}
+      {{- if not .Values.persistence.enabled }}
       - name: halyard-home
         emptyDir: {}
       {{- end }}
@@ -97,7 +112,7 @@ spec:
       - name: service-settings
         configMap:
           name: service-settings
-      {{- if .Values.halyard.serviceConfigs }}
+      {{- if .Values.serviceConfigs }}
       - name: service-configs
         configMap:
           name: service-configs
@@ -105,13 +120,13 @@ spec:
       - name: halyard-initscript
         configMap:
           name: halyard-init-script
-      {{- if .Values.halyard.image.pullSecrets }}
+      {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
-        {{- range .Values.halyard.image.pullSecrets }}
+        {{- range .Values.image.pullSecrets }}
         - name: {{ . }}
         {{- end}}
       {{- end}}
-{{- if .Values.halyard.persistence.enabled }}
+{{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
       name: halyard-home
@@ -119,7 +134,7 @@ spec:
 {{ include "spinnaker.standard-labels-base" . | indent 8 }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      {{- with .Values.halyard.persistence.storageClass }}
+      {{- with .Values.persistence.storageClass }}
       storageClassName: {{ . }}
       {{- end }}
       resources:

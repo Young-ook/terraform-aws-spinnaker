@@ -328,5 +328,7 @@ This module uses eks module inside that requires default vpc on your aws account
 - [Sailing with Spinnaker on AWS](https://aws.amazon.com/blogs/opensource/spinnaker-on-aws/)
 - [Build a Deployment Pipeline with Spinnaker on Kubernetes](https://aws.amazon.com/blogs/opensource/deployment-pipeline-spinnaker-kubernetes/)
 - [Continuous Delivery using Spinnaker on Amazon EKS](https://aws.amazon.com/blogs/opensource/continuous-delivery-spinnaker-amazon-eks/)
-- [How to integrate AWS Lambda with Spinnaker](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/)
 - [Managing Spinnaker using Spinnaker Operator in Amazon EKS](https://aws.amazon.com/blogs/opensource/managing-spinnaker-using-spinnaker-operator-in-amazon-eks/)
+- [How to deploy Spinnaker Keel on Amazon EKS](https://aws.amazon.com/blogs/opensource/how-to-deploy-spinnaker-keel-on-amazon-eks/)
+- [How to integrate AWS Lambda with Spinnaker](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/)
+- [Enhancing Spinnaker deployment experience of AWS Lambda functions with the Lambda plugin](https://aws.amazon.com/blogs/opensource/enhancing-spinnaker-deployment-experience-of-aws-lambda-functions-with-the-lambda-plugin/)

@@ -16,3 +16,6 @@ kubeconfig
 
 # Local .DS_Store
 **/.DS_Store
+
+# local helm chart cache
+**/charts/*.tgz

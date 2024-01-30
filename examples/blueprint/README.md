@@ -325,7 +325,10 @@ You will see error message followings when attempting to run terraform apply in 
 This module uses eks module inside that requires default vpc on your aws account. This is the related [issue](https://github.com/Young-ook/terraform-aws-eks/issues/44). For more details, please refer to the [source](https://github.com/Young-ook/terraform-aws-eks/).
 
 # Additional Resources
-- [Spinnaker aware Amazon VPC](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-aware-aws-vpc)
-- [Spinnaker managed AWS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-aws)
-- [Spinnaker managed ECS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-ecs)
-- [Spinnaker managed EKS](https://github.com/Young-ook/terraform-aws-spinnaker/blob/main/modules/spinnaker-managed-eks)
+- [Sailing with Spinnaker on AWS](https://aws.amazon.com/blogs/opensource/spinnaker-on-aws/)
+- [Build a Deployment Pipeline with Spinnaker on Kubernetes](https://aws.amazon.com/blogs/opensource/deployment-pipeline-spinnaker-kubernetes/)
+- [Continuous Delivery using Spinnaker on Amazon EKS](https://aws.amazon.com/blogs/opensource/continuous-delivery-spinnaker-amazon-eks/)
+- [Managing Spinnaker using Spinnaker Operator in Amazon EKS](https://aws.amazon.com/blogs/opensource/managing-spinnaker-using-spinnaker-operator-in-amazon-eks/)
+- [How to deploy Spinnaker Keel on Amazon EKS](https://aws.amazon.com/blogs/opensource/how-to-deploy-spinnaker-keel-on-amazon-eks/)
+- [How to integrate AWS Lambda with Spinnaker](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/)
+- [Enhancing Spinnaker deployment experience of AWS Lambda functions with the Lambda plugin](https://aws.amazon.com/blogs/opensource/enhancing-spinnaker-deployment-experience-of-aws-lambda-functions-with-the-lambda-plugin/)

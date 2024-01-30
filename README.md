@@ -74,3 +74,6 @@ terraform apply
 - [Simplifying delivery as code with Spinnaker and Kubernetes](https://aws.amazon.com/solutions/case-studies/netflix-kubernetes-reinvent2020-video/)
 - [Google Waze SRE](https://sre.google/workbook/organizational-change/)
 - [AWS re:Invent 2022 - Reimagining multi-account deployments for security and speed (NFX305)](https://youtu.be/MKc9r6xOTpk)
+
+## Netflix Projects
+- [Netflix OSS](https://netflix.github.io/)
